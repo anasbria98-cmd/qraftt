@@ -1,25 +1,17 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import QRCode, { type QRCodeRenderersOptions } from "qrcode";
+import { GeneratorCustomization } from "@/components/generator/generator-customization";
 import { GeneratorFields } from "@/components/generator/generator-fields";
 import { qrTypeOptions } from "@/lib/qr/config";
+import { getDesignWarnings, type QrDesignOptions } from "@/lib/qr/design";
 import { buildQrPayload } from "@/lib/qr/payloads";
+import { drawSvgToCanvas, renderQrSvg } from "@/lib/qr/render";
 import type {
   ErrorCorrectionLevel,
   QrFormValues,
   QrType,
 } from "@/lib/qr/types";
-
-const correctionLevels: Array<{
-  label: string;
-  value: ErrorCorrectionLevel;
-}> = [
-  { label: "Low · 7%", value: "L" },
-  { label: "Medium · 15%", value: "M" },
-  { label: "Quartile · 25%", value: "Q" },
-  { label: "High · 30%", value: "H" },
-];
 
 const initialValues: QrFormValues = {
   emailBody: "",
@@ -58,10 +50,6 @@ const initialValues: QrFormValues = {
   youtube: "",
 };
 
-function addAlpha(hex: string) {
-  return `${hex}ff`;
-}
-
 function saveBlob(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob);
   const anchor = document.createElement("a");
@@ -81,46 +69,57 @@ export function QrGenerator({ initialType = "url" }: QrGeneratorProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [type, setType] = useState<QrType>(initialType);
   const [values, setValues] = useState<QrFormValues>(initialValues);
-  const [foreground, setForeground] = useState("#102a2a");
-  const [background, setBackground] = useState("#ffffff");
+  const [design, setDesign] = useState<QrDesignOptions>({
+    background: "#ffffff",
+    bodyStyle: "square",
+    eyeStyle: "square",
+    foreground: "#102a2a",
+    frame: "none",
+    gradientColor: null,
+    logoDataUrl: null,
+    logoSize: 16,
+  });
   const [errorCorrection, setErrorCorrection] =
     useState<ErrorCorrectionLevel>("M");
   const [engineError, setEngineError] = useState<string | null>(null);
   const [downloading, setDownloading] = useState<"png" | "svg" | null>(null);
 
   const result = useMemo(() => buildQrPayload(type, values), [type, values]);
-  const colorError =
-    foreground.toLowerCase() === background.toLowerCase()
-      ? "Foreground and background colors must be different."
+  const designSafety = useMemo(() => getDesignWarnings(design), [design]);
+  const designError =
+    designSafety.minimumContrast < 2.5
+      ? "Increase the contrast between the QR foreground and background colors."
       : null;
-  const validationError = result.error ?? colorError;
+  const validationError = result.error ?? designError;
   const payload = validationError ? "" : result.payload;
-
-  const renderOptions = useMemo<QRCodeRenderersOptions>(
-    () => ({
-      color: {
-        dark: addAlpha(foreground),
-        light: addAlpha(background),
-      },
-      errorCorrectionLevel: errorCorrection,
-      margin: 4,
-      width: 640,
-    }),
-    [background, errorCorrection, foreground],
-  );
+  const effectiveCorrection = design.logoDataUrl ? "H" : errorCorrection;
+  const artwork = useMemo(() => {
+    if (!payload) return { error: null, svg: "" };
+    try {
+      return {
+        error: null,
+        svg: renderQrSvg(payload, effectiveCorrection, design),
+      };
+    } catch {
+      return {
+        error: "This content is too large for the selected error correction level.",
+        svg: "",
+      };
+    }
+  }, [design, effectiveCorrection, payload]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
     const context = canvas.getContext("2d");
-    if (!payload) {
+    if (!artwork.svg) {
       context?.clearRect(0, 0, canvas.width, canvas.height);
       return;
     }
 
     let active = true;
-    QRCode.toCanvas(canvas, payload, renderOptions)
+    drawSvgToCanvas(canvas, artwork.svg, 640)
       .then(() => {
         if (active) setEngineError(null);
       })
@@ -135,7 +134,7 @@ export function QrGenerator({ initialType = "url" }: QrGeneratorProps) {
     return () => {
       active = false;
     };
-  }, [payload, renderOptions]);
+  }, [artwork.svg]);
 
   function updateValue<Key extends keyof QrFormValues>(
     key: Key,
@@ -167,11 +166,11 @@ export function QrGenerator({ initialType = "url" }: QrGeneratorProps) {
   }
 
   async function downloadPng() {
-    if (!payload || engineError) return;
+    if (!artwork.svg || engineError) return;
     setDownloading("png");
     try {
       const canvas = document.createElement("canvas");
-      await QRCode.toCanvas(canvas, payload, { ...renderOptions, width: 1_024 });
+      await drawSvgToCanvas(canvas, artwork.svg, 1_024);
       const blob = await new Promise<Blob | null>((resolve) =>
         canvas.toBlob(resolve, "image/png"),
       );
@@ -185,15 +184,13 @@ export function QrGenerator({ initialType = "url" }: QrGeneratorProps) {
   }
 
   async function downloadSvg() {
-    if (!payload || engineError) return;
+    if (!artwork.svg || engineError) return;
     setDownloading("svg");
     try {
-      const svg = await QRCode.toString(payload, {
-        ...renderOptions,
-        type: "svg",
-        width: 1_024,
-      });
-      saveBlob(new Blob([svg], { type: "image/svg+xml;charset=utf-8" }), `qraft-${type}-qr.svg`);
+      saveBlob(
+        new Blob([artwork.svg], { type: "image/svg+xml;charset=utf-8" }),
+        `qraft-${type}-qr.svg`,
+      );
     } catch {
       setEngineError("SVG export failed. Try reducing the content length.");
     } finally {
@@ -201,8 +198,8 @@ export function QrGenerator({ initialType = "url" }: QrGeneratorProps) {
     }
   }
 
-  const currentError = validationError ?? engineError;
-  const canDownload = Boolean(payload) && !engineError && !downloading;
+  const currentError = validationError ?? artwork.error ?? engineError;
+  const canDownload = Boolean(artwork.svg) && !engineError && !downloading;
 
   return (
     <section className="generator-shell" aria-labelledby="generator-title">
@@ -247,49 +244,15 @@ export function QrGenerator({ initialType = "url" }: QrGeneratorProps) {
             values={values}
           />
 
-          <div className="generator-customize">
-            <div className="color-controls">
-              <label>
-                <span className="generator-label">Foreground</span>
-                <span className="color-input-wrap">
-                  <input
-                    aria-label="QR foreground color"
-                    onChange={(event) => setForeground(event.target.value)}
-                    type="color"
-                    value={foreground}
-                  />
-                  <span>{foreground.toUpperCase()}</span>
-                </span>
-              </label>
-              <label>
-                <span className="generator-label">Background</span>
-                <span className="color-input-wrap">
-                  <input
-                    aria-label="QR background color"
-                    onChange={(event) => setBackground(event.target.value)}
-                    type="color"
-                    value={background}
-                  />
-                  <span>{background.toUpperCase()}</span>
-                </span>
-              </label>
-            </div>
-            <label className="generator-field">
-              <span className="generator-label">Error correction</span>
-              <select
-                onChange={(event) =>
-                  setErrorCorrection(event.target.value as ErrorCorrectionLevel)
-                }
-                value={errorCorrection}
-              >
-                {correctionLevels.map((level) => (
-                  <option key={level.value} value={level.value}>
-                    {level.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-          </div>
+          <GeneratorCustomization
+            design={design}
+            errorCorrection={errorCorrection}
+            onDesignChange={(updates) =>
+              setDesign((current) => ({ ...current, ...updates }))
+            }
+            onErrorCorrectionChange={setErrorCorrection}
+            warnings={designSafety.warnings}
+          />
 
           <div
             aria-live="polite"
@@ -303,16 +266,16 @@ export function QrGenerator({ initialType = "url" }: QrGeneratorProps) {
         <div className="generator-preview-panel">
           <div className="generator-preview-heading">
             <span>Live preview</span>
-            <span>{errorCorrection} correction</span>
+            <span>{effectiveCorrection} correction</span>
           </div>
           <div className="generator-canvas-wrap">
             <canvas
               aria-label={`Live ${type} QR code preview`}
-              className={!payload || engineError ? "is-empty" : undefined}
+              className={!artwork.svg || engineError ? "is-empty" : undefined}
               ref={canvasRef}
               role="img"
             />
-            {!payload || engineError ? (
+            {!artwork.svg || engineError ? (
               <p>Complete the fields to preview your QR code.</p>
             ) : null}
           </div>
