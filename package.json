@@ -9,6 +9,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:sites": "opennextjs-cloudflare build --skipWranglerConfigCheck && wrangler deploy .open-next/worker.js --dry-run --outdir .sites-worker --compatibility-date 2025-03-01 --compatibility-flags nodejs_compat --assets .open-next/assets --name qraft-qr-generator && node scripts/prepare-sites-build.mjs",
     "start": "next start",
     "lint": "eslint .",
     "test": "node --test tests/*.test.mts"
