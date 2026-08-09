@@ -14,6 +14,19 @@ interface QrTypeSelectorProps {
   selectedType: QrType;
 }
 
+const brandTypes = new Set<QrType>([
+  "whatsapp",
+  "instagram",
+  "youtube",
+  "facebook",
+  "telegram",
+  "tiktok",
+  "spotify",
+  "discord",
+  "reddit",
+  "snapchat",
+]);
+
 function matchesSearch(option: QrTypeOption, search: string) {
   const terms = [
     option.label,
@@ -111,7 +124,11 @@ export function QrTypeSelector({
 
           return (
             <section
-              className="qr-type-category"
+              className={
+                category === "Popular"
+                  ? "qr-type-category is-popular"
+                  : "qr-type-category"
+              }
               key={category}
               role="presentation"
             >
@@ -142,15 +159,28 @@ export function QrTypeSelector({
                       tabIndex={focusable ? 0 : -1}
                       type="button"
                     >
-                      <span className="qr-type-icon-wrap">
+                      <span
+                        className={
+                          brandTypes.has(option.value)
+                            ? `qr-type-icon-wrap is-brand qr-type-brand-${option.value}`
+                            : "qr-type-icon-wrap"
+                        }
+                      >
                         <QrTypeIcon type={option.value} />
                       </span>
-                      <span>{option.label}</span>
-                      {selected ? (
-                        <span aria-hidden="true" className="qr-type-selected-mark">
-                          ✓
+                      <span aria-hidden="true" className="qr-type-card-action">
+                        →
+                      </span>
+                      <span className="qr-type-card-copy">
+                        <span className="qr-type-card-label">{option.label}</span>
+                        <span className="qr-type-card-meta">
+                          {selected
+                            ? "Selected"
+                            : category === "Popular"
+                              ? "Popular format"
+                              : "QR format"}
                         </span>
-                      ) : null}
+                      </span>
                     </button>
                   );
                 })}

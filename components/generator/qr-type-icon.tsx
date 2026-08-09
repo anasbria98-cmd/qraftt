@@ -9,6 +9,7 @@ type IconName =
   | "community"
   | "file"
   | "form"
+  | "gamepad"
   | "image"
   | "link"
   | "location"
@@ -33,7 +34,7 @@ const iconByType: Record<QrType, IconName> = {
   "app-store": "app",
   "audio-url": "music",
   calendar: "calendar",
-  discord: "community",
+  discord: "gamepad",
   email: "mail",
   facebook: "user",
   "google-docs": "file",
@@ -72,6 +73,7 @@ const iconPaths: Record<IconName, string> = {
   community: "M8 12a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm8 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM3 20a5 5 0 0 1 10 0m-2 0a5 5 0 0 1 10 0",
   file: "M6 3h8l4 4v14H6V3Zm8 0v5h4M9 12h6m-6 4h6",
   form: "M6 3h12v18H6V3Zm3 5h1m3 0h3m-7 4h1m3 0h3m-7 4h1m3 0h3",
+  gamepad: "M7 8h10a4 4 0 0 1 3.7 5.5l-1.3 3.2a2 2 0 0 1-3.2.7L14.5 16h-5l-1.7 1.4a2 2 0 0 1-3.2-.7l-1.3-3.2A4 4 0 0 1 7 8Zm1 3v4m-2-2h4m6-1h.01m2 2h.01",
   image: "M4 4h16v16H4V4Zm3 12 4-4 3 3 2-2 4 4M8 8h.01",
   link: "M9 12h6M10 7H8a5 5 0 0 0 0 10h2m4-10h2a5 5 0 0 1 0 10h-2",
   location: "M12 21s6-5.2 6-11a6 6 0 1 0-12 0c0 5.8 6 11 6 11Zm0-8a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z",

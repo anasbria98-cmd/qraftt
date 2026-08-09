@@ -4,9 +4,17 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { GeneratorCustomization } from "@/components/generator/generator-customization";
 import { GeneratorFields } from "@/components/generator/generator-fields";
 import { QrTypeSelector } from "@/components/generator/qr-type-selector";
-import { getDesignWarnings, type QrDesignOptions } from "@/lib/qr/design";
+import {
+  defaultDesign,
+  getDesignWarnings,
+  type QrDesignOptions,
+} from "@/lib/qr/design";
 import { buildQrPayload } from "@/lib/qr/payloads";
-import { drawSvgToCanvas, renderQrSvg } from "@/lib/qr/render";
+import {
+  drawSvgToCanvas,
+  renderQrSvg,
+  setSvgDimensions,
+} from "@/lib/qr/render";
 import type {
   ErrorCorrectionLevel,
   QrFormValues,
@@ -81,22 +89,17 @@ interface QrGeneratorProps {
   initialType?: QrType;
 }
 
+const exportSizes = [512, 1_000, 2_000] as const;
+type ExportSize = (typeof exportSizes)[number];
+
 export function QrGenerator({ initialType = "url" }: QrGeneratorProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [type, setType] = useState<QrType>(initialType);
   const [values, setValues] = useState<QrFormValues>(initialValues);
-  const [design, setDesign] = useState<QrDesignOptions>({
-    background: "#ffffff",
-    bodyStyle: "square",
-    eyeStyle: "square",
-    foreground: "#102a2a",
-    frame: "none",
-    gradientColor: null,
-    logoDataUrl: null,
-    logoSize: 16,
-  });
+  const [design, setDesign] = useState<QrDesignOptions>(defaultDesign);
   const [errorCorrection, setErrorCorrection] =
     useState<ErrorCorrectionLevel>("M");
+  const [exportSize, setExportSize] = useState<ExportSize>(1_000);
   const [engineError, setEngineError] = useState<string | null>(null);
   const [downloading, setDownloading] = useState<"png" | "svg" | null>(null);
 
@@ -164,7 +167,7 @@ export function QrGenerator({ initialType = "url" }: QrGeneratorProps) {
     setDownloading("png");
     try {
       const canvas = document.createElement("canvas");
-      await drawSvgToCanvas(canvas, artwork.svg, 1_024);
+      await drawSvgToCanvas(canvas, artwork.svg, exportSize);
       const blob = await new Promise<Blob | null>((resolve) =>
         canvas.toBlob(resolve, "image/png"),
       );
@@ -182,7 +185,9 @@ export function QrGenerator({ initialType = "url" }: QrGeneratorProps) {
     setDownloading("svg");
     try {
       saveBlob(
-        new Blob([artwork.svg], { type: "image/svg+xml;charset=utf-8" }),
+        new Blob([setSvgDimensions(artwork.svg, exportSize)], {
+          type: "image/svg+xml;charset=utf-8",
+        }),
         `qraft-${type}-qr.svg`,
       );
     } catch {
@@ -223,6 +228,10 @@ export function QrGenerator({ initialType = "url" }: QrGeneratorProps) {
               setDesign((current) => ({ ...current, ...updates }))
             }
             onErrorCorrectionChange={setErrorCorrection}
+            onReset={() => {
+              setDesign(defaultDesign);
+              setErrorCorrection("M");
+            }}
             warnings={designSafety.warnings}
           />
 
@@ -254,6 +263,22 @@ export function QrGenerator({ initialType = "url" }: QrGeneratorProps) {
           <p className="generator-privacy-note">
             Generated in your browser. Nothing is uploaded.
           </p>
+          <label className="export-size-field">
+            <span>Export size</span>
+            <select
+              aria-label="Export resolution"
+              onChange={(event) =>
+                setExportSize(Number(event.target.value) as ExportSize)
+              }
+              value={exportSize}
+            >
+              {exportSizes.map((size) => (
+                <option key={size} value={size}>
+                  {size} × {size} px
+                </option>
+              ))}
+            </select>
+          </label>
           <div className="generator-downloads">
             <button
               className="button button-primary"

@@ -1,5 +1,9 @@
 import QRCode from "qrcode";
-import { frameLabels, type QrDesignOptions } from "./design.ts";
+import {
+  frameLabels,
+  frameVariants,
+  type QrDesignOptions,
+} from "./design.ts";
 import type { ErrorCorrectionLevel } from "./types.ts";
 
 export const QUIET_ZONE_MODULES = 4;
@@ -30,12 +34,22 @@ function renderBodyModule(
   fill: string,
 ) {
   if (style === "dots") {
-    const radius = moduleSize * 0.42;
+    const radius = moduleSize * 0.4;
+    return `<circle cx="${x + moduleSize / 2}" cy="${y + moduleSize / 2}" r="${radius}" fill="${fill}"/>`;
+  }
+
+  if (style === "circles") {
+    const radius = moduleSize * 0.47;
     return `<circle cx="${x + moduleSize / 2}" cy="${y + moduleSize / 2}" r="${radius}" fill="${fill}"/>`;
   }
 
   const inset = style === "rounded" ? moduleSize * 0.06 : 0;
-  const radius = style === "rounded" ? moduleSize * 0.28 : 0;
+  const radius =
+    style === "soft"
+      ? moduleSize * 0.48
+      : style === "rounded"
+        ? moduleSize * 0.28
+        : 0;
   return `<rect x="${x + inset}" y="${y + inset}" width="${moduleSize - inset * 2}" height="${moduleSize - inset * 2}" rx="${radius}" fill="${fill}"/>`;
 }
 
@@ -57,14 +71,52 @@ function renderEye(
     ].join("");
   }
 
-  const outerRadius = style === "rounded" ? moduleSize * 1.25 : 0;
-  const middleRadius = style === "rounded" ? moduleSize * 0.85 : 0;
-  const innerRadius = style === "rounded" ? moduleSize * 0.55 : 0;
+  const outerRadius =
+    style === "soft"
+      ? moduleSize * 2.1
+      : style === "rounded"
+        ? moduleSize * 1.25
+        : 0;
+  const middleRadius =
+    style === "soft"
+      ? moduleSize * 1.55
+      : style === "rounded"
+        ? moduleSize * 0.85
+        : 0;
+  const innerRadius =
+    style === "soft"
+      ? moduleSize * 1.15
+      : style === "rounded"
+        ? moduleSize * 0.55
+        : 0;
   return [
     `<rect data-qr-eye="${style}" x="${x}" y="${y}" width="${moduleSize * 7}" height="${moduleSize * 7}" rx="${outerRadius}" fill="${fill}"/>`,
     `<rect x="${x + moduleSize}" y="${y + moduleSize}" width="${moduleSize * 5}" height="${moduleSize * 5}" rx="${middleRadius}" fill="${background}"/>`,
     `<rect x="${x + moduleSize * 2}" y="${y + moduleSize * 2}" width="${moduleSize * 3}" height="${moduleSize * 3}" rx="${innerRadius}" fill="${fill}"/>`,
   ].join("");
+}
+
+function renderFrame(design: QrDesignOptions) {
+  if (design.frame === "none") return "";
+
+  const label = escapeXml(frameLabels[design.frame]);
+  const variant = frameVariants[design.frame];
+  const background = design.frameBackground;
+  const text = design.frameTextColor;
+
+  if (variant === "badge") {
+    return `<rect x="274" y="862" width="452" height="96" rx="48" fill="${text}"/><text x="500" y="923" text-anchor="middle" fill="${background}" font-family="Arial, sans-serif" font-size="42" font-weight="800" letter-spacing="3">${label}</text>`;
+  }
+
+  if (variant === "caption") {
+    return `<path d="M72 830H928V928Q928 968 888 968H112Q72 968 72 928Z" fill="${text}"/><text x="500" y="910" text-anchor="middle" fill="${background}" font-family="Arial, sans-serif" font-size="42" font-weight="800" letter-spacing="3">${label}</text>`;
+  }
+
+  if (variant === "ticket") {
+    return `<rect x="45" y="45" width="910" height="910" rx="58" fill="none" stroke="${text}" stroke-width="9" stroke-dasharray="22 16"/><path d="M205 850H795" stroke="${text}" stroke-width="6" stroke-linecap="round"/><text x="500" y="925" text-anchor="middle" fill="${text}" font-family="Arial, sans-serif" font-size="40" font-weight="800" letter-spacing="3">${label}</text>`;
+  }
+
+  return `<rect x="42" y="42" width="916" height="916" rx="54" fill="none" stroke="${text}" stroke-width="10"/><text x="500" y="925" text-anchor="middle" fill="${text}" font-family="Arial, sans-serif" font-size="40" font-weight="800" letter-spacing="3">${label}</text>`;
 }
 
 export function renderQrSvg(
@@ -75,9 +127,9 @@ export function renderQrSvg(
   const qr = QRCode.create(payload, { errorCorrectionLevel });
   const matrixSize = qr.modules.size;
   const framed = design.frame !== "none";
-  const qrBoxSize = framed ? 790 : VIEWBOX_SIZE;
+  const qrBoxSize = framed ? 770 : VIEWBOX_SIZE;
   const qrBoxX = (VIEWBOX_SIZE - qrBoxSize) / 2;
-  const qrBoxY = framed ? 42 : 0;
+  const qrBoxY = framed ? 64 : 0;
   const moduleSize =
     qrBoxSize / (matrixSize + QUIET_ZONE_MODULES * 2);
   const originX = qrBoxX + QUIET_ZONE_MODULES * moduleSize;
@@ -123,9 +175,7 @@ export function renderQrSvg(
   const gradient = design.gradientColor
     ? `<linearGradient id="qr-gradient" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${design.foreground}"/><stop offset="1" stop-color="${design.gradientColor}"/></linearGradient>`
     : "";
-  const frame = framed
-    ? `<rect x="20" y="20" width="960" height="960" rx="42" fill="none" stroke="${design.foreground}" stroke-width="14"/><text x="500" y="925" text-anchor="middle" fill="${design.foreground}" font-family="Arial, sans-serif" font-size="52" font-weight="700" letter-spacing="4">${escapeXml(frameLabels[design.frame])}</text>`
-    : "";
+  const frame = renderFrame(design);
 
   let logo = "";
   if (design.logoDataUrl) {
@@ -136,7 +186,16 @@ export function renderQrSvg(
     logo = `<rect x="${centerX - size / 2 - padding}" y="${centerY - size / 2 - padding}" width="${size + padding * 2}" height="${size + padding * 2}" rx="${padding}" fill="${design.background}"/><image href="${escapeXml(design.logoDataUrl)}" x="${centerX - size / 2}" y="${centerY - size / 2}" width="${size}" height="${size}" preserveAspectRatio="xMidYMid meet"/>`;
   }
 
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${VIEWBOX_SIZE}" height="${VIEWBOX_SIZE}" viewBox="0 0 ${VIEWBOX_SIZE} ${VIEWBOX_SIZE}" role="img" aria-label="QR code"><defs>${gradient}</defs><rect width="${VIEWBOX_SIZE}" height="${VIEWBOX_SIZE}" fill="${design.background}"/>${frame}<rect x="${qrBoxX}" y="${qrBoxY}" width="${qrBoxSize}" height="${qrBoxSize}" rx="${framed ? 20 : 0}" fill="${design.background}"/>${body.join("")}${eyes}${logo}</svg>`;
+  const canvasBackground = framed
+    ? design.frameBackground
+    : design.background;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${VIEWBOX_SIZE}" height="${VIEWBOX_SIZE}" viewBox="0 0 ${VIEWBOX_SIZE} ${VIEWBOX_SIZE}" role="img" aria-label="QR code"><defs>${gradient}</defs><rect width="${VIEWBOX_SIZE}" height="${VIEWBOX_SIZE}" fill="${canvasBackground}"/>${frame}<rect x="${qrBoxX}" y="${qrBoxY}" width="${qrBoxSize}" height="${qrBoxSize}" rx="${framed ? 28 : 0}" fill="${design.background}"/>${body.join("")}${eyes}${logo}</svg>`;
+}
+
+export function setSvgDimensions(svg: string, size: number) {
+  return svg
+    .replace(/width="\d+"/, `width="${size}"`)
+    .replace(/height="\d+"/, `height="${size}"`);
 }
 
 export function drawSvgToCanvas(
