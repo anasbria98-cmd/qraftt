@@ -3,6 +3,11 @@ import type { QrType } from "@/lib/qr/types";
 export interface GeneratorPageContent {
   badge: string;
   faq: ReadonlyArray<{ answer: string; question: string }>;
+  guidance?: {
+    description: string;
+    items: ReadonlyArray<{ description: string; title: string }>;
+    title: string;
+  };
   h1: string;
   howTo: ReadonlyArray<{ description: string; title: string }>;
   introduction: string;
@@ -12,6 +17,7 @@ export interface GeneratorPageContent {
   seoTitle: string;
   slug: GeneratorPageSlug;
   type: QrType;
+  topic?: string;
   useCases: ReadonlyArray<{ description: string; title: string }>;
 }
 
@@ -36,7 +42,19 @@ export type GeneratorPageSlug =
   | "menu-qr-code-generator"
   | "spotify-qr-code-generator"
   | "paypal-qr-code-generator"
-  | "pdf-qr-code-generator";
+  | "pdf-qr-code-generator"
+  | "calendar-qr-code-generator"
+  | "google-forms-qr-code-generator"
+  | "google-docs-qr-code-generator"
+  | "image-qr-code-generator"
+  | "audio-qr-code-generator"
+  | "spreadsheet-qr-code-generator"
+  | "presentation-qr-code-generator"
+  | "discord-qr-code-generator"
+  | "reddit-qr-code-generator"
+  | "amazon-qr-code-generator"
+  | "snapchat-qr-code-generator"
+  | "app-store-qr-code-generator";
 
 export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
   "qr-code-generator": {
@@ -142,6 +160,28 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
           "No server is needed to read the QR code. The device uses the embedded network details directly, although the WiFi network itself needs internet access if you expect it to provide an online connection.",
       },
     ],
+    guidance: {
+      title: "Check these details before printing a WiFi QR code",
+      description:
+        "A WiFi code is only useful when its network details match the router exactly and the finished design remains easy for guest devices to scan.",
+      items: [
+        {
+          title: "Match the SSID exactly",
+          description:
+            "Preserve capitalization, spaces, punctuation, and the hidden-network setting shown in the router configuration.",
+        },
+        {
+          title: "Use the correct security mode",
+          description:
+            "Choose WPA/WPA2, WEP, or no password based on the network itself; the wrong mode can prevent connection even with the right password.",
+        },
+        {
+          title: "Test as a new guest",
+          description:
+            "Forget the network on a phone or use a device that has never joined it, then scan the final printed code and confirm access.",
+        },
+      ],
+    },
     h1: "Free WiFi QR Code Generator",
     howTo: [
       {
@@ -164,15 +204,17 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
       "Turn a network name and password into a scannable WiFi QR code so guests can connect without typing credentials. The network details are encoded locally and directly into the static QR code.",
     label: "WiFi QR Generator",
     metaDescription:
-      "Create a free WiFi QR code for WPA, WEP, open, or hidden networks. Generate locally and download PNG or SVG without signup.",
+      "Create a free WiFi QR code for WPA/WPA2, WEP, open, or hidden networks. Encode the SSID and password locally, then download PNG or SVG.",
     related: [
       "qr-code-generator",
-      "url-qr-code-generator",
-      "vcard-qr-code-generator",
+      "menu-qr-code-generator",
+      "whatsapp-qr-code-generator",
+      "text-qr-code-generator",
     ],
-    seoTitle: "Free WiFi QR Code Generator",
+    seoTitle: "Free WiFi QR Code Generator — Share Network Access",
     slug: "wifi-qr-code-generator",
     type: "wifi",
+    topic: "WiFi QR code",
     useCases: [
       {
         title: "Cafés and restaurants",
@@ -220,6 +262,28 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
           "Yes. The QR code contains a direct wa.me destination. Once downloaded, it does not redirect through or depend on Qraft.",
       },
     ],
+    guidance: {
+      title: "Build a WhatsApp QR code people can trust",
+      description:
+        "A clear destination and a concise optional opener help people understand who they are contacting before they continue in WhatsApp.",
+      items: [
+        {
+          title: "Include the country code",
+          description:
+            "Enter the complete international number so the wa.me destination works consistently for people scanning from different countries.",
+        },
+        {
+          title: "Keep the opener useful",
+          description:
+            "Use a short message that gives context, such as the product, booking, or support topic, without collecting sensitive information.",
+        },
+        {
+          title: "Confirm the receiving account",
+          description:
+            "Scan the finished code and verify the correct person or business appears before placing it on permanent materials.",
+        },
+      ],
+    },
     h1: "Free WhatsApp QR Code Generator",
     howTo: [
       {
@@ -242,15 +306,17 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
       "Create a QR code that opens a WhatsApp conversation with the correct international number and an optional pre-filled message. The static code links directly to WhatsApp and never routes through our server.",
     label: "WhatsApp QR Generator",
     metaDescription:
-      "Create a free WhatsApp QR code with an optional pre-filled message. Direct wa.me link, local generation, and PNG or SVG downloads.",
+      "Create a free WhatsApp QR code for a phone number with an optional pre-filled message. Generate a direct wa.me link and download PNG or SVG.",
     related: [
-      "qr-code-generator",
-      "url-qr-code-generator",
+      "phone-qr-code-generator",
+      "sms-qr-code-generator",
       "vcard-qr-code-generator",
+      "instagram-qr-code-generator",
     ],
-    seoTitle: "Free WhatsApp QR Code Generator",
+    seoTitle: "Free WhatsApp QR Code Generator with Message",
     slug: "whatsapp-qr-code-generator",
     type: "whatsapp",
+    topic: "WhatsApp QR code",
     useCases: [
       {
         title: "Customer support",
@@ -268,7 +334,7 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
           "Let visitors start a structured booking request from a poster, card, or front-desk display.",
       },
       {
-        title: "Event coordination",
+        title: "Event questions and updates",
         description:
           "Give attendees a simple way to reach an organizer without manually saving a number first.",
       },
@@ -298,6 +364,28 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
           "No. The vCard is assembled and encoded in your browser. The downloaded code contains the details directly and does not require a Qraft account or server.",
       },
     ],
+    guidance: {
+      title: "Make a vCard QR code easier to save correctly",
+      description:
+        "Complete, consistent contact details reduce cleanup after a scan and help recipients recognize whose information they are adding.",
+      items: [
+        {
+          title: "Use a recognizable contact name",
+          description:
+            "Enter the name as it should appear in an address book, with the organization and job title only when they add useful context.",
+        },
+        {
+          title: "Use durable contact details",
+          description:
+            "Choose a phone number, email address, and website that are likely to remain valid for the life of the printed code.",
+        },
+        {
+          title: "Test the saved record",
+          description:
+            "Scan on both iPhone and Android when possible, save the contact, and inspect every field rather than checking only the preview.",
+        },
+      ],
+    },
     h1: "Free vCard QR Code Generator",
     howTo: [
       {
@@ -320,18 +408,20 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
       "Create a vCard QR code that lets people save structured contact details without typing them manually. Qraft builds a standards-compatible vCard 4.0 locally and embeds it directly in the static code.",
     label: "vCard QR Generator",
     metaDescription:
-      "Create a free vCard QR code for names, phone, email, company, title, and website. Private local generation with PNG and SVG downloads.",
+      "Create a free vCard QR code for a name, phone, email, company, title, and website. Generate the contact locally and download PNG or SVG.",
     related: [
-      "qr-code-generator",
       "whatsapp-qr-code-generator",
-      "url-qr-code-generator",
+      "email-qr-code-generator",
+      "phone-qr-code-generator",
+      "linkedin-qr-code-generator",
     ],
-    seoTitle: "Free vCard QR Code Generator",
+    seoTitle: "Free vCard QR Code Generator for Contact Details",
     slug: "vcard-qr-code-generator",
     type: "vcard",
+    topic: "vCard contact QR code",
     useCases: [
       {
-        title: "Business cards",
+        title: "Contact-ready business cards",
         description:
           "Add a save-ready digital contact to a traditional card without crowding the printed layout.",
       },
@@ -376,6 +466,28 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
           "The QR code itself does not expire. It will stop reaching useful content only if the destination page is removed, moved, blocked, or allowed to expire.",
       },
     ],
+    guidance: {
+      title: "Choose a URL that will keep working",
+      description:
+        "A static URL QR code cannot be edited after download, so destination quality matters as much as the visual design of the code itself.",
+      items: [
+        {
+          title: "Use the final HTTPS address",
+          description:
+            "Encode the public canonical destination rather than a temporary preview, private dashboard, or session-specific sharing link.",
+        },
+        {
+          title: "Check the mobile landing page",
+          description:
+            "Open the URL on a phone and confirm it loads quickly, presents the expected content, and does not require unintended access permissions.",
+        },
+        {
+          title: "Scan the placed asset",
+          description:
+            "Test the exported code at the real print size, viewing distance, surface, and lighting before producing a large quantity.",
+        },
+      ],
+    },
     h1: "Free URL QR Code Generator",
     howTo: [
       {
@@ -389,7 +501,7 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
           "Keep strong contrast between foreground and background, then select error correction for the intended environment.",
       },
       {
-        title: "Scan before publishing",
+        title: "Verify the final destination",
         description:
           "Test the preview and final file on more than one device before printing large quantities or permanent signage.",
       },
@@ -398,16 +510,18 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
       "Convert any HTTP or HTTPS destination into a static URL QR code with no tracking redirect. The link is encoded directly in your browser, and the downloaded PNG or SVG remains independent of Qraft.",
     label: "URL QR Generator",
     metaDescription:
-      "Create a free static URL QR code with no redirect or scan tracking. Generate locally, customize colors, and download PNG or SVG.",
+      "Create a free static URL QR code that opens a website directly with no Qraft redirect or scan tracking. Customize it and download PNG or SVG.",
     related: [
       "qr-code-generator",
-      "whatsapp-qr-code-generator",
-      "wifi-qr-code-generator",
-      "vcard-qr-code-generator",
+      "pdf-qr-code-generator",
+      "google-forms-qr-code-generator",
+      "app-store-qr-code-generator",
+      "menu-qr-code-generator",
     ],
-    seoTitle: "Free URL QR Code Generator — No Redirect",
+    seoTitle: "Free URL QR Code Generator — Direct Static Link",
     slug: "url-qr-code-generator",
     type: "url",
+    topic: "URL QR code",
     useCases: [
       {
         title: "Menus and service pages",
@@ -415,7 +529,7 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
           "Link table cards, room displays, or instructions directly to a mobile-friendly page.",
       },
       {
-        title: "Product packaging",
+        title: "Product support destinations",
         description:
           "Connect physical products to setup guides, specifications, care instructions, or warranty pages.",
       },
@@ -849,6 +963,28 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
           "No. The static code stores a direct instagram.com destination and does not pass visitors through a Qraft redirect.",
       },
     ],
+    guidance: {
+      title: "Prepare an Instagram QR code for public sharing",
+      description:
+        "The profile destination, account visibility, and final physical placement all affect whether a scan leads people to the account you intend.",
+      items: [
+        {
+          title: "Confirm the exact username",
+          description:
+            "Open the profile from its public URL and check spelling, punctuation, and account identity before generating permanent material.",
+        },
+        {
+          title: "Review profile visibility",
+          description:
+            "A private account can still be linked, but people who are not approved followers will only see what Instagram allows.",
+        },
+        {
+          title: "Give the code context",
+          description:
+            "Label the placement so people know they are opening Instagram and understand why the account is relevant to them.",
+        },
+      ],
+    },
     h1: "Free Instagram QR Code Generator",
     howTo: [
       {
@@ -862,7 +998,7 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
           "Check spelling and scan the live preview to make sure the intended account opens rather than a similar username.",
       },
       {
-        title: "Style and download",
+        title: "Prepare the profile code for placement",
         description:
           "Choose readable colors and export PNG for digital material or scalable SVG for professional printing.",
       },
@@ -871,19 +1007,20 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
       "Create a static Instagram QR code from a username or official profile URL. The direct instagram.com destination is validated and encoded locally, making it easy to connect printed and physical material to your account.",
     label: "Instagram QR Generator",
     metaDescription:
-      "Create a free Instagram QR code from a username or profile URL. Generate locally with a direct Instagram destination and download PNG or SVG.",
+      "Create a free Instagram QR code from a username or official profile URL. Generate a direct profile link locally and download PNG or SVG.",
     related: [
       "facebook-qr-code-generator",
       "tiktok-qr-code-generator",
+      "snapchat-qr-code-generator",
       "youtube-qr-code-generator",
-      "url-qr-code-generator",
     ],
-    seoTitle: "Free Instagram QR Code Generator",
+    seoTitle: "Free Instagram QR Code Generator for Profiles",
     slug: "instagram-qr-code-generator",
     type: "instagram",
+    topic: "Instagram profile QR code",
     useCases: [
       {
-        title: "Retail displays",
+        title: "In-store profile discovery",
         description:
           "Connect shoppers to product photos, launches, and account updates from counters and packaging.",
       },
@@ -1323,6 +1460,28 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
           "The static QR code itself does not expire. It continues to work while the Google review or Maps URL encoded in it remains available.",
       },
     ],
+    guidance: {
+      title: "Use a Google review QR code responsibly",
+      description:
+        "The code should make honest feedback easier without influencing what customers say or sending them to the wrong business profile.",
+      items: [
+        {
+          title: "Use the business profile’s review link",
+          description:
+            "Copy the review-request destination supplied by the correct Google Business Profile and verify the business name after scanning.",
+        },
+        {
+          title: "Ask for genuine feedback",
+          description:
+            "Present the code as a neutral invitation to share a real experience, without rewards, review gating, or pressure for a specific rating.",
+        },
+        {
+          title: "Place it after a real interaction",
+          description:
+            "Use receipts, completion cards, or checkout material where verified customers can respond at an appropriate moment.",
+        },
+      ],
+    },
     h1: "Free Google Review QR Code Generator",
     howTo: [
       {
@@ -1345,16 +1504,17 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
       "Turn an official Google review or Google Maps link into a static QR code customers can scan after a genuine visit. The validated destination is encoded locally and opens Google directly, without a Qraft redirect or review collection page.",
     label: "Google Review QR Generator",
     metaDescription:
-      "Create a free Google review QR code from an official review or Maps URL. Generate locally and download PNG or SVG with no signup.",
+      "Create a free Google Review QR code from an official Business Profile review or Maps URL. Generate locally and download PNG or SVG.",
     related: [
       "location-qr-code-generator",
       "url-qr-code-generator",
       "menu-qr-code-generator",
       "whatsapp-qr-code-generator",
     ],
-    seoTitle: "Free Google Review QR Code Generator",
+    seoTitle: "Free Google Review QR Code Generator for Business",
     slug: "google-review-qr-code-generator",
     type: "google-review",
+    topic: "Google Review QR code",
     useCases: [
       {
         title: "Receipts and checkout counters",
@@ -1402,6 +1562,28 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
           "No. Scanning opens the restaurant or menu URL encoded in the static QR code, with no Qraft redirect in between.",
       },
     ],
+    guidance: {
+      title: "Create a menu QR code guests can use comfortably",
+      description:
+        "A reliable menu destination, accessible mobile page, and well-tested table placement are more important than decorative styling alone.",
+      items: [
+        {
+          title: "Link to a mobile-friendly menu",
+          description:
+            "Use readable text, current prices, clear dietary information, and navigation that works without pinching or downloading an app.",
+        },
+        {
+          title: "Keep the destination stable",
+          description:
+            "Update content at the same public URL whenever possible so printed table cards do not need replacement after every menu change.",
+        },
+        {
+          title: "Test the table environment",
+          description:
+            "Scan the printed code under actual lighting, at seated distance, and on the material used for tables, counters, or windows.",
+        },
+      ],
+    },
     h1: "Free Menu QR Code Generator",
     howTo: [
       {
@@ -1424,16 +1606,17 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
       "Create a static menu QR code that sends guests straight to your restaurant’s public menu, ordering page, or hosted menu file. The destination is validated and encoded in the browser, so every scan opens your link without relying on Qraft.",
     label: "Menu QR Generator",
     metaDescription:
-      "Create a free menu QR code for a restaurant website or public menu URL. Generate locally and download print-ready PNG or SVG files.",
+      "Create a free restaurant menu QR code for a public digital menu or ordering URL. Generate locally and download print-ready PNG or SVG.",
     related: [
       "pdf-qr-code-generator",
       "google-review-qr-code-generator",
       "wifi-qr-code-generator",
       "url-qr-code-generator",
     ],
-    seoTitle: "Free Menu QR Code Generator for Restaurants",
+    seoTitle: "Free Restaurant Menu QR Code Generator",
     slug: "menu-qr-code-generator",
     type: "menu",
+    topic: "restaurant menu QR code",
     useCases: [
       {
         title: "Restaurant tables",
@@ -1639,6 +1822,28 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
           "The QR code does not expire, but it stops reaching the document if the hosting provider removes the file, changes its URL, or restricts public access.",
       },
     ],
+    guidance: {
+      title: "Prepare a dependable PDF QR code",
+      description:
+        "The QR code can remain scannable for years, but the document is only useful while its direct URL stays public, stable, and readable on mobile devices.",
+      items: [
+        {
+          title: "Use a direct HTTPS file URL",
+          description:
+            "Link to the PDF itself rather than a private dashboard, expiring preview, or page that requires the owner’s signed-in session.",
+        },
+        {
+          title: "Optimize the document for phones",
+          description:
+            "Keep the file size reasonable, use legible typography, and add document accessibility features where the source format allows.",
+        },
+        {
+          title: "Keep ownership of the destination",
+          description:
+            "Host the PDF somewhere you can maintain, then test the public link and final printed QR code from a separate device.",
+        },
+      ],
+    },
     h1: "Free PDF QR Code Generator",
     howTo: [
       {
@@ -1661,16 +1866,17 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
       "Create a static QR code for a PDF that is already hosted at a public web address. Qraft requires a direct URL ending in .pdf and generates the code locally, without uploading, copying, storing, or serving your document.",
     label: "PDF QR Generator",
     metaDescription:
-      "Create a free QR code for a direct public PDF URL. No file upload or hosting—generate locally and download a high-quality PNG or SVG.",
+      "Create a free PDF QR code for a direct public document URL. No file upload or hosting—generate locally and download a sharp PNG or SVG.",
     related: [
       "menu-qr-code-generator",
       "url-qr-code-generator",
-      "email-qr-code-generator",
-      "vcard-qr-code-generator",
+      "google-docs-qr-code-generator",
+      "presentation-qr-code-generator",
     ],
-    seoTitle: "Free PDF QR Code Generator — No Upload",
+    seoTitle: "Free PDF QR Code Generator — Direct Document Link",
     slug: "pdf-qr-code-generator",
     type: "pdf-link",
+    topic: "PDF QR code",
     useCases: [
       {
         title: "Product manuals",
@@ -1691,6 +1897,954 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
         title: "Restaurant PDF menus",
         description:
           "Open a hosted menu file from table cards while keeping the PDF under the restaurant’s own control.",
+      },
+    ],
+  },
+  "calendar-qr-code-generator": {
+    badge: "Standards-based calendar event",
+    faq: [
+      {
+        question: "What does a calendar QR code contain?",
+        answer:
+          "It contains an iCalendar event with a title, start and end time, plus optional location and description. Compatible scanners can offer to add those details to a calendar app.",
+      },
+      {
+        question: "Which time zone does the event use?",
+        answer:
+          "The event uses the local date and time you enter. Always scan the finished code on a device in the audience’s expected time zone and confirm the displayed time before sharing it.",
+      },
+      {
+        question: "Can the event be edited after download?",
+        answer:
+          "No. The static QR code stores the event details directly. Create and replace the code if the schedule, venue, or description changes.",
+      },
+      {
+        question: "Does Qraft create or host a calendar invitation?",
+        answer:
+          "No. The standards-compatible event payload is generated locally. The scanning device decides which calendar application handles it.",
+      },
+    ],
+    h1: "Free Calendar Event QR Code Generator",
+    howTo: [
+      {
+        title: "Enter the event details",
+        description:
+          "Add a clear title, local start and end time, and any useful venue or attendance notes.",
+      },
+      {
+        title: "Check the generated event",
+        description:
+          "Scan the live preview and confirm the calendar app shows the correct date, duration, location, and description.",
+      },
+      {
+        title: "Customize and download",
+        description:
+          "Choose a readable design, export PNG or SVG, and test the final asset on the devices your audience is likely to use.",
+      },
+    ],
+    introduction:
+      "Create a static calendar QR code containing a standards-compatible iCalendar event. The title, local start and end time, location, and description are encoded directly in your browser without hosting an event page.",
+    label: "Calendar QR Generator",
+    metaDescription:
+      "Create a free calendar event QR code with dates, times, location, and notes. Generate an iCalendar payload locally and download PNG or SVG.",
+    related: [
+      "location-qr-code-generator",
+      "email-qr-code-generator",
+      "url-qr-code-generator",
+      "text-qr-code-generator",
+    ],
+    seoTitle: "Free Calendar Event QR Code Generator",
+    slug: "calendar-qr-code-generator",
+    type: "calendar",
+    useCases: [
+      {
+        title: "Conference schedules",
+        description:
+          "Let attendees add a keynote, workshop, or networking session from badges, programs, and venue signs.",
+      },
+      {
+        title: "Appointments",
+        description:
+          "Place confirmed dates and times on printed reminders, service cards, or client handoff documents.",
+      },
+      {
+        title: "Classes and training",
+        description:
+          "Share a lesson, webinar, rehearsal, or training session with the essential timing and location included.",
+      },
+      {
+        title: "Community events",
+        description:
+          "Make public meetings, performances, and local activities easy to add without retyping their details.",
+      },
+    ],
+  },
+  "google-forms-qr-code-generator": {
+    badge: "Direct Google Forms link",
+    faq: [
+      {
+        question: "Which Google Forms links are accepted?",
+        answer:
+          "Use an official forms.gle short link or a public Google Forms response URL. Editing and administration links are not intended for respondents.",
+      },
+      {
+        question: "Does Qraft collect form responses?",
+        answer:
+          "No. Scanning opens Google Forms directly. Form access, responses, storage, and account requirements remain entirely with Google and the form owner.",
+      },
+      {
+        question: "Can a form require sign-in?",
+        answer:
+          "Yes. Google Forms settings may restrict respondents to an organization or require a Google account. Test the link while signed out when public access is required.",
+      },
+      {
+        question: "Can I change the form after printing the QR code?",
+        answer:
+          "Yes, when the response URL stays the same. If you replace the form or its link changes, generate a new static QR code.",
+      },
+    ],
+    h1: "Free Google Forms QR Code Generator",
+    howTo: [
+      {
+        title: "Copy the respondent link",
+        description:
+          "Open the form’s Send panel and copy its public response URL or official forms.gle short link.",
+      },
+      {
+        title: "Test access and settings",
+        description:
+          "Paste the link, scan the preview, and confirm the intended audience can open and submit the form.",
+      },
+      {
+        title: "Download for your touchpoint",
+        description:
+          "Export a high-contrast PNG or SVG and test the final code at its intended print or display size.",
+      },
+    ],
+    introduction:
+      "Turn an official Google Forms respondent link into a static QR code for surveys, registrations, feedback, and check-ins. The validated destination is encoded locally and opens Google Forms directly.",
+    label: "Google Forms QR Generator",
+    metaDescription:
+      "Create a free Google Forms QR code from an official public form link. Generate locally with no signup and download PNG or SVG.",
+    related: [
+      "google-docs-qr-code-generator",
+      "calendar-qr-code-generator",
+      "url-qr-code-generator",
+      "google-review-qr-code-generator",
+    ],
+    seoTitle: "Free Google Forms QR Code Generator",
+    slug: "google-forms-qr-code-generator",
+    type: "google-forms",
+    useCases: [
+      {
+        title: "Event registration",
+        description:
+          "Connect posters, invitations, and venue displays to the correct attendee registration form.",
+      },
+      {
+        title: "Customer feedback",
+        description:
+          "Invite structured feedback from receipts, table cards, product inserts, or completion notes.",
+      },
+      {
+        title: "Attendance and check-in",
+        description:
+          "Give participants a quick route to a controlled sign-in or attendance form at the venue.",
+      },
+      {
+        title: "Education surveys",
+        description:
+          "Link worksheets, slides, and classroom displays to quizzes, polls, or course feedback forms.",
+      },
+    ],
+  },
+  "google-docs-qr-code-generator": {
+    badge: "Shareable Google Docs link",
+    faq: [
+      {
+        question: "Which Google Docs URLs work?",
+        answer:
+          "Use an official docs.google.com/document link. The document’s sharing settings must allow the intended audience to view it.",
+      },
+      {
+        question: "Does Qraft copy or store the document?",
+        answer:
+          "No. Only the Google Docs URL is placed in the QR code. The document stays in Google Drive under the owner’s access controls.",
+      },
+      {
+        question: "Can I update the document later?",
+        answer:
+          "Yes. Edits made to the same Google document remain available through the printed QR code because its URL has not changed.",
+      },
+      {
+        question: "Why do some scanners see an access request?",
+        answer:
+          "Google applies the document’s current sharing policy. Check link access in a private browser window before distributing the code publicly.",
+      },
+    ],
+    h1: "Free Google Docs QR Code Generator",
+    howTo: [
+      {
+        title: "Choose the right document access",
+        description:
+          "Review Google Docs sharing settings and copy the link intended for viewers rather than an internal workspace shortcut.",
+      },
+      {
+        title: "Paste and scan the document link",
+        description:
+          "Enter the official URL and test the preview while signed out if anonymous viewing should be possible.",
+      },
+      {
+        title: "Export the QR asset",
+        description:
+          "Customize with strong contrast, then download PNG for digital use or SVG for crisp professional printing.",
+      },
+    ],
+    introduction:
+      "Create a static QR code for a shareable Google Docs document. Qraft validates the official docs.google.com destination and generates the code in your browser without copying, uploading, or hosting the file.",
+    label: "Google Docs QR Generator",
+    metaDescription:
+      "Create a free QR code for a shareable Google Docs URL. Validate the official link, generate locally, and download PNG or SVG.",
+    related: [
+      "google-forms-qr-code-generator",
+      "pdf-qr-code-generator",
+      "spreadsheet-qr-code-generator",
+      "url-qr-code-generator",
+    ],
+    seoTitle: "Free Google Docs QR Code Generator",
+    slug: "google-docs-qr-code-generator",
+    type: "google-docs",
+    useCases: [
+      {
+        title: "Living instructions",
+        description:
+          "Link equipment, rooms, and printed guides to instructions that can be updated at the same document URL.",
+      },
+      {
+        title: "Meeting notes",
+        description:
+          "Share agendas, minutes, and collaborative notes from table tents, whiteboards, or presentation slides.",
+      },
+      {
+        title: "Class resources",
+        description:
+          "Connect worksheets and classroom displays to reading material, assignments, or shared reference notes.",
+      },
+      {
+        title: "Public information",
+        description:
+          "Offer policies, schedules, and service details through a maintained document with appropriate public access.",
+      },
+    ],
+  },
+  "image-qr-code-generator": {
+    badge: "Direct public image links",
+    faq: [
+      {
+        question: "Does Qraft upload or host images?",
+        answer:
+          "No. The image must already have a public direct URL. Qraft encodes that address locally and never receives or stores the image file.",
+      },
+      {
+        question: "Which image formats are accepted?",
+        answer:
+          "Use a direct URL ending in PNG, JPG, JPEG, WebP, GIF, or AVIF. A webpage containing an image is not the same as a direct image URL.",
+      },
+      {
+        question: "What happens if the image URL changes?",
+        answer:
+          "The static QR code keeps the original address. Replace the image at that same URL or generate a new code for a different destination.",
+      },
+      {
+        question: "How do I verify that an image is public?",
+        answer:
+          "Open the direct URL in a private browser window or on another device. It should load without a login, private network, or expiring session link.",
+      },
+    ],
+    h1: "Free Image and PNG QR Code Generator",
+    howTo: [
+      {
+        title: "Publish the image at a stable URL",
+        description:
+          "Use your website or a trusted file host and obtain a direct public link ending in a supported image extension.",
+      },
+      {
+        title: "Paste and verify the image",
+        description:
+          "Enter the URL, scan the preview, and make sure the intended image opens without authentication.",
+      },
+      {
+        title: "Download and test the QR code",
+        description:
+          "Export PNG or SVG, then scan the final asset at the size and distance planned for its placement.",
+      },
+    ],
+    introduction:
+      "Create a static QR code for a PNG, JPG, WebP, GIF, or AVIF image that is already hosted at a public URL. The direct link is validated and encoded locally without uploading or storing your image.",
+    label: "Image QR Generator",
+    metaDescription:
+      "Create a free QR code for a direct public PNG, JPG, WebP, GIF, or AVIF URL. No uploads—generate locally and download PNG or SVG.",
+    related: [
+      "pdf-qr-code-generator",
+      "audio-qr-code-generator",
+      "url-qr-code-generator",
+      "presentation-qr-code-generator",
+    ],
+    seoTitle: "Free Image and PNG QR Code Generator",
+    slug: "image-qr-code-generator",
+    type: "image-url",
+    useCases: [
+      {
+        title: "Photo exhibits",
+        description:
+          "Connect captions, labels, and printed programs to a full-resolution image hosted by the creator.",
+      },
+      {
+        title: "Product diagrams",
+        description:
+          "Link packaging and equipment labels to a detailed diagram, reference image, or visual instruction.",
+      },
+      {
+        title: "Event galleries",
+        description:
+          "Share a selected public poster, map, schedule graphic, or downloadable event image.",
+      },
+      {
+        title: "Digital portfolios",
+        description:
+          "Point cards and printed work to a specific public visual without routing scans through Qraft.",
+      },
+    ],
+  },
+  "audio-qr-code-generator": {
+    badge: "Direct public audio links",
+    faq: [
+      {
+        question: "Does Qraft upload or stream audio?",
+        answer:
+          "No. The audio file stays on the public host you choose. Qraft only encodes its direct URL locally inside the QR code.",
+      },
+      {
+        question: "Which audio formats are accepted?",
+        answer:
+          "Direct URLs ending in MP3, WAV, OGG, M4A, AAC, FLAC, or WebM are supported. Streaming service pages should use their relevant platform generator instead.",
+      },
+      {
+        question: "Will audio start playing automatically?",
+        answer:
+          "Usually not. The scanner opens the audio destination, while playback behavior depends on the device, browser, file host, and user settings.",
+      },
+      {
+        question: "Can I replace the audio later?",
+        answer:
+          "Yes, if the replacement remains public at exactly the same URL. A changed address requires a new static QR code.",
+      },
+    ],
+    h1: "Free Audio URL QR Code Generator",
+    howTo: [
+      {
+        title: "Host the audio publicly",
+        description:
+          "Publish the file on a reliable HTTPS host and copy a direct URL ending in a supported audio extension.",
+      },
+      {
+        title: "Test playback access",
+        description:
+          "Paste the link and scan the preview on another device to confirm the file opens without a private login.",
+      },
+      {
+        title: "Customize and export",
+        description:
+          "Choose a high-contrast design, download PNG or SVG, and test the placed code before distribution.",
+      },
+    ],
+    introduction:
+      "Generate a static QR code for an MP3, WAV, OGG, M4A, AAC, FLAC, or WebM file already available at a public URL. Qraft validates the direct link without uploading, hosting, or streaming audio.",
+    label: "Audio QR Generator",
+    metaDescription:
+      "Create a free audio QR code for a direct public MP3, WAV, OGG, M4A, AAC, FLAC, or WebM URL. No upload; download PNG or SVG.",
+    related: [
+      "spotify-qr-code-generator",
+      "image-qr-code-generator",
+      "url-qr-code-generator",
+      "youtube-qr-code-generator",
+    ],
+    seoTitle: "Free Audio URL QR Code Generator",
+    slug: "audio-qr-code-generator",
+    type: "audio-url",
+    useCases: [
+      {
+        title: "Museum audio guides",
+        description:
+          "Place a direct narration or sound clip beside an exhibit without requiring a custom application.",
+      },
+      {
+        title: "Language learning",
+        description:
+          "Connect worksheets, flashcards, and classroom displays to pronunciation or listening exercises.",
+      },
+      {
+        title: "Music samples",
+        description:
+          "Link programs, portfolios, and physical releases to a public preview or creator-hosted recording.",
+      },
+      {
+        title: "Accessible instructions",
+        description:
+          "Offer spoken directions or explanations alongside printed signs, guides, and service materials.",
+      },
+    ],
+  },
+  "spreadsheet-qr-code-generator": {
+    badge: "Public spreadsheet links",
+    faq: [
+      {
+        question: "Which spreadsheet links are supported?",
+        answer:
+          "Use a public Excel, CSV, ODS, or official Google Sheets URL. The generator checks the file extension or recognized Google Sheets destination.",
+      },
+      {
+        question: "Does Qraft read or store spreadsheet data?",
+        answer:
+          "No. Only the destination URL is encoded. Qraft does not fetch the workbook, inspect its cells, or upload it to another service.",
+      },
+      {
+        question: "Can I update the spreadsheet after printing?",
+        answer:
+          "Yes, if the public URL stays unchanged. Updates to the same Google Sheet or replacement file remain available through the code.",
+      },
+      {
+        question: "Why does a scanner see a permission screen?",
+        answer:
+          "The host still controls access. Test the link in a private browser window and remove unintended sign-in restrictions before public distribution.",
+      },
+    ],
+    h1: "Free Excel and Spreadsheet QR Code Generator",
+    howTo: [
+      {
+        title: "Prepare a public spreadsheet link",
+        description:
+          "Use a shareable Google Sheets URL or host an Excel, CSV, or ODS file where the audience can open it.",
+      },
+      {
+        title: "Verify access and mobile usability",
+        description:
+          "Paste the destination, scan the preview, and check permissions plus readability on a phone.",
+      },
+      {
+        title: "Export the finished QR code",
+        description:
+          "Choose safe colors, download PNG or SVG, and test the final placement before sharing it widely.",
+      },
+    ],
+    introduction:
+      "Create a static QR code for a public Excel, CSV, ODS, or Google Sheets destination. The validated spreadsheet URL is encoded directly in your browser without fetching, reading, or hosting the file.",
+    label: "Spreadsheet QR Generator",
+    metaDescription:
+      "Create a free QR code for Excel, CSV, ODS, or Google Sheets URLs. Generate locally without file uploads and download PNG or SVG.",
+    related: [
+      "google-docs-qr-code-generator",
+      "presentation-qr-code-generator",
+      "pdf-qr-code-generator",
+      "url-qr-code-generator",
+    ],
+    seoTitle: "Free Excel and Spreadsheet QR Code Generator",
+    slug: "spreadsheet-qr-code-generator",
+    type: "spreadsheet-url",
+    useCases: [
+      {
+        title: "Inventory and checklists",
+        description:
+          "Connect workstations, storage areas, and field materials to a maintained tracking sheet.",
+      },
+      {
+        title: "Schedules and rosters",
+        description:
+          "Share an approved public timetable, assignment list, or event roster from printed notices.",
+      },
+      {
+        title: "Published data",
+        description:
+          "Link reports, exhibits, and research materials to a downloadable public dataset or workbook.",
+      },
+      {
+        title: "Price and order sheets",
+        description:
+          "Give authorized audiences quick access to current lists while retaining control of the hosted file.",
+      },
+    ],
+  },
+  "presentation-qr-code-generator": {
+    badge: "Public presentation links",
+    faq: [
+      {
+        question: "Which presentation URLs are supported?",
+        answer:
+          "Use a public PPT, PPTX, ODP, or official Google Slides URL. The link must be accessible to the people who will scan it.",
+      },
+      {
+        question: "Does Qraft upload or convert presentations?",
+        answer:
+          "No. Qraft encodes the public destination only. It does not receive, preview, convert, or host the presentation file.",
+      },
+      {
+        question: "Can I update the slides later?",
+        answer:
+          "Yes, when the same public URL remains valid. Editing an existing Google Slides deck or replacing a hosted file at the same address preserves the QR destination.",
+      },
+      {
+        question: "Will the presentation open in slideshow mode?",
+        answer:
+          "That depends on the URL and hosting service. Copy the published or presentation link you want viewers to see and test it before printing.",
+      },
+    ],
+    h1: "Free PPTX and Presentation QR Code Generator",
+    howTo: [
+      {
+        title: "Publish a viewable presentation",
+        description:
+          "Use a public Google Slides link or host a PPT, PPTX, or ODP file at a stable web address.",
+      },
+      {
+        title: "Paste and test the destination",
+        description:
+          "Scan the live preview on another device and confirm the correct deck opens with the intended permissions.",
+      },
+      {
+        title: "Download the QR asset",
+        description:
+          "Apply a readable design and export PNG for screens or SVG for sharp presentation and print placement.",
+      },
+    ],
+    introduction:
+      "Create a static QR code for a public PPT, PPTX, ODP, or Google Slides presentation. Qraft validates and encodes the destination locally without uploading, converting, or hosting your slide deck.",
+    label: "Presentation QR Generator",
+    metaDescription:
+      "Create a free QR code for PPT, PPTX, ODP, or Google Slides URLs. Generate locally without uploads and download PNG or SVG.",
+    related: [
+      "spreadsheet-qr-code-generator",
+      "google-docs-qr-code-generator",
+      "pdf-qr-code-generator",
+      "url-qr-code-generator",
+    ],
+    seoTitle: "Free PPTX and Presentation QR Code Generator",
+    slug: "presentation-qr-code-generator",
+    type: "presentation-url",
+    useCases: [
+      {
+        title: "Conference talks",
+        description:
+          "Share an approved slide deck from the closing slide, speaker handout, or session signage.",
+      },
+      {
+        title: "Classroom lessons",
+        description:
+          "Connect worksheets and learning spaces to slides students can review on their own devices.",
+      },
+      {
+        title: "Sales materials",
+        description:
+          "Link brochures, proposals, and booth displays to a current public product or company presentation.",
+      },
+      {
+        title: "Training resources",
+        description:
+          "Place maintained presentation material on manuals, workstation cards, and course documentation.",
+      },
+    ],
+  },
+  "discord-qr-code-generator": {
+    badge: "Official Discord destinations",
+    faq: [
+      {
+        question: "Which Discord URLs can I use?",
+        answer:
+          "Use an official discord.gg invite, discord.com/invite link, or a discord.com server/channel destination. Invalid lookalike domains are rejected.",
+      },
+      {
+        question: "Can a Discord invite expire?",
+        answer:
+          "Yes. Invite behavior is controlled by the server and may include an expiration date, usage limit, or revocation. Create a non-expiring invite when appropriate and permitted.",
+      },
+      {
+        question: "Does Qraft join or manage the server?",
+        answer:
+          "No. The QR code only opens Discord. Membership approval, community rules, moderation, and account requirements remain with Discord and the server administrators.",
+      },
+      {
+        question: "Will the Discord app open automatically?",
+        answer:
+          "A compatible device may open the installed Discord app; otherwise the official destination normally opens in a browser.",
+      },
+    ],
+    h1: "Free Discord QR Code Generator",
+    howTo: [
+      {
+        title: "Copy the official Discord destination",
+        description:
+          "Create or select the appropriate invite, server, or channel link and review its access and expiration settings.",
+      },
+      {
+        title: "Paste and verify the link",
+        description:
+          "Enter the URL and scan the preview while signed out or with a separate account to confirm the intended experience.",
+      },
+      {
+        title: "Customize and export",
+        description:
+          "Use strong contrast, download PNG or SVG, and test the final code before displaying it publicly.",
+      },
+    ],
+    introduction:
+      "Create a static Discord QR code for an official invite, server, or channel URL. The destination is validated and encoded directly in your browser, with no Qraft redirect or community management layer.",
+    label: "Discord QR Generator",
+    metaDescription:
+      "Create a free Discord QR code for an official invite, server, or channel URL. Generate locally and download customizable PNG or SVG.",
+    related: [
+      "telegram-qr-code-generator",
+      "reddit-qr-code-generator",
+      "url-qr-code-generator",
+      "instagram-qr-code-generator",
+    ],
+    seoTitle: "Free Discord QR Code Generator",
+    slug: "discord-qr-code-generator",
+    type: "discord",
+    useCases: [
+      {
+        title: "Gaming communities",
+        description:
+          "Place a managed invite on event signs, team materials, streams, and physical community merchandise.",
+      },
+      {
+        title: "Course discussion spaces",
+        description:
+          "Share the correct server or channel from approved classroom and workshop materials.",
+      },
+      {
+        title: "Event coordination",
+        description:
+          "Help attendees reach a dedicated community or support channel from badges and venue displays.",
+      },
+      {
+        title: "Product communities",
+        description:
+          "Connect packaging, documentation, and booths to an official support or enthusiast server.",
+      },
+    ],
+  },
+  "reddit-qr-code-generator": {
+    badge: "Direct Reddit links",
+    faq: [
+      {
+        question: "Which Reddit links are accepted?",
+        answer:
+          "Use an official reddit.com or redd.it URL for a community, profile, post, comment thread, or other public destination.",
+      },
+      {
+        question: "Does Qraft track Reddit visits?",
+        answer:
+          "No. The official Reddit URL is encoded directly in the static code and scans are not routed through Qraft.",
+      },
+      {
+        question: "Can age or login restrictions still appear?",
+        answer:
+          "Yes. Reddit applies its own account, content, region, age, and community visibility rules after the destination opens.",
+      },
+      {
+        question: "Can a Reddit post disappear after printing?",
+        answer:
+          "Yes. Posts, communities, and short links can be removed or restricted. The QR code remains unchanged but cannot preserve unavailable content.",
+      },
+    ],
+    h1: "Free Reddit QR Code Generator",
+    howTo: [
+      {
+        title: "Copy the public Reddit URL",
+        description:
+          "Open the community, profile, post, or discussion you want to share and copy its official link.",
+      },
+      {
+        title: "Check the destination",
+        description:
+          "Paste the URL and scan the preview to confirm it reaches the intended public Reddit content.",
+      },
+      {
+        title: "Style and download",
+        description:
+          "Keep the QR design readable, export PNG or SVG, and test the final placement with a phone.",
+      },
+    ],
+    introduction:
+      "Generate a static Reddit QR code for a public community, profile, post, or discussion URL. Qraft validates official reddit.com and redd.it destinations and encodes the link locally without tracking redirects.",
+    label: "Reddit QR Generator",
+    metaDescription:
+      "Create a free Reddit QR code for a community, profile, post, or discussion URL. Direct local generation with PNG and SVG downloads.",
+    related: [
+      "discord-qr-code-generator",
+      "telegram-qr-code-generator",
+      "url-qr-code-generator",
+      "youtube-qr-code-generator",
+    ],
+    seoTitle: "Free Reddit QR Code Generator",
+    slug: "reddit-qr-code-generator",
+    type: "reddit",
+    useCases: [
+      {
+        title: "Community promotion",
+        description:
+          "Make an appropriate public subreddit easier to find from flyers, meetups, and printed resources.",
+      },
+      {
+        title: "Discussion references",
+        description:
+          "Connect a presentation, article, or workshop handout to a relevant public thread.",
+      },
+      {
+        title: "Creator participation",
+        description:
+          "Share an official AMA, announcement, or discussion from event and campaign materials.",
+      },
+      {
+        title: "Support resources",
+        description:
+          "Link product guides or community documentation to a maintained public Reddit resource.",
+      },
+    ],
+  },
+  "amazon-qr-code-generator": {
+    badge: "Official Amazon destinations",
+    faq: [
+      {
+        question: "Which Amazon links can I use?",
+        answer:
+          "Use a public product or storefront URL on a supported official Amazon country domain, or an official amzn.to short link.",
+      },
+      {
+        question: "Does Qraft sell or fulfill products?",
+        answer:
+          "No. Qraft only encodes the Amazon URL. Product information, availability, pricing, purchases, returns, and accounts are handled by Amazon and the seller.",
+      },
+      {
+        question: "Can product prices change after printing?",
+        answer:
+          "Yes. The code opens the current Amazon page, whose price, seller, inventory, and availability may change independently.",
+      },
+      {
+        question: "Are affiliate links supported?",
+        answer:
+          "A valid official Amazon URL can retain its existing query parameters. Anyone using affiliate links remains responsible for required disclosures and program rules.",
+      },
+    ],
+    h1: "Free Amazon QR Code Generator",
+    howTo: [
+      {
+        title: "Copy the Amazon destination",
+        description:
+          "Open the intended product or storefront on the correct regional Amazon site and copy its public URL.",
+      },
+      {
+        title: "Verify product and region",
+        description:
+          "Paste the link, scan the preview, and confirm the correct listing, seller context, and country store open.",
+      },
+      {
+        title: "Download the finished code",
+        description:
+          "Customize for clear scanning, export PNG or SVG, and test the final asset before distribution.",
+      },
+    ],
+    introduction:
+      "Create a static QR code for a public Amazon product or storefront on an official regional domain. The direct destination is validated and generated locally; Qraft does not sell products or process purchases.",
+    label: "Amazon QR Generator",
+    metaDescription:
+      "Create a free Amazon QR code for an official product or storefront URL. Generate locally with no redirects and download PNG or SVG.",
+    related: [
+      "url-qr-code-generator",
+      "image-qr-code-generator",
+      "paypal-qr-code-generator",
+      "google-review-qr-code-generator",
+    ],
+    seoTitle: "Free Amazon Product QR Code Generator",
+    slug: "amazon-qr-code-generator",
+    type: "amazon",
+    useCases: [
+      {
+        title: "Product packaging",
+        description:
+          "Connect inserts and labels to the matching official product detail page or storefront listing.",
+      },
+      {
+        title: "Retail displays",
+        description:
+          "Offer an online product destination from a shelf card or demonstration while clearly identifying the retailer.",
+      },
+      {
+        title: "Author and creator promotion",
+        description:
+          "Link event cards, books, and merchandise materials to an official Amazon listing or store page.",
+      },
+      {
+        title: "Product comparison handouts",
+        description:
+          "Give readers a direct route to a referenced listing while allowing Amazon to show current availability.",
+      },
+    ],
+  },
+  "snapchat-qr-code-generator": {
+    badge: "Official Snapchat links",
+    faq: [
+      {
+        question: "Which Snapchat links can I use?",
+        answer:
+          "Use an official snapchat.com URL for a profile, shared destination, Lens, Spotlight item, or other supported public Snapchat path.",
+      },
+      {
+        question: "Is this the same as a Snapcode?",
+        answer:
+          "No. This is a standard QR code containing an official Snapchat URL. Snapchat controls its separate Snapcode format and in-app behavior.",
+      },
+      {
+        question: "Will scanning open the Snapchat app?",
+        answer:
+          "A compatible device may open Snapchat when installed. Otherwise the destination typically opens through a browser or app-install flow.",
+      },
+      {
+        question: "Does Qraft access my Snapchat account?",
+        answer:
+          "No. No login or account connection is used. The public Snapchat URL is validated and encoded locally in the static QR code.",
+      },
+    ],
+    h1: "Free Snapchat QR Code Generator",
+    howTo: [
+      {
+        title: "Copy the Snapchat destination",
+        description:
+          "Use Snapchat’s sharing tools to copy the official profile, Lens, Spotlight, or shared-content URL.",
+      },
+      {
+        title: "Paste and test the link",
+        description:
+          "Scan the live preview on a phone and confirm the intended public destination opens correctly.",
+      },
+      {
+        title: "Customize and export",
+        description:
+          "Choose a readable design, then download PNG for digital material or SVG for scalable print use.",
+      },
+    ],
+    introduction:
+      "Create a static Snapchat QR code for an official profile, Lens, Spotlight, or shared destination URL. The link is validated and encoded locally without connecting to your Snapchat account.",
+    label: "Snapchat QR Generator",
+    metaDescription:
+      "Create a free Snapchat QR code for an official profile or shared destination URL. Generate locally and download PNG or SVG.",
+    related: [
+      "instagram-qr-code-generator",
+      "tiktok-qr-code-generator",
+      "discord-qr-code-generator",
+      "url-qr-code-generator",
+    ],
+    seoTitle: "Free Snapchat QR Code Generator",
+    slug: "snapchat-qr-code-generator",
+    type: "snapchat",
+    useCases: [
+      {
+        title: "Creator promotion",
+        description:
+          "Connect portfolio cards, event materials, and merchandise to an official public Snapchat destination.",
+      },
+      {
+        title: "Brand campaigns",
+        description:
+          "Link packaging and displays to a profile, Lens, or approved shared experience on Snapchat.",
+      },
+      {
+        title: "Events and venues",
+        description:
+          "Make an official profile or event-related destination easy to open from posters and photo areas.",
+      },
+      {
+        title: "Printed profiles",
+        description:
+          "Add a direct Snapchat route to cards, media kits, and other materials without asking people to search.",
+      },
+    ],
+  },
+  "app-store-qr-code-generator": {
+    badge: "Official app listing links",
+    faq: [
+      {
+        question: "Which app store links are accepted?",
+        answer:
+          "Use an official apps.apple.com Apple App Store listing or a play.google.com/store/apps/details Google Play listing with a valid app identifier.",
+      },
+      {
+        question: "Can one QR code choose the store automatically?",
+        answer:
+          "This static generator encodes one direct store URL. Use the listing appropriate for your audience, or create separate Apple and Google Play codes.",
+      },
+      {
+        question: "Does Qraft install or distribute the app?",
+        answer:
+          "No. Scanning opens the official store listing. Installation, purchases, subscriptions, compatibility, and account requirements stay with Apple, Google, and the app publisher.",
+      },
+      {
+        question: "Will the QR code expire when the app updates?",
+        answer:
+          "Usually not if the store listing URL remains the same. The destination can stop working if the app is removed or its official listing changes.",
+      },
+    ],
+    h1: "Free App Store and Google Play QR Code Generator",
+    howTo: [
+      {
+        title: "Copy the official app listing",
+        description:
+          "Open the app in Apple’s App Store or Google Play and copy its public store URL.",
+      },
+      {
+        title: "Verify the app and platform",
+        description:
+          "Paste the link and scan the preview to confirm the correct publisher, app, region, and store open.",
+      },
+      {
+        title: "Download for promotion",
+        description:
+          "Customize with strong contrast, export PNG or SVG, and test the final code on the target platform.",
+      },
+    ],
+    introduction:
+      "Create a static QR code for an official Apple App Store or Google Play app listing. The store destination is validated and encoded directly in your browser without an account, redirect, or app-install service.",
+    label: "App Store QR Generator",
+    metaDescription:
+      "Create a free QR code for an Apple App Store or Google Play app listing. Validate the official URL and download PNG or SVG.",
+    related: [
+      "url-qr-code-generator",
+      "google-forms-qr-code-generator",
+      "youtube-qr-code-generator",
+      "image-qr-code-generator",
+    ],
+    seoTitle: "Free App Store and Google Play QR Generator",
+    slug: "app-store-qr-code-generator",
+    type: "app-store",
+    useCases: [
+      {
+        title: "Product packaging",
+        description:
+          "Help customers reach the correct companion app from setup cards, labels, and manuals.",
+      },
+      {
+        title: "Retail and event displays",
+        description:
+          "Promote an official app listing from booths, posters, counters, and demonstration areas.",
+      },
+      {
+        title: "Print campaigns",
+        description:
+          "Connect flyers, magazines, and direct mail to the relevant Apple or Google store destination.",
+      },
+      {
+        title: "Onboarding material",
+        description:
+          "Place the correct installation link on welcome packs, training guides, and device setup instructions.",
       },
     ],
   },

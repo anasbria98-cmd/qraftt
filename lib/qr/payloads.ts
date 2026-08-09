@@ -257,6 +257,100 @@ function buildLocationPayload(values: QrFormValues): QrPayloadResult {
   };
 }
 
+function escapeCalendarText(value: string) {
+  return value
+    .replace(/\\/g, "\\\\")
+    .replace(/\r?\n/g, "\\n")
+    .replace(/,/g, "\\,")
+    .replace(/;/g, "\\;");
+}
+
+function normalizeCalendarDate(value: string, label: string): QrPayloadResult {
+  const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/.exec(value);
+  if (!match) return invalid(`Enter a valid ${label} date and time.`);
+
+  const [, year, month, day, hour, minute] = match;
+  const date = new Date(
+    Number(year),
+    Number(month) - 1,
+    Number(day),
+    Number(hour),
+    Number(minute),
+  );
+  const valid =
+    date.getFullYear() === Number(year) &&
+    date.getMonth() === Number(month) - 1 &&
+    date.getDate() === Number(day) &&
+    date.getHours() === Number(hour) &&
+    date.getMinutes() === Number(minute);
+
+  return valid
+    ? { error: null, payload: `${year}${month}${day}T${hour}${minute}00` }
+    : invalid(`Enter a valid ${label} date and time.`);
+}
+
+function createStableCalendarId(value: string) {
+  let hash = 2_166_136_261;
+  for (const character of value) {
+    hash ^= character.charCodeAt(0);
+    hash = Math.imul(hash, 16_777_619);
+  }
+  return `${(hash >>> 0).toString(16)}@qraft.local`;
+}
+
+function buildCalendarPayload(values: QrFormValues): QrPayloadResult {
+  const title = values.calendarTitle.trim();
+  if (!title) return invalid("Enter an event title.");
+  if (title.length > 200) return invalid("Keep the event title under 200 characters.");
+  if (values.calendarLocation.length > 300) {
+    return invalid("Keep the event location under 300 characters.");
+  }
+  if (values.calendarDescription.length > 1_000) {
+    return invalid("Keep the event description under 1,000 characters.");
+  }
+
+  const start = normalizeCalendarDate(values.calendarStart, "start");
+  if (start.error) return start;
+  const end = normalizeCalendarDate(values.calendarEnd, "end");
+  if (end.error) return end;
+  if (end.payload <= start.payload) {
+    return invalid("The event end must be after the start.");
+  }
+
+  const identity = [title, start.payload, end.payload, values.calendarLocation].join("|");
+  const timestamp = new Date()
+    .toISOString()
+    .replace(/[-:]/g, "")
+    .replace(/\.\d{3}/, "");
+  const lines = [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//Qraft//Static QR Event//EN",
+    "CALSCALE:GREGORIAN",
+    "BEGIN:VEVENT",
+    `UID:${createStableCalendarId(identity)}`,
+    `DTSTAMP:${timestamp}`,
+    `DTSTART:${start.payload}`,
+    `DTEND:${end.payload}`,
+    `SUMMARY:${escapeCalendarText(title)}`,
+  ];
+
+  if (values.calendarLocation.trim()) {
+    lines.push(`LOCATION:${escapeCalendarText(values.calendarLocation.trim())}`);
+  }
+  if (values.calendarDescription.trim()) {
+    lines.push(
+      `DESCRIPTION:${escapeCalendarText(values.calendarDescription.trim())}`,
+    );
+  }
+  lines.push("END:VEVENT", "END:VCALENDAR");
+
+  return {
+    error: null,
+    payload: `${lines.map(foldVCardLine).join("\r\n")}\r\n`,
+  };
+}
+
 function isClearlyPrivateHostname(hostname: string) {
   const host = hostname.toLowerCase().replace(/^\[|\]$/g, "");
   if (host === "localhost" || host === "::1" || host.endsWith(".local")) {
@@ -348,6 +442,53 @@ function isPayPalUrl(url: URL) {
   return false;
 }
 
+function isGoogleFormsUrl(url: URL) {
+  const hostname = url.hostname.toLowerCase().replace(/^www\./, "");
+  if (hostname === "forms.gle") return url.pathname !== "/";
+  if (hostname !== "docs.google.com") return false;
+  return /^\/forms\/(?:u\/\d+\/)?d\/(?:e\/)?[a-z\d_-]+\/(?:viewform|prefill|formresponse)\/?$/i.test(
+    url.pathname,
+  );
+}
+
+function isGoogleDocsUrl(url: URL) {
+  return (
+    url.hostname.toLowerCase() === "docs.google.com" &&
+    /^\/document\/d\/(?:e\/)?[a-z\d_-]+(?:\/|$)/i.test(url.pathname)
+  );
+}
+
+function hasFileExtension(url: URL, extensions: readonly string[]) {
+  const pathname = url.pathname.toLowerCase();
+  return extensions.some((extension) => pathname.endsWith(`.${extension}`));
+}
+
+function isGoogleSheetsUrl(url: URL) {
+  return (
+    url.hostname.toLowerCase() === "docs.google.com" &&
+    /^\/spreadsheets\/d\/[a-z\d_-]+(?:\/|$)/i.test(url.pathname)
+  );
+}
+
+function isGoogleSlidesUrl(url: URL) {
+  return (
+    url.hostname.toLowerCase() === "docs.google.com" &&
+    /^\/presentation\/d\/[a-z\d_-]+(?:\/|$)/i.test(url.pathname)
+  );
+}
+
+function isAppStoreUrl(url: URL) {
+  const hostname = url.hostname.toLowerCase().replace(/^www\./, "");
+  if (hostname === "apps.apple.com" || hostname === "itunes.apple.com") {
+    return /\/app(?:\/[^/]+)?\/id\d+(?:\/|$)/i.test(url.pathname);
+  }
+  return (
+    hostname === "play.google.com" &&
+    url.pathname === "/store/apps/details" &&
+    /^[a-z\d_.]+$/i.test(url.searchParams.get("id") ?? "")
+  );
+}
+
 function buildLinkPayload(
   type: LinkQrType,
   values: QrFormValues,
@@ -379,9 +520,62 @@ function buildLinkPayload(
       return /\.pdf$/i.test(url.pathname)
         ? normalized
         : invalid("Use a direct public URL ending in .pdf.");
+    case "google-forms":
+      return isGoogleFormsUrl(url)
+        ? normalized
+        : invalid("Use a public URL on forms.gle or Google Forms.");
+    case "google-docs":
+      return isGoogleDocsUrl(url)
+        ? normalized
+        : invalid("Use an official Google Docs document URL.");
+    case "image-url":
+      return hasFileExtension(url, ["png", "jpg", "jpeg", "webp", "gif", "avif"])
+        ? normalized
+        : invalid("Use a direct public PNG, JPG, WebP, GIF, or AVIF URL.");
+    case "audio-url":
+      return hasFileExtension(url, ["mp3", "wav", "ogg", "m4a", "aac", "flac", "webm"])
+        ? normalized
+        : invalid("Use a direct public MP3, WAV, OGG, M4A, AAC, FLAC, or WebM URL.");
+    case "spreadsheet-url":
+      return isGoogleSheetsUrl(url) ||
+        hasFileExtension(url, ["xls", "xlsx", "csv", "ods"])
+        ? normalized
+        : invalid("Use a public Excel, CSV, ODS, or Google Sheets URL.");
+    case "presentation-url":
+      return isGoogleSlidesUrl(url) ||
+        hasFileExtension(url, ["ppt", "pptx", "odp"])
+        ? normalized
+        : invalid("Use a public PPT, PPTX, ODP, or Google Slides URL.");
+    case "app-store":
+      return isAppStoreUrl(url)
+        ? normalized
+        : invalid("Use an official Apple App Store or Google Play app URL.");
     case "menu":
       return normalized;
   }
+}
+
+function hasValidPlatformPath(url: URL, type: SocialQrType) {
+  const hostname = url.hostname.toLowerCase().replace(/^www\./, "");
+  const path = url.pathname;
+
+  if (type === "discord") {
+    if (hostname === "discord.gg") return /^\/[a-z\d-]+\/?$/i.test(path);
+    return (
+      /^\/invite\/[a-z\d-]+\/?$/i.test(path) ||
+      /^\/channels\/\d+(?:\/\d+)?\/?$/i.test(path)
+    );
+  }
+  if (type === "reddit") {
+    return path !== "/";
+  }
+  if (type === "amazon") {
+    return path !== "/";
+  }
+  if (type === "snapchat") {
+    return /^\/(?:add|t|lens|spotlight|p)\//i.test(path);
+  }
+  return true;
 }
 
 function normalizePlatformUrl(
@@ -402,7 +596,8 @@ function normalizePlatformUrl(
     !allowed ||
     url.username ||
     url.password ||
-    (url.pathname === "/" && !url.search)
+    (url.pathname === "/" && !url.search) ||
+    !hasValidPlatformPath(url, type)
   ) {
     return invalid(`Use a public URL on an official ${type} domain.`);
   }
@@ -523,6 +718,8 @@ export function buildQrPayload(
       return buildPhonePayload(values);
     case "location":
       return buildLocationPayload(values);
+    case "calendar":
+      return buildCalendarPayload(values);
     default:
       if (isLinkQrType(type)) return buildLinkPayload(type, values);
       if (isSocialQrType(type)) return buildSocialPayload(type, values);

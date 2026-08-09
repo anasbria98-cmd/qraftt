@@ -26,6 +26,7 @@ function createPageSchema(
 ) {
   const url = `${siteConfig.url}/${page.slug}`;
   const breadcrumb = createBreadcrumbSchema(breadcrumbs);
+  const topic = page.topic ?? page.label;
 
   return {
     "@context": "https://schema.org",
@@ -42,7 +43,7 @@ function createPageSchema(
       {
         "@type": "HowTo",
         description: page.introduction,
-        name: `How to create a ${page.label}`,
+        name: `How to create your ${topic}`,
         step: page.howTo.map((step, index) => ({
           "@type": "HowToStep",
           name: step.title,
@@ -66,6 +67,7 @@ function createPageSchema(
 }
 
 export function GeneratorLandingPage({ page }: GeneratorLandingPageProps) {
+  const topic = page.topic ?? page.label;
   const breadcrumbs: BreadcrumbItem[] = [
     { href: "/", label: "Home" },
     ...(page.slug === "qr-code-generator"
@@ -100,7 +102,7 @@ export function GeneratorLandingPage({ page }: GeneratorLandingPageProps) {
           <SectionHeading
             align="center"
             eyebrow="Three simple steps"
-            title={`How to create a ${page.label}`}
+            title={`How to create your ${topic}`}
           />
           <ol className="steps-grid seo-steps">
             {page.howTo.map((step, index) => (
@@ -114,13 +116,38 @@ export function GeneratorLandingPage({ page }: GeneratorLandingPageProps) {
         </Container>
       </section>
 
+      {page.guidance ? (
+        <section className="section">
+          <Container>
+            <SectionHeading
+              eyebrow="Before you publish"
+              title={page.guidance.title}
+              description={page.guidance.description}
+            />
+            <div className="format-grid seo-use-cases">
+              {page.guidance.items.map((item, index) => (
+                <article className="format-card" key={item.title}>
+                  <span className="format-number">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <div>
+                    <h3>{item.title}</h3>
+                    <p>{item.description}</p>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </Container>
+        </section>
+      ) : null}
+
       <AdSlot placement="content" />
 
       <section className="section">
         <Container>
           <SectionHeading
             eyebrow="Practical ideas"
-            title={`Useful ${page.label} use cases`}
+            title={`Useful ways to use your ${topic}`}
           />
           <div className="format-grid seo-use-cases">
             {page.useCases.map((useCase, index) => (
@@ -142,7 +169,7 @@ export function GeneratorLandingPage({ page }: GeneratorLandingPageProps) {
         <Container className="seo-faq-layout">
           <SectionHeading
             eyebrow="Helpful answers"
-            title={`${page.label} FAQ`}
+            title={`${topic} FAQ`}
             description="Clear answers to the questions people usually ask before creating and sharing this type of QR code."
           />
           <div className="seo-faq-list">

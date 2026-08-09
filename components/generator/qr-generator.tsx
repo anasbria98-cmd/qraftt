@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { GeneratorCustomization } from "@/components/generator/generator-customization";
 import { GeneratorFields } from "@/components/generator/generator-fields";
-import { qrTypeOptions } from "@/lib/qr/config";
+import { QrTypeSelector } from "@/components/generator/qr-type-selector";
 import { getDesignWarnings, type QrDesignOptions } from "@/lib/qr/design";
 import { buildQrPayload } from "@/lib/qr/payloads";
 import { drawSvgToCanvas, renderQrSvg } from "@/lib/qr/render";
@@ -14,11 +14,23 @@ import type {
 } from "@/lib/qr/types";
 
 const initialValues: QrFormValues = {
+  amazon: "",
+  "app-store": "",
+  "audio-url": "",
+  calendarDescription: "",
+  calendarEnd: "",
+  calendarLocation: "",
+  calendarStart: "",
+  calendarTitle: "",
+  discord: "",
   emailBody: "",
   emailSubject: "",
   emailTo: "",
   facebook: "",
   "google-review": "",
+  "google-docs": "",
+  "google-forms": "",
+  "image-url": "",
   instagram: "",
   linkedin: "",
   locationLatitude: "",
@@ -26,10 +38,14 @@ const initialValues: QrFormValues = {
   menu: "",
   paypal: "",
   "pdf-link": "",
+  "presentation-url": "",
+  reddit: "",
   phoneNumber: "",
   smsMessage: "",
   smsNumber: "",
   spotify: "",
+  "spreadsheet-url": "",
+  snapchat: "",
   telegram: "",
   text: "",
   tiktok: "",
@@ -143,28 +159,6 @@ export function QrGenerator({ initialType = "url" }: QrGeneratorProps) {
     setValues((current) => ({ ...current, [key]: value }));
   }
 
-  function handleTabKeyDown(
-    event: React.KeyboardEvent<HTMLButtonElement>,
-    index: number,
-  ) {
-    let nextIndex: number | null = null;
-    if (event.key === "ArrowRight" || event.key === "ArrowDown") {
-      nextIndex = (index + 1) % qrTypeOptions.length;
-    } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
-      nextIndex = (index - 1 + qrTypeOptions.length) % qrTypeOptions.length;
-    } else if (event.key === "Home") {
-      nextIndex = 0;
-    } else if (event.key === "End") {
-      nextIndex = qrTypeOptions.length - 1;
-    }
-
-    if (nextIndex === null) return;
-    event.preventDefault();
-    const nextType = qrTypeOptions[nextIndex].value;
-    setType(nextType);
-    document.getElementById(`generator-tab-${nextType}`)?.focus();
-  }
-
   async function downloadPng() {
     if (!artwork.svg || engineError) return;
     setDownloading("png");
@@ -211,29 +205,7 @@ export function QrGenerator({ initialType = "url" }: QrGeneratorProps) {
         <span className="local-badge">Local only</span>
       </div>
 
-      <div
-        aria-label="QR code type"
-        aria-orientation="horizontal"
-        className="generator-tabs"
-        role="tablist"
-      >
-        {qrTypeOptions.map((item, index) => (
-          <button
-            aria-controls="generator-fields-panel"
-            aria-selected={type === item.value}
-            className={type === item.value ? "active" : undefined}
-            id={`generator-tab-${item.value}`}
-            key={item.value}
-            onKeyDown={(event) => handleTabKeyDown(event, index)}
-            onClick={() => setType(item.value)}
-            role="tab"
-            tabIndex={type === item.value ? 0 : -1}
-            type="button"
-          >
-            {item.label}
-          </button>
-        ))}
-      </div>
+      <QrTypeSelector onSelect={setType} selectedType={type} />
 
       <div className="generator-main">
         <div className="generator-controls">

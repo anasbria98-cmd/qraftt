@@ -4,14 +4,25 @@ export type SocialQrType =
   | "youtube"
   | "tiktok"
   | "linkedin"
-  | "telegram";
+  | "telegram"
+  | "discord"
+  | "reddit"
+  | "amazon"
+  | "snapchat";
 
 export type LinkQrType =
   | "google-review"
   | "menu"
   | "spotify"
   | "paypal"
-  | "pdf-link";
+  | "pdf-link"
+  | "google-forms"
+  | "google-docs"
+  | "image-url"
+  | "audio-url"
+  | "spreadsheet-url"
+  | "presentation-url"
+  | "app-store";
 
 export type QrType =
   | "url"
@@ -23,6 +34,7 @@ export type QrType =
   | "sms"
   | "phone"
   | "location"
+  | "calendar"
   | LinkQrType
   | SocialQrType;
 
@@ -31,11 +43,23 @@ export type ErrorCorrectionLevel = "L" | "M" | "Q" | "H";
 export type WifiEncryption = "WPA" | "WEP" | "nopass";
 
 export interface QrFormValues {
+  amazon: string;
+  "app-store": string;
+  "audio-url": string;
+  calendarDescription: string;
+  calendarEnd: string;
+  calendarLocation: string;
+  calendarStart: string;
+  calendarTitle: string;
+  discord: string;
   emailBody: string;
   emailSubject: string;
   emailTo: string;
   facebook: string;
   "google-review": string;
+  "google-docs": string;
+  "google-forms": string;
+  "image-url": string;
   instagram: string;
   linkedin: string;
   locationLatitude: string;
@@ -43,10 +67,14 @@ export interface QrFormValues {
   menu: string;
   paypal: string;
   "pdf-link": string;
+  "presentation-url": string;
+  reddit: string;
   phoneNumber: string;
   smsMessage: string;
   smsNumber: string;
   spotify: string;
+  "spreadsheet-url": string;
+  snapchat: string;
   telegram: string;
   text: string;
   tiktok: string;

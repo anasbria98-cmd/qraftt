@@ -6,11 +6,23 @@ import { buildQrPayload } from "../lib/qr/payloads.ts";
 import type { QrFormValues } from "../lib/qr/types.ts";
 
 const values: QrFormValues = {
+  amazon: "https://www.amazon.com/dp/B012345678",
+  "app-store": "https://play.google.com/store/apps/details?id=com.example.qraft",
+  "audio-url": "https://media.example.com/guides/welcome.mp3",
+  calendarDescription: "Bring your ticket, notebook, and photo ID.",
+  calendarEnd: "2026-09-12T11:30",
+  calendarLocation: "Studio 4, Main Street",
+  calendarStart: "2026-09-12T09:00",
+  calendarTitle: "Qraft workshop",
+  discord: "https://discord.gg/qraft",
   emailBody: "Line 1\nLine 2",
   emailSubject: "Hello & welcome",
   emailTo: "hello@example.com",
   facebook: "qraft.page",
   "google-review": "https://g.page/r/example-code/review",
+  "google-docs": "https://docs.google.com/document/d/ExampleDocumentId123/view",
+  "google-forms": "https://forms.gle/ExampleForm123",
+  "image-url": "https://media.example.com/gallery/poster.png",
   instagram: "@qraft",
   linkedin: "linkedin.com/in/qraft",
   locationLatitude: "48.198634",
@@ -18,10 +30,14 @@ const values: QrFormValues = {
   menu: "https://restaurant.example/menu",
   paypal: "https://paypal.me/Qraft/25USD",
   "pdf-link": "https://example.com/guides/menu.pdf",
+  "presentation-url": "https://media.example.com/talks/keynote.pptx",
+  reddit: "https://www.reddit.com/r/qraft/",
   phoneNumber: "+1 (202) 555-0147",
   smsMessage: "Hello! Meet at 5 & bring tea.",
   smsNumber: "+1 (202) 555-0147",
   spotify: "https://open.spotify.com/track/6rqhFgbbKwnb9MLmUQDhG6",
+  "spreadsheet-url": "https://docs.google.com/spreadsheets/d/ExampleSheetId123/view",
+  snapchat: "https://www.snapchat.com/add/qraft",
   telegram: "@qraft_bot",
   text: "Share this exactly",
   tiktok: "@qraft",
@@ -125,11 +141,35 @@ test("creates standards-based SMS, phone, and location URIs", () => {
   );
 });
 
+test("creates a standards-compatible iCalendar event payload", () => {
+  const result = buildQrPayload("calendar", values);
+  assert.equal(result.error, null);
+  assert.match(result.payload, /^BEGIN:VCALENDAR\r\nVERSION:2\.0\r\n/);
+  assert.match(result.payload, /\r\nBEGIN:VEVENT\r\n/);
+  assert.match(result.payload, /\r\nUID:[a-f\d]+@qraft\.local\r\n/);
+  assert.match(result.payload, /\r\nDTSTAMP:\d{8}T\d{6}Z\r\n/);
+  assert.match(result.payload, /\r\nDTSTART:20260912T090000\r\n/);
+  assert.match(result.payload, /\r\nDTEND:20260912T113000\r\n/);
+  assert.match(result.payload, /\r\nSUMMARY:Qraft workshop\r\n/);
+  assert.match(result.payload, /\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n$/);
+  assert.match(
+    buildQrPayload("calendar", {
+      ...values,
+      calendarEnd: "2026-09-12T08:59",
+    }).error ?? "",
+    /end must be after the start/,
+  );
+});
+
 test("creates direct official social platform destinations", () => {
   const expected = {
+    amazon: "https://www.amazon.com/dp/B012345678",
+    discord: "https://discord.gg/qraft",
     facebook: "https://www.facebook.com/qraft.page",
     instagram: "https://www.instagram.com/qraft",
     linkedin: "https://linkedin.com/in/qraft",
+    reddit: "https://www.reddit.com/r/qraft/",
+    snapchat: "https://www.snapchat.com/add/qraft",
     telegram: "https://t.me/qraft_bot",
     tiktok: "https://www.tiktok.com/@qraft",
     youtube: "https://youtube.com/@qraft",
@@ -160,11 +200,18 @@ test("rejects invalid phone, coordinate, and platform destinations", () => {
 
 test("creates direct validated destination-link payloads", () => {
   const expected = {
+    "app-store": "https://play.google.com/store/apps/details?id=com.example.qraft",
+    "audio-url": "https://media.example.com/guides/welcome.mp3",
+    "google-docs": "https://docs.google.com/document/d/ExampleDocumentId123/view",
+    "google-forms": "https://forms.gle/ExampleForm123",
     "google-review": "https://g.page/r/example-code/review",
+    "image-url": "https://media.example.com/gallery/poster.png",
     menu: "https://restaurant.example/menu",
     spotify: "https://open.spotify.com/track/6rqhFgbbKwnb9MLmUQDhG6",
     paypal: "https://paypal.me/Qraft/25USD",
     "pdf-link": "https://example.com/guides/menu.pdf",
+    "presentation-url": "https://media.example.com/talks/keynote.pptx",
+    "spreadsheet-url": "https://docs.google.com/spreadsheets/d/ExampleSheetId123/view",
   } as const;
 
   for (const [type, payload] of Object.entries(expected)) {
@@ -207,6 +254,50 @@ test("rejects unsupported or non-public destination-link URLs", () => {
       menu: "http://localhost/menu",
     }).error ?? "",
     /public URL/,
+  );
+  const invalidNewDestinations = [
+    ["google-forms", "https://docs.google.com/forms/d/example/edit", /Google Forms/],
+    ["google-docs", "https://docs.google.com/spreadsheets/d/example/view", /Google Docs/],
+    ["image-url", "https://example.com/image.svg", /PNG, JPG/],
+    ["audio-url", "https://example.com/listen", /direct public MP3/],
+    ["spreadsheet-url", "https://example.com/report.pdf", /spreadsheet|Excel/],
+    ["presentation-url", "https://example.com/slides.pdf", /presentation|PPT/],
+    ["app-store", "https://play.google.com/store/books/details?id=example", /App Store|Google Play/],
+  ] as const;
+
+  for (const [type, destination, errorPattern] of invalidNewDestinations) {
+    assert.match(
+      buildQrPayload(type, { ...values, [type]: destination }).error ?? "",
+      errorPattern,
+    );
+  }
+  assert.match(
+    buildQrPayload("discord", {
+      ...values,
+      discord: "https://discord.com/download",
+    }).error ?? "",
+    /official discord domain/,
+  );
+  assert.match(
+    buildQrPayload("reddit", {
+      ...values,
+      reddit: "https://reddit.example/r/qraft",
+    }).error ?? "",
+    /official reddit domain/,
+  );
+  assert.match(
+    buildQrPayload("amazon", {
+      ...values,
+      amazon: "https://amazon.example/dp/B012345678",
+    }).error ?? "",
+    /official amazon domain/,
+  );
+  assert.match(
+    buildQrPayload("snapchat", {
+      ...values,
+      snapchat: "https://snapchat.com/about",
+    }).error ?? "",
+    /official snapchat domain/,
   );
 });
 

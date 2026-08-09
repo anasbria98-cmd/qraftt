@@ -339,6 +339,63 @@ export function GeneratorFields({
         </div>
       ) : null}
 
+      {type === "calendar" ? (
+        <>
+          <Field label="Event title">
+            <input
+              {...invalidProps}
+              maxLength={200}
+              onChange={(event) => onChange("calendarTitle", event.target.value)}
+              placeholder="Team workshop"
+              type="text"
+              value={values.calendarTitle}
+            />
+          </Field>
+          <div className="generator-two-fields">
+            <Field label="Starts">
+              <input
+                {...invalidProps}
+                onChange={(event) => onChange("calendarStart", event.target.value)}
+                type="datetime-local"
+                value={values.calendarStart}
+              />
+            </Field>
+            <Field label="Ends">
+              <input
+                {...invalidProps}
+                min={values.calendarStart || undefined}
+                onChange={(event) => onChange("calendarEnd", event.target.value)}
+                type="datetime-local"
+                value={values.calendarEnd}
+              />
+            </Field>
+          </div>
+          <Field label="Location" hint="Optional">
+            <input
+              maxLength={300}
+              onChange={(event) => onChange("calendarLocation", event.target.value)}
+              placeholder="Conference room or address"
+              type="text"
+              value={values.calendarLocation}
+            />
+          </Field>
+          <Field
+            label="Description"
+            hint={`${values.calendarDescription.length.toLocaleString()} / 1,000 characters`}
+          >
+            <textarea
+              maxLength={1_000}
+              onChange={(event) =>
+                onChange("calendarDescription", event.target.value)
+              }
+              placeholder="Add optional event details"
+              rows={4}
+              value={values.calendarDescription}
+            />
+          </Field>
+        </>
+      ) : null}
+
       {isSocialQrType(type) ? (
         <Field
           label={socialQrConfig[type].fieldLabel}

@@ -1,26 +1,64 @@
 import type { LinkQrType, QrType, SocialQrType } from "./types";
 
-export const qrTypeOptions: Array<{ label: string; value: QrType }> = [
-  { label: "URL", value: "url" },
-  { label: "Text", value: "text" },
-  { label: "WiFi", value: "wifi" },
-  { label: "WhatsApp", value: "whatsapp" },
-  { label: "Email", value: "email" },
-  { label: "vCard", value: "vcard" },
-  { label: "SMS", value: "sms" },
-  { label: "Phone", value: "phone" },
-  { label: "Location", value: "location" },
-  { label: "Instagram", value: "instagram" },
-  { label: "Facebook", value: "facebook" },
-  { label: "YouTube", value: "youtube" },
-  { label: "TikTok", value: "tiktok" },
-  { label: "LinkedIn", value: "linkedin" },
-  { label: "Telegram", value: "telegram" },
-  { label: "Google Review", value: "google-review" },
-  { label: "Menu", value: "menu" },
-  { label: "Spotify", value: "spotify" },
-  { label: "PayPal", value: "paypal" },
-  { label: "PDF Link", value: "pdf-link" },
+export type QrTypeCategory =
+  | "Popular"
+  | "Links & Social"
+  | "Contact & Communication"
+  | "Files & Documents"
+  | "Business"
+  | "Payments"
+  | "Other";
+
+export interface QrTypeOption {
+  category: QrTypeCategory;
+  keywords?: readonly string[];
+  label: string;
+  value: QrType;
+}
+
+export const qrTypeCategoryOrder: readonly QrTypeCategory[] = [
+  "Popular",
+  "Links & Social",
+  "Contact & Communication",
+  "Files & Documents",
+  "Business",
+  "Payments",
+  "Other",
+];
+
+export const qrTypeOptions: QrTypeOption[] = [
+  { category: "Popular", label: "URL", value: "url" },
+  { category: "Popular", label: "WiFi", value: "wifi" },
+  { category: "Popular", label: "WhatsApp", value: "whatsapp" },
+  { category: "Popular", label: "Google Review", value: "google-review" },
+  { category: "Popular", label: "Menu", value: "menu" },
+  { category: "Popular", keywords: ["document"], label: "PDF", value: "pdf-link" },
+  { category: "Popular", label: "Instagram", value: "instagram" },
+  { category: "Popular", keywords: ["contact"], label: "vCard", value: "vcard" },
+  { category: "Links & Social", label: "Facebook", value: "facebook" },
+  { category: "Links & Social", label: "YouTube", value: "youtube" },
+  { category: "Links & Social", label: "TikTok", value: "tiktok" },
+  { category: "Links & Social", label: "LinkedIn", value: "linkedin" },
+  { category: "Links & Social", label: "Telegram", value: "telegram" },
+  { category: "Links & Social", label: "Discord", value: "discord" },
+  { category: "Links & Social", label: "Reddit", value: "reddit" },
+  { category: "Links & Social", label: "Snapchat", value: "snapchat" },
+  { category: "Links & Social", keywords: ["music", "podcast"], label: "Spotify", value: "spotify" },
+  { category: "Contact & Communication", label: "Email", value: "email" },
+  { category: "Contact & Communication", label: "SMS", value: "sms" },
+  { category: "Contact & Communication", label: "Phone", value: "phone" },
+  { category: "Files & Documents", label: "Google Docs", value: "google-docs" },
+  { category: "Files & Documents", keywords: ["png", "jpg"], label: "Image", value: "image-url" },
+  { category: "Files & Documents", keywords: ["mp3"], label: "Audio", value: "audio-url" },
+  { category: "Files & Documents", keywords: ["excel", "sheets"], label: "Spreadsheet", value: "spreadsheet-url" },
+  { category: "Files & Documents", keywords: ["pptx", "slides"], label: "Presentation", value: "presentation-url" },
+  { category: "Business", label: "Google Forms", value: "google-forms" },
+  { category: "Business", keywords: ["product", "store"], label: "Amazon", value: "amazon" },
+  { category: "Business", keywords: ["apple", "google play", "mobile app"], label: "App Stores", value: "app-store" },
+  { category: "Payments", label: "PayPal", value: "paypal" },
+  { category: "Other", label: "Text", value: "text" },
+  { category: "Other", keywords: ["map", "coordinates"], label: "Location", value: "location" },
+  { category: "Other", keywords: ["event", "appointment"], label: "Calendar", value: "calendar" },
 ];
 
 interface LinkQrConfig {
@@ -54,6 +92,41 @@ export const linkQrConfig: Record<LinkQrType, LinkQrConfig> = {
     fieldLabel: "Public PDF URL",
     hint: "The direct public URL must end in .pdf. Files are not uploaded to Qraft.",
     placeholder: "https://example.com/document.pdf",
+  },
+  "google-forms": {
+    fieldLabel: "Google Forms URL",
+    hint: "Use a public forms.gle link or an official Google Forms response URL.",
+    placeholder: "https://forms.gle/example",
+  },
+  "google-docs": {
+    fieldLabel: "Google Docs URL",
+    hint: "Use a shareable docs.google.com/document link.",
+    placeholder: "https://docs.google.com/document/d/.../view",
+  },
+  "image-url": {
+    fieldLabel: "Public image URL",
+    hint: "Use a direct PNG, JPG, WebP, GIF, or AVIF URL. Images are not uploaded.",
+    placeholder: "https://example.com/image.png",
+  },
+  "audio-url": {
+    fieldLabel: "Public audio URL",
+    hint: "Use a direct MP3, WAV, OGG, M4A, AAC, FLAC, or WebM audio URL.",
+    placeholder: "https://example.com/audio.mp3",
+  },
+  "spreadsheet-url": {
+    fieldLabel: "Public spreadsheet URL",
+    hint: "Use a public Excel, CSV, ODS, or Google Sheets URL.",
+    placeholder: "https://docs.google.com/spreadsheets/d/.../view",
+  },
+  "presentation-url": {
+    fieldLabel: "Public presentation URL",
+    hint: "Use a public PPT, PPTX, ODP, or Google Slides URL.",
+    placeholder: "https://docs.google.com/presentation/d/.../view",
+  },
+  "app-store": {
+    fieldLabel: "App Store or Google Play URL",
+    hint: "Use an official Apple App Store or Google Play app listing.",
+    placeholder: "https://apps.apple.com/app/example/id123456789",
   },
 };
 
@@ -125,6 +198,57 @@ export const socialQrConfig: Record<SocialQrType, SocialQrConfig> = {
     minLength: 5,
     placeholder: "@username",
     usernamePattern: /^[a-z\d_]+$/i,
+  },
+  discord: {
+    allowedHosts: ["discord.gg", "discord.com", "discordapp.com"],
+    fieldLabel: "Discord invite or server URL",
+    hint: "Use an official Discord invite or discord.com server/channel URL.",
+    placeholder: "https://discord.gg/example",
+    urlOnly: true,
+  },
+  reddit: {
+    allowedHosts: ["reddit.com", "redd.it"],
+    fieldLabel: "Reddit URL",
+    hint: "Use a public Reddit community, profile, post, or short link.",
+    placeholder: "https://www.reddit.com/r/example/",
+    urlOnly: true,
+  },
+  amazon: {
+    allowedHosts: [
+      "amazon.com",
+      "amazon.ca",
+      "amazon.com.mx",
+      "amazon.com.br",
+      "amazon.co.uk",
+      "amazon.de",
+      "amazon.fr",
+      "amazon.it",
+      "amazon.es",
+      "amazon.nl",
+      "amazon.pl",
+      "amazon.se",
+      "amazon.com.be",
+      "amazon.co.jp",
+      "amazon.in",
+      "amazon.com.au",
+      "amazon.sg",
+      "amazon.ae",
+      "amazon.sa",
+      "amazon.eg",
+      "amazon.com.tr",
+      "amzn.to",
+    ],
+    fieldLabel: "Amazon product or store URL",
+    hint: "Use a public product or storefront URL on an official Amazon domain.",
+    placeholder: "https://www.amazon.com/dp/PRODUCTID",
+    urlOnly: true,
+  },
+  snapchat: {
+    allowedHosts: ["snapchat.com"],
+    fieldLabel: "Snapchat profile or destination URL",
+    hint: "Use an official snapchat.com profile, Lens, Spotlight, or shared destination.",
+    placeholder: "https://www.snapchat.com/add/username",
+    urlOnly: true,
   },
 };
 
