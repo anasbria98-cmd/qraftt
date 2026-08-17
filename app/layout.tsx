@@ -10,8 +10,8 @@ import "./globals.css";
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   title: {
-    default: "Qraft — Free QR Code Generator",
-    template: "%s | Qraft",
+    default: "Qraftt — Free QR Code Generator",
+    template: "%s | Qraftt",
   },
   description: siteConfig.description,
   other: adSenseClientId

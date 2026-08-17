@@ -46,8 +46,6 @@ const initialValues: QrFormValues = {
   menu: "",
   paypal: "",
   "pdf-link": "",
-  "presentation-url": "",
-  reddit: "",
   phoneNumber: "",
   smsMessage: "",
   smsNumber: "",
@@ -86,22 +84,31 @@ function saveBlob(blob: Blob, filename: string) {
 }
 
 interface QrGeneratorProps {
+  catalogFirst?: boolean;
   initialType?: QrType;
 }
 
 const exportSizes = [512, 1_000, 2_000] as const;
 type ExportSize = (typeof exportSizes)[number];
+type ExportFormat = "png" | "svg";
 
-export function QrGenerator({ initialType = "url" }: QrGeneratorProps) {
+export function QrGenerator({
+  catalogFirst = false,
+  initialType = "url",
+}: QrGeneratorProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const mobileCanvasRef = useRef<HTMLCanvasElement>(null);
+  const previewPanelRef = useRef<HTMLDivElement>(null);
   const [type, setType] = useState<QrType>(initialType);
   const [values, setValues] = useState<QrFormValues>(initialValues);
   const [design, setDesign] = useState<QrDesignOptions>(defaultDesign);
   const [errorCorrection, setErrorCorrection] =
     useState<ErrorCorrectionLevel>("M");
   const [exportSize, setExportSize] = useState<ExportSize>(1_000);
+  const [exportFormat, setExportFormat] = useState<ExportFormat>("png");
   const [engineError, setEngineError] = useState<string | null>(null);
   const [downloading, setDownloading] = useState<"png" | "svg" | null>(null);
+  const [mobilePreviewOpen, setMobilePreviewOpen] = useState(false);
 
   const result = useMemo(() => buildQrPayload(type, values), [type, values]);
   const designSafety = useMemo(() => getDesignWarnings(design), [design]);
@@ -128,17 +135,22 @@ export function QrGenerator({ initialType = "url" }: QrGeneratorProps) {
   }, [design, effectiveCorrection, payload]);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+    const canvases = [canvasRef.current, mobileCanvasRef.current].filter(
+      (canvas): canvas is HTMLCanvasElement => Boolean(canvas),
+    );
+    if (!canvases.length) return;
 
-    const context = canvas.getContext("2d");
     if (!artwork.svg) {
-      context?.clearRect(0, 0, canvas.width, canvas.height);
+      for (const canvas of canvases) {
+        canvas.getContext("2d")?.clearRect(0, 0, canvas.width, canvas.height);
+      }
       return;
     }
 
     let active = true;
-    drawSvgToCanvas(canvas, artwork.svg, 640)
+    Promise.all(
+      canvases.map((canvas) => drawSvgToCanvas(canvas, artwork.svg, 640)),
+    )
       .then(() => {
         if (active) setEngineError(null);
       })
@@ -153,7 +165,7 @@ export function QrGenerator({ initialType = "url" }: QrGeneratorProps) {
     return () => {
       active = false;
     };
-  }, [artwork.svg]);
+  }, [artwork.svg, mobilePreviewOpen]);
 
   function updateValue<Key extends keyof QrFormValues>(
     key: Key,
@@ -172,7 +184,7 @@ export function QrGenerator({ initialType = "url" }: QrGeneratorProps) {
         canvas.toBlob(resolve, "image/png"),
       );
       if (!blob) throw new Error("PNG export failed");
-      saveBlob(blob, `qraft-${type}-qr.png`);
+      saveBlob(blob, `qraftt-${type}-qr.png`);
     } catch {
       setEngineError("PNG export failed. Try reducing the content length.");
     } finally {
@@ -188,7 +200,7 @@ export function QrGenerator({ initialType = "url" }: QrGeneratorProps) {
         new Blob([setSvgDimensions(artwork.svg, exportSize)], {
           type: "image/svg+xml;charset=utf-8",
         }),
-        `qraft-${type}-qr.svg`,
+        `qraftt-${type}-qr.svg`,
       );
     } catch {
       setEngineError("SVG export failed. Try reducing the content length.");
@@ -197,29 +209,103 @@ export function QrGenerator({ initialType = "url" }: QrGeneratorProps) {
     }
   }
 
+  function downloadSelectedFormat() {
+    return exportFormat === "png" ? downloadPng() : downloadSvg();
+  }
+
   const currentError = validationError ?? artwork.error ?? engineError;
   const canDownload = Boolean(artwork.svg) && !engineError && !downloading;
 
   return (
-    <section className="generator-shell" aria-labelledby="generator-title">
-      <div className="generator-heading">
-        <div>
-          <p className="generator-kicker">QR workspace</p>
-          <h2 id="generator-title">Create your code</h2>
+    <section
+      className={catalogFirst ? "generator-shell generator-home-workflow" : "generator-shell"}
+      aria-labelledby="generator-title"
+    >
+      {catalogFirst ? (
+        <h2 className="visually-hidden" id="generator-title">
+          Create your QR code
+        </h2>
+      ) : null}
+      {!catalogFirst ? (
+        <div className="generator-heading">
+          <div>
+            <p className="generator-kicker">QR workspace</p>
+            <h2 id="generator-title">Create your code</h2>
+          </div>
+          <span className="local-badge">Local only</span>
         </div>
-        <span className="local-badge">Local only</span>
-      </div>
+      ) : null}
 
-      <QrTypeSelector onSelect={setType} selectedType={type} />
+      <QrTypeSelector
+        onSelect={setType}
+        selectedType={type}
+        showSelectedSummary={!catalogFirst}
+      />
 
       <div className="generator-main">
         <div className="generator-controls">
+          <div className="generator-stage-heading">
+            <span>1</span>
+            <div>
+              <h3>Add Content</h3>
+              <p>Enter exactly what the selected QR code should contain.</p>
+            </div>
+          </div>
+
           <GeneratorFields
             error={currentError}
             onChange={updateValue}
             type={type}
             values={values}
           />
+
+          <div className="generator-stage-heading customization-stage-heading">
+            <span>2</span>
+            <div>
+              <h3>Customize QR</h3>
+              <p>Apply a template or shape the details while previewing every change.</p>
+            </div>
+          </div>
+
+          <aside className={mobilePreviewOpen ? "mobile-preview-dock open" : "mobile-preview-dock"}>
+            <button
+              aria-expanded={mobilePreviewOpen}
+              className="mobile-preview-toggle"
+              onClick={() => setMobilePreviewOpen((current) => !current)}
+              type="button"
+            >
+              <span>Live preview</span>
+              <strong>{mobilePreviewOpen ? "Hide" : "View QR"}</strong>
+            </button>
+            {mobilePreviewOpen ? (
+              <div className="mobile-preview-content">
+                <div className="mobile-preview-canvas">
+                  <canvas
+                    aria-label={`Compact live ${type} QR code preview`}
+                    className={!artwork.svg || engineError ? "is-empty" : undefined}
+                    ref={mobileCanvasRef}
+                    role="img"
+                  />
+                  {!artwork.svg || engineError ? <span>Complete the fields</span> : null}
+                </div>
+                <div>
+                  <span>{effectiveCorrection} correction</span>
+                  <button
+                    onClick={() => {
+                      setMobilePreviewOpen(false);
+                      previewPanelRef.current?.scrollIntoView({
+                        behavior: "smooth",
+                        block: "start",
+                      });
+                    }}
+                    type="button"
+                  >
+                    Preview &amp; download
+                  </button>
+                </div>
+              </div>
+            ) : null}
+          </aside>
 
           <GeneratorCustomization
             design={design}
@@ -244,9 +330,15 @@ export function QrGenerator({ initialType = "url" }: QrGeneratorProps) {
           </div>
         </div>
 
-        <div className="generator-preview-panel">
+        <div className="generator-preview-panel" ref={previewPanelRef}>
           <div className="generator-preview-heading">
-            <span>Live preview</span>
+            <div className="generator-stage-heading preview-stage-heading">
+              <span>3</span>
+              <div>
+                <h3>Generate &amp; download QR</h3>
+                <small>Every design detail is included in your file.</small>
+              </div>
+            </div>
             <span>{effectiveCorrection} correction</span>
           </div>
           <div className="generator-canvas-wrap">
@@ -263,40 +355,50 @@ export function QrGenerator({ initialType = "url" }: QrGeneratorProps) {
           <p className="generator-privacy-note">
             Generated in your browser. Nothing is uploaded.
           </p>
-          <label className="export-size-field">
-            <span>Export size</span>
-            <select
-              aria-label="Export resolution"
-              onChange={(event) =>
-                setExportSize(Number(event.target.value) as ExportSize)
-              }
-              value={exportSize}
-            >
-              {exportSizes.map((size) => (
-                <option key={size} value={size}>
-                  {size} × {size} px
-                </option>
-              ))}
-            </select>
-          </label>
-          <div className="generator-downloads">
-            <button
-              className="button button-primary"
-              disabled={!canDownload}
-              onClick={downloadPng}
-              type="button"
-            >
-              {downloading === "png" ? "Preparing…" : "Download PNG"}
-            </button>
-            <button
-              className="button button-secondary"
-              disabled={!canDownload}
-              onClick={downloadSvg}
-              type="button"
-            >
-              {downloading === "svg" ? "Preparing…" : "Download SVG"}
-            </button>
+          <div className="generator-download-settings">
+            <label className="export-select-field">
+              <span>Format</span>
+              <select
+                aria-label="Export format"
+                onChange={(event) =>
+                  setExportFormat(event.target.value as ExportFormat)
+                }
+                value={exportFormat}
+              >
+                <option value="png">PNG</option>
+                <option value="svg">SVG</option>
+              </select>
+            </label>
+            <label className="export-select-field">
+              <span>Size</span>
+              <select
+                aria-label="Export resolution"
+                onChange={(event) =>
+                  setExportSize(Number(event.target.value) as ExportSize)
+                }
+                value={exportSize}
+              >
+                {exportSizes.map((size) => (
+                  <option key={size} value={size}>
+                    {size} × {size}
+                  </option>
+                ))}
+              </select>
+            </label>
           </div>
+          <button
+            className="button button-primary generator-download-button"
+            disabled={!canDownload}
+            onClick={() => void downloadSelectedFormat()}
+            type="button"
+          >
+            {downloading
+              ? "Preparing download…"
+              : `Download ${exportFormat.toUpperCase()}`}
+          </button>
+          <p className="generator-export-note">
+            Static file · no account · no server dependency
+          </p>
         </div>
       </div>
     </section>

@@ -49,9 +49,7 @@ export type GeneratorPageSlug =
   | "image-qr-code-generator"
   | "audio-qr-code-generator"
   | "spreadsheet-qr-code-generator"
-  | "presentation-qr-code-generator"
   | "discord-qr-code-generator"
-  | "reddit-qr-code-generator"
   | "amazon-qr-code-generator"
   | "snapchat-qr-code-generator"
   | "app-store-qr-code-generator";
@@ -73,7 +71,7 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
       {
         question: "Is my information uploaded?",
         answer:
-          "No. Qraft generates the QR code locally in your browser. Your link, message, WiFi password, or contact details are not sent to our server.",
+          "No. Qraftt generates the QR code locally in your browser. Your link, message, WiFi password, or contact details are not sent to our server.",
       },
       {
         question: "Should I download PNG or SVG?",
@@ -100,7 +98,7 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
       },
     ],
     introduction:
-      "Create a static QR code for links, messages, WiFi access, contact details, and more. Everything is generated in your browser, so the downloaded code points directly to your content without relying on Qraft after download.",
+      "Create a static QR code for links, messages, WiFi access, contact details, and more. Everything is generated in your browser, so the downloaded code points directly to your content without relying on Qraftt after download.",
     label: "QR Code Generator",
     metaDescription:
       "Create free static QR codes locally in your browser. Customize colors and download PNG or SVG with no signup, watermark, or scan limits.",
@@ -257,9 +255,9 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
           "Yes. A blank message opens the conversation without pre-filling text, which is useful for general support or sales contact links.",
       },
       {
-        question: "Will the code work without Qraft?",
+        question: "Will the code work without Qraftt?",
         answer:
-          "Yes. The QR code contains a direct wa.me destination. Once downloaded, it does not redirect through or depend on Qraft.",
+          "Yes. The QR code contains a direct wa.me destination. Once downloaded, it does not redirect through or depend on Qraftt.",
       },
     ],
     guidance: {
@@ -351,7 +349,7 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
       {
         question: "Which vCard version is generated?",
         answer:
-          "Qraft generates a standards-based vCard 4.0 payload with properly escaped text, contact fields, and line formatting.",
+          "Qraftt generates a standards-based vCard 4.0 payload with properly escaped text, contact fields, and line formatting.",
       },
       {
         question: "Can I change the contact after printing?",
@@ -359,9 +357,9 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
           "A static vCard QR code cannot be updated after download. If contact details change, create and print a new code.",
       },
       {
-        question: "Are my contact details stored by Qraft?",
+        question: "Are my contact details stored by Qraftt?",
         answer:
-          "No. The vCard is assembled and encoded in your browser. The downloaded code contains the details directly and does not require a Qraft account or server.",
+          "No. The vCard is assembled and encoded in your browser. The downloaded code contains the details directly and does not require a Qraftt account or server.",
       },
     ],
     guidance: {
@@ -405,7 +403,7 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
       },
     ],
     introduction:
-      "Create a vCard QR code that lets people save structured contact details without typing them manually. Qraft builds a standards-compatible vCard 4.0 locally and embeds it directly in the static code.",
+      "Create a vCard QR code that lets people save structured contact details without typing them manually. Qraftt builds a standards-compatible vCard 4.0 locally and embeds it directly in the static code.",
     label: "vCard QR Generator",
     metaDescription:
       "Create a free vCard QR code for a name, phone, email, company, title, and website. Generate the contact locally and download PNG or SVG.",
@@ -451,14 +449,14 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
           "No. This generator creates a static code that stores the destination directly. To use a different URL, generate and distribute a new QR code.",
       },
       {
-        question: "Does Qraft track scans?",
+        question: "Does Qraftt track scans?",
         answer:
-          "No. The code opens your URL directly without a Qraft redirect, so we do not receive scan data or add tracking parameters.",
+          "No. The code opens your URL directly without a Qraftt redirect, so we do not receive scan data or add tracking parameters.",
       },
       {
         question: "Do I need to include https://?",
         answer:
-          "You can enter a domain without the scheme and Qraft will add HTTPS. Always check the normalized destination in your browser before printing widely.",
+          "You can enter a domain without the scheme and Qraftt will add HTTPS. Always check the normalized destination in your browser before printing widely.",
       },
       {
         question: "Will a URL QR code expire?",
@@ -493,7 +491,7 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
       {
         title: "Paste the destination URL",
         description:
-          "Enter the exact page you want to open. Qraft accepts HTTP or HTTPS and adds HTTPS to plain domains.",
+          "Enter the exact page you want to open. Qraftt accepts HTTP or HTTPS and adds HTTPS to plain domains.",
       },
       {
         title: "Choose readable colors",
@@ -507,10 +505,10 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
       },
     ],
     introduction:
-      "Convert any HTTP or HTTPS destination into a static URL QR code with no tracking redirect. The link is encoded directly in your browser, and the downloaded PNG or SVG remains independent of Qraft.",
+      "Convert any HTTP or HTTPS destination into a static URL QR code with no tracking redirect. The link is encoded directly in your browser, and the downloaded PNG or SVG remains independent of Qraftt.",
     label: "URL QR Generator",
     metaDescription:
-      "Create a free static URL QR code that opens a website directly with no Qraft redirect or scan tracking. Customize it and download PNG or SVG.",
+      "Create a free static URL QR code that opens a website directly with no Qraftt redirect or scan tracking. Customize it and download PNG or SVG.",
     related: [
       "qr-code-generator",
       "pdf-qr-code-generator",
@@ -643,7 +641,7 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
           "The QR code uses a standard mailto destination. Behavior depends on the email application configured on the scanning device.",
       },
       {
-        question: "Are email addresses or messages stored by Qraft?",
+        question: "Are email addresses or messages stored by Qraftt?",
         answer:
           "No. The mailto destination is assembled and encoded locally in your browser, then stored directly in the downloaded static QR code.",
       },
@@ -714,7 +712,7 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
       {
         question: "How should I format the mobile number?",
         answer:
-          "Include the international country code. Qraft accepts common spacing and punctuation, then creates a clean global number for the SMS destination.",
+          "Include the international country code. Qraftt accepts common spacing and punctuation, then creates a clean global number for the SMS destination.",
       },
       {
         question: "Can long pre-filled messages be used?",
@@ -724,7 +722,7 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
       {
         question: "Does SMS require internet access?",
         answer:
-          "Opening the draft does not depend on Qraft or a web page. Sending still requires the device to have an available mobile messaging service.",
+          "Opening the draft does not depend on Qraftt or a web page. Sending still requires the device to have an available mobile messaging service.",
       },
     ],
     h1: "Free SMS QR Code Generator",
@@ -746,7 +744,7 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
       },
     ],
     introduction:
-      "Build a static QR code that opens an SMS draft with a validated international number and optional message. Qraft creates the standards-based sms URI locally, with no redirect or server dependency after download.",
+      "Build a static QR code that opens an SMS draft with a validated international number and optional message. Qraftt creates the standards-based sms URI locally, with no redirect or server dependency after download.",
     label: "SMS QR Generator",
     metaDescription:
       "Create a free SMS QR code with a phone number and optional prefilled message. Local static generation with PNG and SVG downloads.",
@@ -801,9 +799,9 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
           "Yes. The destination can be a mobile, landline, or business number as long as it is entered in a valid international format.",
       },
       {
-        question: "Does Qraft route or record calls?",
+        question: "Does Qraftt route or record calls?",
         answer:
-          "No. The static QR code contains a direct tel URI. Qraft is not involved when the code is scanned or when a call is placed.",
+          "No. The static QR code contains a direct tel URI. Qraftt is not involved when the code is scanned or when a call is placed.",
       },
     ],
     h1: "Free Phone Number QR Code Generator",
@@ -825,7 +823,7 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
       },
     ],
     introduction:
-      "Create a phone QR code that opens a device’s dialer with a validated international number ready to call. The static tel destination is encoded locally and works without a Qraft redirect or hosted landing page.",
+      "Create a phone QR code that opens a device’s dialer with a validated international number ready to call. The static tel destination is encoded locally and works without a Qraftt redirect or hosted landing page.",
     label: "Phone QR Generator",
     metaDescription:
       "Create a free phone number QR code that opens the dialer. Generate a direct tel code locally and download PNG or SVG without signup.",
@@ -958,9 +956,9 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
           "It can link to the profile, but Instagram’s privacy rules still apply. People who are not approved followers will only see what the account allows.",
       },
       {
-        question: "Does Qraft track profile visits?",
+        question: "Does Qraftt track profile visits?",
         answer:
-          "No. The static code stores a direct instagram.com destination and does not pass visitors through a Qraft redirect.",
+          "No. The static code stores a direct instagram.com destination and does not pass visitors through a Qraftt redirect.",
       },
     ],
     guidance: {
@@ -1084,7 +1082,7 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
       },
     ],
     introduction:
-      "Generate a Facebook QR code from a username or public URL on an official Facebook domain. Qraft validates the direct destination and creates the static code locally without adding redirects or tracking parameters.",
+      "Generate a Facebook QR code from a username or public URL on an official Facebook domain. Qraftt validates the direct destination and creates the static code locally without adding redirects or tracking parameters.",
     label: "Facebook QR Generator",
     metaDescription:
       "Create a free Facebook QR code for a profile, page, group, event, or post. Direct local generation with PNG and SVG downloads.",
@@ -1141,7 +1139,7 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
       {
         question: "Is scan tracking added to the YouTube URL?",
         answer:
-          "No. Qraft encodes the official URL you provide and does not add a redirect, tracking service, or extra campaign parameters.",
+          "No. Qraftt encodes the official URL you provide and does not add a redirect, tracking service, or extra campaign parameters.",
       },
     ],
     h1: "Free YouTube QR Code Generator",
@@ -1163,7 +1161,7 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
       },
     ],
     introduction:
-      "Turn a public YouTube channel, video, playlist, Short, or live-stream URL into a static QR code. The official destination is validated and encoded directly in your browser with no Qraft redirect.",
+      "Turn a public YouTube channel, video, playlist, Short, or live-stream URL into a static QR code. The official destination is validated and encoded directly in your browser with no Qraftt redirect.",
     label: "YouTube QR Generator",
     metaDescription:
       "Create a free YouTube QR code for a channel, video, playlist, Short, or stream. Validate the direct URL and download PNG or SVG.",
@@ -1242,7 +1240,7 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
       },
     ],
     introduction:
-      "Create a TikTok QR code from a username, profile URL, or official video link. The direct tiktok.com destination is checked and encoded locally, so the downloaded static code does not depend on Qraft.",
+      "Create a TikTok QR code from a username, profile URL, or official video link. The direct tiktok.com destination is checked and encoded locally, so the downloaded static code does not depend on Qraftt.",
     label: "TikTok QR Generator",
     metaDescription:
       "Create a free TikTok QR code for a username, profile, or video. Direct local generation with customizable PNG and SVG downloads.",
@@ -1297,9 +1295,9 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
           "Not always. LinkedIn may require login or apply visibility settings based on the account, content, region, and person viewing it.",
       },
       {
-        question: "Does Qraft collect profile or scan data?",
+        question: "Does Qraftt collect profile or scan data?",
         answer:
-          "No. The official linkedin.com URL is encoded directly into the static QR code and is not routed through Qraft.",
+          "No. The official linkedin.com URL is encoded directly into the static QR code and is not routed through Qraftt.",
       },
     ],
     h1: "Free LinkedIn QR Code Generator",
@@ -1321,7 +1319,7 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
       },
     ],
     introduction:
-      "Generate a LinkedIn QR code for a public profile, company page, post, or other official LinkedIn URL. Qraft validates and encodes the direct destination locally without adding a tracking redirect.",
+      "Generate a LinkedIn QR code for a public profile, company page, post, or other official LinkedIn URL. Qraftt validates and encodes the direct destination locally without adding a tracking redirect.",
     label: "LinkedIn QR Generator",
     metaDescription:
       "Create a free LinkedIn QR code for a profile, company, or post URL. Generate locally with a direct destination and download PNG or SVG.",
@@ -1368,7 +1366,7 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
       {
         question: "Should I include the @ symbol?",
         answer:
-          "It is optional when entering a public username. Qraft removes the symbol and creates the corresponding direct t.me destination.",
+          "It is optional when entering a public username. Qraftt removes the symbol and creates the corresponding direct t.me destination.",
       },
       {
         question: "Can I use a private invitation link?",
@@ -1376,7 +1374,7 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
           "Yes, when you paste the complete official t.me invitation URL. Treat private invite QR codes carefully because anyone who receives one may be able to request or gain access.",
       },
       {
-        question: "Does scanning depend on Qraft?",
+        question: "Does scanning depend on Qraftt?",
         answer:
           "No. The static QR code points directly to Telegram. The Telegram app or website handles the destination after scanning.",
       },
@@ -1400,7 +1398,7 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
       },
     ],
     introduction:
-      "Create a Telegram QR code for a public username, bot, channel, group, or official invitation URL. The direct t.me destination is generated in your browser and stored in a static code with no Qraft redirect.",
+      "Create a Telegram QR code for a public username, bot, channel, group, or official invitation URL. The direct t.me destination is generated in your browser and stored in a static code with no Qraftt redirect.",
     label: "Telegram QR Generator",
     metaDescription:
       "Create a free Telegram QR code for a username, bot, channel, group, or t.me link. Generate locally and download PNG or SVG.",
@@ -1447,7 +1445,7 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
       {
         question: "Does the QR code collect or store reviews?",
         answer:
-          "No. The code opens the Google destination you provide. Reviews are written and submitted on Google, not on Qraft.",
+          "No. The code opens the Google destination you provide. Reviews are written and submitted on Google, not on Qraftt.",
       },
       {
         question: "Can I offer a reward for scanning and reviewing?",
@@ -1501,7 +1499,7 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
       },
     ],
     introduction:
-      "Turn an official Google review or Google Maps link into a static QR code customers can scan after a genuine visit. The validated destination is encoded locally and opens Google directly, without a Qraft redirect or review collection page.",
+      "Turn an official Google review or Google Maps link into a static QR code customers can scan after a genuine visit. The validated destination is encoded locally and opens Google directly, without a Qraftt redirect or review collection page.",
     label: "Google Review QR Generator",
     metaDescription:
       "Create a free Google Review QR code from an official Business Profile review or Maps URL. Generate locally and download PNG or SVG.",
@@ -1542,9 +1540,9 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
     badge: "Open a digital menu directly",
     faq: [
       {
-        question: "Does Qraft host my restaurant menu?",
+        question: "Does Qraftt host my restaurant menu?",
         answer:
-          "No. Enter a public menu page that you already manage or use. The QR code stores that destination directly and Qraft does not upload or host menu files.",
+          "No. Enter a public menu page that you already manage or use. The QR code stores that destination directly and Qraftt does not upload or host menu files.",
       },
       {
         question: "Can the menu change after I print the QR code?",
@@ -1557,9 +1555,9 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
           "Yes. For a direct public file ending in .pdf, the dedicated PDF QR generator provides more specific validation. A responsive web menu is often easier to read on phones.",
       },
       {
-        question: "Will guests pass through a Qraft page?",
+        question: "Will guests pass through a Qraftt page?",
         answer:
-          "No. Scanning opens the restaurant or menu URL encoded in the static QR code, with no Qraft redirect in between.",
+          "No. Scanning opens the restaurant or menu URL encoded in the static QR code, with no Qraftt redirect in between.",
       },
     ],
     guidance: {
@@ -1603,7 +1601,7 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
       },
     ],
     introduction:
-      "Create a static menu QR code that sends guests straight to your restaurant’s public menu, ordering page, or hosted menu file. The destination is validated and encoded in the browser, so every scan opens your link without relying on Qraft.",
+      "Create a static menu QR code that sends guests straight to your restaurant’s public menu, ordering page, or hosted menu file. The destination is validated and encoded in the browser, so every scan opens your link without relying on Qraftt.",
     label: "Menu QR Generator",
     metaDescription:
       "Create a free restaurant menu QR code for a public digital menu or ordering URL. Generate locally and download print-ready PNG or SVG.",
@@ -1654,9 +1652,9 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
           "No. It opens the selected Spotify destination. Playback, availability, login requirements, and app behavior are controlled by Spotify and the scanner’s device.",
       },
       {
-        question: "Does Qraft copy or host Spotify audio?",
+        question: "Does Qraftt copy or host Spotify audio?",
         answer:
-          "No. Qraft stores only the official Spotify URL in the QR code. It does not download, stream, or host tracks or podcast episodes.",
+          "No. Qraftt stores only the official Spotify URL in the QR code. It does not download, stream, or host tracks or podcast episodes.",
       },
       {
         question: "Can I use a Spotify URI instead of a web URL?",
@@ -1683,7 +1681,7 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
       },
     ],
     introduction:
-      "Create a static Spotify QR code for a track, album, playlist, artist, podcast show, or episode. Qraft validates the official open.spotify.com destination and encodes it locally, so scans go straight to Spotify without an intermediate redirect.",
+      "Create a static Spotify QR code for a track, album, playlist, artist, podcast show, or episode. Qraftt validates the official open.spotify.com destination and encodes it locally, so scans go straight to Spotify without an intermediate redirect.",
     label: "Spotify QR Generator",
     metaDescription:
       "Create a free Spotify QR code for a track, album, playlist, artist, show, or episode. Generate locally and download PNG or SVG.",
@@ -1723,9 +1721,9 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
     badge: "Opens PayPal securely",
     faq: [
       {
-        question: "Does Qraft process the payment?",
+        question: "Does Qraftt process the payment?",
         answer:
-          "No. Qraft only places your validated PayPal URL in a static QR code. The person scanning reviews and completes any transaction on PayPal.",
+          "No. Qraftt only places your validated PayPal URL in a static QR code. The person scanning reviews and completes any transaction on PayPal.",
       },
       {
         question: "Which PayPal links can I use?",
@@ -1738,7 +1736,7 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
           "No. A scan only opens the PayPal destination. The payer must confirm the recipient, amount, payment type, and funding method within PayPal.",
       },
       {
-        question: "Are PayPal fees included or changed by Qraft?",
+        question: "Are PayPal fees included or changed by Qraftt?",
         answer:
           "No. Any availability, account requirements, fees, buyer protections, or transaction terms are determined by PayPal and the parties to the payment.",
       },
@@ -1762,7 +1760,7 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
       },
     ],
     introduction:
-      "Convert an official PayPal.Me or supported PayPal payment URL into a static QR code. The link is validated and generated locally; Qraft never handles money, account credentials, checkout details, or transaction data.",
+      "Convert an official PayPal.Me or supported PayPal payment URL into a static QR code. The link is validated and generated locally; Qraftt never handles money, account credentials, checkout details, or transaction data.",
     label: "PayPal QR Generator",
     metaDescription:
       "Create a free QR code for an official PayPal.Me or PayPal payment link. Generated locally with no signup; download PNG or SVG.",
@@ -1802,9 +1800,9 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
     badge: "Direct links to public PDFs",
     faq: [
       {
-        question: "Does Qraft upload or host my PDF?",
+        question: "Does Qraftt upload or host my PDF?",
         answer:
-          "No. The PDF must already be available at a public URL ending in .pdf. Qraft validates and encodes that link locally without uploading the file.",
+          "No. The PDF must already be available at a public URL ending in .pdf. Qraftt validates and encodes that link locally without uploading the file.",
       },
       {
         question: "What makes a PDF URL public?",
@@ -1863,7 +1861,7 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
       },
     ],
     introduction:
-      "Create a static QR code for a PDF that is already hosted at a public web address. Qraft requires a direct URL ending in .pdf and generates the code locally, without uploading, copying, storing, or serving your document.",
+      "Create a static QR code for a PDF that is already hosted at a public web address. Qraftt requires a direct URL ending in .pdf and generates the code locally, without uploading, copying, storing, or serving your document.",
     label: "PDF QR Generator",
     metaDescription:
       "Create a free PDF QR code for a direct public document URL. No file upload or hosting—generate locally and download a sharp PNG or SVG.",
@@ -1871,7 +1869,7 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
       "menu-qr-code-generator",
       "url-qr-code-generator",
       "google-docs-qr-code-generator",
-      "presentation-qr-code-generator",
+      "spreadsheet-qr-code-generator",
     ],
     seoTitle: "Free PDF QR Code Generator — Direct Document Link",
     slug: "pdf-qr-code-generator",
@@ -1919,7 +1917,7 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
           "No. The static QR code stores the event details directly. Create and replace the code if the schedule, venue, or description changes.",
       },
       {
-        question: "Does Qraft create or host a calendar invitation?",
+        question: "Does Qraftt create or host a calendar invitation?",
         answer:
           "No. The standards-compatible event payload is generated locally. The scanning device decides which calendar application handles it.",
       },
@@ -1988,7 +1986,7 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
           "Use an official forms.gle short link or a public Google Forms response URL. Editing and administration links are not intended for respondents.",
       },
       {
-        question: "Does Qraft collect form responses?",
+        question: "Does Qraftt collect form responses?",
         answer:
           "No. Scanning opens Google Forms directly. Form access, responses, storage, and account requirements remain entirely with Google and the form owner.",
       },
@@ -2067,7 +2065,7 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
           "Use an official docs.google.com/document link. The document’s sharing settings must allow the intended audience to view it.",
       },
       {
-        question: "Does Qraft copy or store the document?",
+        question: "Does Qraftt copy or store the document?",
         answer:
           "No. Only the Google Docs URL is placed in the QR code. The document stays in Google Drive under the owner’s access controls.",
       },
@@ -2101,7 +2099,7 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
       },
     ],
     introduction:
-      "Create a static QR code for a shareable Google Docs document. Qraft validates the official docs.google.com destination and generates the code in your browser without copying, uploading, or hosting the file.",
+      "Create a static QR code for a shareable Google Docs document. Qraftt validates the official docs.google.com destination and generates the code in your browser without copying, uploading, or hosting the file.",
     label: "Google Docs QR Generator",
     metaDescription:
       "Create a free QR code for a shareable Google Docs URL. Validate the official link, generate locally, and download PNG or SVG.",
@@ -2141,9 +2139,9 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
     badge: "Direct public image links",
     faq: [
       {
-        question: "Does Qraft upload or host images?",
+        question: "Does Qraftt upload or host images?",
         answer:
-          "No. The image must already have a public direct URL. Qraft encodes that address locally and never receives or stores the image file.",
+          "No. The image must already have a public direct URL. Qraftt encodes that address locally and never receives or stores the image file.",
       },
       {
         question: "Which image formats are accepted?",
@@ -2188,7 +2186,7 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
       "pdf-qr-code-generator",
       "audio-qr-code-generator",
       "url-qr-code-generator",
-      "presentation-qr-code-generator",
+      "google-docs-qr-code-generator",
     ],
     seoTitle: "Free Image and PNG QR Code Generator",
     slug: "image-qr-code-generator",
@@ -2212,7 +2210,7 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
       {
         title: "Digital portfolios",
         description:
-          "Point cards and printed work to a specific public visual without routing scans through Qraft.",
+          "Point cards and printed work to a specific public visual without routing scans through Qraftt.",
       },
     ],
   },
@@ -2220,9 +2218,9 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
     badge: "Direct public audio links",
     faq: [
       {
-        question: "Does Qraft upload or stream audio?",
+        question: "Does Qraftt upload or stream audio?",
         answer:
-          "No. The audio file stays on the public host you choose. Qraft only encodes its direct URL locally inside the QR code.",
+          "No. The audio file stays on the public host you choose. Qraftt only encodes its direct URL locally inside the QR code.",
       },
       {
         question: "Which audio formats are accepted?",
@@ -2259,7 +2257,7 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
       },
     ],
     introduction:
-      "Generate a static QR code for an MP3, WAV, OGG, M4A, AAC, FLAC, or WebM file already available at a public URL. Qraft validates the direct link without uploading, hosting, or streaming audio.",
+      "Generate a static QR code for an MP3, WAV, OGG, M4A, AAC, FLAC, or WebM file already available at a public URL. Qraftt validates the direct link without uploading, hosting, or streaming audio.",
     label: "Audio QR Generator",
     metaDescription:
       "Create a free audio QR code for a direct public MP3, WAV, OGG, M4A, AAC, FLAC, or WebM URL. No upload; download PNG or SVG.",
@@ -2304,9 +2302,9 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
           "Use a public Excel, CSV, ODS, or official Google Sheets URL. The generator checks the file extension or recognized Google Sheets destination.",
       },
       {
-        question: "Does Qraft read or store spreadsheet data?",
+        question: "Does Qraftt read or store spreadsheet data?",
         answer:
-          "No. Only the destination URL is encoded. Qraft does not fetch the workbook, inspect its cells, or upload it to another service.",
+          "No. Only the destination URL is encoded. Qraftt does not fetch the workbook, inspect its cells, or upload it to another service.",
       },
       {
         question: "Can I update the spreadsheet after printing?",
@@ -2344,7 +2342,7 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
       "Create a free QR code for Excel, CSV, ODS, or Google Sheets URLs. Generate locally without file uploads and download PNG or SVG.",
     related: [
       "google-docs-qr-code-generator",
-      "presentation-qr-code-generator",
+      "image-qr-code-generator",
       "pdf-qr-code-generator",
       "url-qr-code-generator",
     ],
@@ -2374,85 +2372,6 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
       },
     ],
   },
-  "presentation-qr-code-generator": {
-    badge: "Public presentation links",
-    faq: [
-      {
-        question: "Which presentation URLs are supported?",
-        answer:
-          "Use a public PPT, PPTX, ODP, or official Google Slides URL. The link must be accessible to the people who will scan it.",
-      },
-      {
-        question: "Does Qraft upload or convert presentations?",
-        answer:
-          "No. Qraft encodes the public destination only. It does not receive, preview, convert, or host the presentation file.",
-      },
-      {
-        question: "Can I update the slides later?",
-        answer:
-          "Yes, when the same public URL remains valid. Editing an existing Google Slides deck or replacing a hosted file at the same address preserves the QR destination.",
-      },
-      {
-        question: "Will the presentation open in slideshow mode?",
-        answer:
-          "That depends on the URL and hosting service. Copy the published or presentation link you want viewers to see and test it before printing.",
-      },
-    ],
-    h1: "Free PPTX and Presentation QR Code Generator",
-    howTo: [
-      {
-        title: "Publish a viewable presentation",
-        description:
-          "Use a public Google Slides link or host a PPT, PPTX, or ODP file at a stable web address.",
-      },
-      {
-        title: "Paste and test the destination",
-        description:
-          "Scan the live preview on another device and confirm the correct deck opens with the intended permissions.",
-      },
-      {
-        title: "Download the QR asset",
-        description:
-          "Apply a readable design and export PNG for screens or SVG for sharp presentation and print placement.",
-      },
-    ],
-    introduction:
-      "Create a static QR code for a public PPT, PPTX, ODP, or Google Slides presentation. Qraft validates and encodes the destination locally without uploading, converting, or hosting your slide deck.",
-    label: "Presentation QR Generator",
-    metaDescription:
-      "Create a free QR code for PPT, PPTX, ODP, or Google Slides URLs. Generate locally without uploads and download PNG or SVG.",
-    related: [
-      "spreadsheet-qr-code-generator",
-      "google-docs-qr-code-generator",
-      "pdf-qr-code-generator",
-      "url-qr-code-generator",
-    ],
-    seoTitle: "Free PPTX and Presentation QR Code Generator",
-    slug: "presentation-qr-code-generator",
-    type: "presentation-url",
-    useCases: [
-      {
-        title: "Conference talks",
-        description:
-          "Share an approved slide deck from the closing slide, speaker handout, or session signage.",
-      },
-      {
-        title: "Classroom lessons",
-        description:
-          "Connect worksheets and learning spaces to slides students can review on their own devices.",
-      },
-      {
-        title: "Sales materials",
-        description:
-          "Link brochures, proposals, and booth displays to a current public product or company presentation.",
-      },
-      {
-        title: "Training resources",
-        description:
-          "Place maintained presentation material on manuals, workstation cards, and course documentation.",
-      },
-    ],
-  },
   "discord-qr-code-generator": {
     badge: "Official Discord destinations",
     faq: [
@@ -2467,7 +2386,7 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
           "Yes. Invite behavior is controlled by the server and may include an expiration date, usage limit, or revocation. Create a non-expiring invite when appropriate and permitted.",
       },
       {
-        question: "Does Qraft join or manage the server?",
+        question: "Does Qraftt join or manage the server?",
         answer:
           "No. The QR code only opens Discord. Membership approval, community rules, moderation, and account requirements remain with Discord and the server administrators.",
       },
@@ -2496,13 +2415,13 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
       },
     ],
     introduction:
-      "Create a static Discord QR code for an official invite, server, or channel URL. The destination is validated and encoded directly in your browser, with no Qraft redirect or community management layer.",
+      "Create a static Discord QR code for an official invite, server, or channel URL. The destination is validated and encoded directly in your browser, with no Qraftt redirect or community management layer.",
     label: "Discord QR Generator",
     metaDescription:
       "Create a free Discord QR code for an official invite, server, or channel URL. Generate locally and download customizable PNG or SVG.",
     related: [
       "telegram-qr-code-generator",
-      "reddit-qr-code-generator",
+      "facebook-qr-code-generator",
       "url-qr-code-generator",
       "instagram-qr-code-generator",
     ],
@@ -2532,85 +2451,6 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
       },
     ],
   },
-  "reddit-qr-code-generator": {
-    badge: "Direct Reddit links",
-    faq: [
-      {
-        question: "Which Reddit links are accepted?",
-        answer:
-          "Use an official reddit.com or redd.it URL for a community, profile, post, comment thread, or other public destination.",
-      },
-      {
-        question: "Does Qraft track Reddit visits?",
-        answer:
-          "No. The official Reddit URL is encoded directly in the static code and scans are not routed through Qraft.",
-      },
-      {
-        question: "Can age or login restrictions still appear?",
-        answer:
-          "Yes. Reddit applies its own account, content, region, age, and community visibility rules after the destination opens.",
-      },
-      {
-        question: "Can a Reddit post disappear after printing?",
-        answer:
-          "Yes. Posts, communities, and short links can be removed or restricted. The QR code remains unchanged but cannot preserve unavailable content.",
-      },
-    ],
-    h1: "Free Reddit QR Code Generator",
-    howTo: [
-      {
-        title: "Copy the public Reddit URL",
-        description:
-          "Open the community, profile, post, or discussion you want to share and copy its official link.",
-      },
-      {
-        title: "Check the destination",
-        description:
-          "Paste the URL and scan the preview to confirm it reaches the intended public Reddit content.",
-      },
-      {
-        title: "Style and download",
-        description:
-          "Keep the QR design readable, export PNG or SVG, and test the final placement with a phone.",
-      },
-    ],
-    introduction:
-      "Generate a static Reddit QR code for a public community, profile, post, or discussion URL. Qraft validates official reddit.com and redd.it destinations and encodes the link locally without tracking redirects.",
-    label: "Reddit QR Generator",
-    metaDescription:
-      "Create a free Reddit QR code for a community, profile, post, or discussion URL. Direct local generation with PNG and SVG downloads.",
-    related: [
-      "discord-qr-code-generator",
-      "telegram-qr-code-generator",
-      "url-qr-code-generator",
-      "youtube-qr-code-generator",
-    ],
-    seoTitle: "Free Reddit QR Code Generator",
-    slug: "reddit-qr-code-generator",
-    type: "reddit",
-    useCases: [
-      {
-        title: "Community promotion",
-        description:
-          "Make an appropriate public subreddit easier to find from flyers, meetups, and printed resources.",
-      },
-      {
-        title: "Discussion references",
-        description:
-          "Connect a presentation, article, or workshop handout to a relevant public thread.",
-      },
-      {
-        title: "Creator participation",
-        description:
-          "Share an official AMA, announcement, or discussion from event and campaign materials.",
-      },
-      {
-        title: "Support resources",
-        description:
-          "Link product guides or community documentation to a maintained public Reddit resource.",
-      },
-    ],
-  },
   "amazon-qr-code-generator": {
     badge: "Official Amazon destinations",
     faq: [
@@ -2620,9 +2460,9 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
           "Use a public product or storefront URL on a supported official Amazon country domain, or an official amzn.to short link.",
       },
       {
-        question: "Does Qraft sell or fulfill products?",
+        question: "Does Qraftt sell or fulfill products?",
         answer:
-          "No. Qraft only encodes the Amazon URL. Product information, availability, pricing, purchases, returns, and accounts are handled by Amazon and the seller.",
+          "No. Qraftt only encodes the Amazon URL. Product information, availability, pricing, purchases, returns, and accounts are handled by Amazon and the seller.",
       },
       {
         question: "Can product prices change after printing?",
@@ -2654,7 +2494,7 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
       },
     ],
     introduction:
-      "Create a static QR code for a public Amazon product or storefront on an official regional domain. The direct destination is validated and generated locally; Qraft does not sell products or process purchases.",
+      "Create a static QR code for a public Amazon product or storefront on an official regional domain. The direct destination is validated and generated locally; Qraftt does not sell products or process purchases.",
     label: "Amazon QR Generator",
     metaDescription:
       "Create a free Amazon QR code for an official product or storefront URL. Generate locally with no redirects and download PNG or SVG.",
@@ -2709,7 +2549,7 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
           "A compatible device may open Snapchat when installed. Otherwise the destination typically opens through a browser or app-install flow.",
       },
       {
-        question: "Does Qraft access my Snapchat account?",
+        question: "Does Qraftt access my Snapchat account?",
         answer:
           "No. No login or account connection is used. The public Snapchat URL is validated and encoded locally in the static QR code.",
       },
@@ -2783,7 +2623,7 @@ export const generatorPages: Record<GeneratorPageSlug, GeneratorPageContent> = {
           "This static generator encodes one direct store URL. Use the listing appropriate for your audience, or create separate Apple and Google Play codes.",
       },
       {
-        question: "Does Qraft install or distribute the app?",
+        question: "Does Qraftt install or distribute the app?",
         answer:
           "No. Scanning opens the official store listing. Installation, purchases, subscriptions, compatibility, and account requirements stay with Apple, Google, and the app publisher.",
       },

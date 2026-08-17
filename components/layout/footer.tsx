@@ -22,6 +22,7 @@ export function Footer() {
                 {label}
               </Link>
             ))}
+            <a href="mailto:support@qraftt.com">support@qraftt.com</a>
             <CookieSettingsButton />
           </nav>
         </div>

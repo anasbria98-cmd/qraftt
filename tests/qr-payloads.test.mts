@@ -30,8 +30,6 @@ const values: QrFormValues = {
   menu: "https://restaurant.example/menu",
   paypal: "https://paypal.me/Qraft/25USD",
   "pdf-link": "https://example.com/guides/menu.pdf",
-  "presentation-url": "https://media.example.com/talks/keynote.pptx",
-  reddit: "https://www.reddit.com/r/qraft/",
   phoneNumber: "+1 (202) 555-0147",
   smsMessage: "Hello! Meet at 5 & bring tea.",
   smsNumber: "+1 (202) 555-0147",
@@ -168,7 +166,6 @@ test("creates direct official social platform destinations", () => {
     facebook: "https://www.facebook.com/qraft.page",
     instagram: "https://www.instagram.com/qraft",
     linkedin: "https://linkedin.com/in/qraft",
-    reddit: "https://www.reddit.com/r/qraft/",
     snapchat: "https://www.snapchat.com/add/qraft",
     telegram: "https://t.me/qraft_bot",
     tiktok: "https://www.tiktok.com/@qraft",
@@ -210,7 +207,6 @@ test("creates direct validated destination-link payloads", () => {
     spotify: "https://open.spotify.com/track/6rqhFgbbKwnb9MLmUQDhG6",
     paypal: "https://paypal.me/Qraft/25USD",
     "pdf-link": "https://example.com/guides/menu.pdf",
-    "presentation-url": "https://media.example.com/talks/keynote.pptx",
     "spreadsheet-url": "https://docs.google.com/spreadsheets/d/ExampleSheetId123/view",
   } as const;
 
@@ -261,7 +257,6 @@ test("rejects unsupported or non-public destination-link URLs", () => {
     ["image-url", "https://example.com/image.svg", /PNG, JPG/],
     ["audio-url", "https://example.com/listen", /direct public MP3/],
     ["spreadsheet-url", "https://example.com/report.pdf", /spreadsheet|Excel/],
-    ["presentation-url", "https://example.com/slides.pdf", /presentation|PPT/],
     ["app-store", "https://play.google.com/store/books/details?id=example", /App Store|Google Play/],
   ] as const;
 
@@ -277,13 +272,6 @@ test("rejects unsupported or non-public destination-link URLs", () => {
       discord: "https://discord.com/download",
     }).error ?? "",
     /official discord domain/,
-  );
-  assert.match(
-    buildQrPayload("reddit", {
-      ...values,
-      reddit: "https://reddit.example/r/qraft",
-    }).error ?? "",
-    /official reddit domain/,
   );
   assert.match(
     buildQrPayload("amazon", {

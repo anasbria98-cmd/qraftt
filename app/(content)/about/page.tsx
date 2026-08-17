@@ -6,9 +6,9 @@ import { Container } from "@/components/ui/container";
 import { createPageMetadata } from "@/lib/seo/metadata";
 import { siteConfig } from "@/lib/site";
 
-const title = "About Qraft";
+const title = "About Qraftt";
 const description =
-  "Learn why Qraft provides free, client-side static QR code tools with no signup, subscription, scan limits, or hosted redirects.";
+  "Learn why Qraftt provides free, client-side static QR code tools with no signup, subscription, scan limits, or hosted redirects.";
 const breadcrumbs = [
   { href: "/", label: "Home" },
   { href: "/about", label: "About" },
@@ -43,8 +43,8 @@ export default function AboutPage() {
       />
       <PageHero
         breadcrumbs={breadcrumbs}
-        eyebrow="Why Qraft exists"
-        introduction="Qraft is a focused set of free static QR tools for people who need a reliable code without creating an account, choosing a subscription, or routing scans through a QR vendor."
+        eyebrow="Why Qraftt exists"
+        introduction="Qraftt is a focused set of free static QR tools for people who need a reliable code without creating an account, choosing a subscription, or routing scans through a QR vendor."
         title="Useful QR tools, built with restraint"
       />
       <section className="content-section">
@@ -63,7 +63,7 @@ export default function AboutPage() {
             <h2>Static by design</h2>
             <p>
               Downloaded codes store their destination or structured content
-              directly. They do not depend on a Qraft redirect, subscription, or
+              directly. They do not depend on a Qraftt redirect, subscription, or
               scan counter after download.
             </p>
           </article>
@@ -90,17 +90,17 @@ export default function AboutPage() {
       <section className="section section-muted">
         <Container className="trust-copy-grid">
           <div>
-            <p className="eyebrow">What Qraft can do</p>
+            <p className="eyebrow">What Qraftt can do</p>
             <h2>Create a file you control.</h2>
           </div>
           <div>
             <p>
-              Qraft validates supported inputs, generates a live preview, and
+              Qraftt validates supported inputs, generates a live preview, and
               exports PNG or SVG. Once downloaded, the static code can be placed
               in your own documents, websites, packaging, or signs.
             </p>
             <p>
-              Qraft cannot guarantee that an external page remains online, that
+              Qraftt cannot guarantee that an external page remains online, that
               every scanner behaves identically, or that a code will survive a
               poor print process. Testing the final destination and physical
               result remains essential.

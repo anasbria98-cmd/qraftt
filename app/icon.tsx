@@ -9,19 +9,27 @@ export default function Icon() {
       <div
         style={{
           alignItems: "center",
-          background: "#102a2a",
-          borderRadius: 16,
-          color: "#b9f5cf",
+          background: "#fbfaf6",
+          borderRadius: 15,
+          color: "#073f33",
           display: "flex",
-          fontSize: 36,
-          fontWeight: 800,
           height: "100%",
           justifyContent: "center",
-          letterSpacing: "-0.08em",
           width: "100%",
         }}
       >
-        Q
+        <svg height="50" viewBox="0 0 48 48" width="50">
+          <g fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="4">
+            <path d="M4 18V8a4 4 0 0 1 4-4h10" />
+            <path d="M30 4h10a4 4 0 0 1 4 4v10" />
+            <path d="M44 30v10a4 4 0 0 1-4 4H30" stroke="#63c7a0" />
+            <path d="M18 44H8a4 4 0 0 1-4-4V30" stroke="#63c7a0" />
+          </g>
+          <rect fill="#073f33" height="9" rx="2" width="9" x="13" y="13" />
+          <rect fill="#073f33" height="9" rx="2" width="9" x="27" y="13" />
+          <rect fill="#63c7a0" height="9" rx="2" width="9" x="13" y="27" />
+          <rect fill="#63c7a0" height="9" rx="2" width="9" x="27" y="27" />
+        </svg>
       </div>
     ),
     size,

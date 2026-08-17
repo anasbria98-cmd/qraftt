@@ -5,9 +5,9 @@ import { Container } from "@/components/ui/container";
 import { createPageMetadata } from "@/lib/seo/metadata";
 import { siteConfig } from "@/lib/site";
 
-const title = "Contact Qraft";
+const title = "Contact Qraftt";
 const description =
-  "View Qraft’s contact page and the current status of support submissions for the free client-side QR generator.";
+  "View Qraftt’s contact page and the current status of support submissions for the free client-side QR generator.";
 const breadcrumbs = [
   { href: "/", label: "Home" },
   { href: "/contact", label: "Contact" },
@@ -44,7 +44,7 @@ export default function ContactPage() {
         breadcrumbs={breadcrumbs}
         eyebrow="Contact"
         introduction="The contact interface is prepared, but online submissions are not connected yet. Nothing entered below is transmitted or stored."
-        title="Get in touch with Qraft"
+        title="Get in touch with Qraftt"
       />
       <section className="content-section">
         <Container className="contact-layout">
@@ -52,10 +52,13 @@ export default function ContactPage() {
             <p className="eyebrow">Before writing</p>
             <h2>Useful details make issues easier to reproduce.</h2>
             <p>
-              When a working support channel is added, include the QR type,
-              browser, device, validation message, and what happened after the
-              scan. Never send passwords, payment details, or confidential QR
-              payloads.
+              When emailing support, include the QR type, browser, device,
+              validation message, and what happened after the scan. Never send
+              passwords, payment details, or confidential QR payloads.
+            </p>
+            <p>
+              Email us at{" "}
+              <a href="mailto:support@qraftt.com">support@qraftt.com</a>.
             </p>
             <div className="contact-status">
               <strong>Submission status</strong>

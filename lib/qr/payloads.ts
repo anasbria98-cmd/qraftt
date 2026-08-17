@@ -470,13 +470,6 @@ function isGoogleSheetsUrl(url: URL) {
   );
 }
 
-function isGoogleSlidesUrl(url: URL) {
-  return (
-    url.hostname.toLowerCase() === "docs.google.com" &&
-    /^\/presentation\/d\/[a-z\d_-]+(?:\/|$)/i.test(url.pathname)
-  );
-}
-
 function isAppStoreUrl(url: URL) {
   const hostname = url.hostname.toLowerCase().replace(/^www\./, "");
   if (hostname === "apps.apple.com" || hostname === "itunes.apple.com") {
@@ -541,11 +534,6 @@ function buildLinkPayload(
         hasFileExtension(url, ["xls", "xlsx", "csv", "ods"])
         ? normalized
         : invalid("Use a public Excel, CSV, ODS, or Google Sheets URL.");
-    case "presentation-url":
-      return isGoogleSlidesUrl(url) ||
-        hasFileExtension(url, ["ppt", "pptx", "odp"])
-        ? normalized
-        : invalid("Use a public PPT, PPTX, ODP, or Google Slides URL.");
     case "app-store":
       return isAppStoreUrl(url)
         ? normalized
@@ -565,9 +553,6 @@ function hasValidPlatformPath(url: URL, type: SocialQrType) {
       /^\/invite\/[a-z\d-]+\/?$/i.test(path) ||
       /^\/channels\/\d+(?:\/\d+)?\/?$/i.test(path)
     );
-  }
-  if (type === "reddit") {
-    return path !== "/";
   }
   if (type === "amazon") {
     return path !== "/";

@@ -45,10 +45,11 @@ export function GeneratorFields({
 
   return (
     <div
-      aria-labelledby={`generator-tab-${type}`}
+      aria-labelledby="generator-selected-type-label"
       className="generator-fields"
       id="generator-fields-panel"
       role="tabpanel"
+      tabIndex={-1}
     >
       {type === "url" ? (
         <Field label="Destination URL" hint="We’ll add https:// if you leave it out.">

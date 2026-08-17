@@ -17,7 +17,7 @@ export function Header() {
           ))}
         </nav>
         <div className="header-cta">
-          <ButtonLink href="/qr-code-generator">Create a QR code</ButtonLink>
+          <ButtonLink href="/#qr-generator">Create QR Code</ButtonLink>
         </div>
         <details className="mobile-menu">
           <summary aria-label="Open navigation menu">
@@ -33,6 +33,9 @@ export function Header() {
                 </Link>
               ))}
             </nav>
+            <div className="mobile-menu-cta">
+              <ButtonLink href="/#qr-generator">Create QR Code</ButtonLink>
+            </div>
           </div>
         </details>
       </Container>

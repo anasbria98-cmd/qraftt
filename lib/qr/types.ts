@@ -6,7 +6,6 @@ export type SocialQrType =
   | "linkedin"
   | "telegram"
   | "discord"
-  | "reddit"
   | "amazon"
   | "snapchat";
 
@@ -21,7 +20,6 @@ export type LinkQrType =
   | "image-url"
   | "audio-url"
   | "spreadsheet-url"
-  | "presentation-url"
   | "app-store";
 
 export type QrType =
@@ -67,8 +65,6 @@ export interface QrFormValues {
   menu: string;
   paypal: string;
   "pdf-link": string;
-  "presentation-url": string;
-  reddit: string;
   phoneNumber: string;
   smsMessage: string;
   smsNumber: string;

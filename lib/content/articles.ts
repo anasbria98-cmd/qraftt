@@ -83,7 +83,7 @@ export const blogArticles: Record<BlogArticleSlug, BlogArticle> = {
         heading: "Enter and validate the content",
         id: "enter-content",
         paragraphs: [
-          "Paste or type the destination into the matching generator. Qraft validates common mistakes before rendering—for example, unsafe URL schemes, malformed email addresses, invalid coordinates, and incomplete phone numbers. Validation can confirm a format, but it cannot promise that an external page will stay online or that information on another service is correct.",
+          "Paste or type the destination into the matching generator. Qraftt validates common mistakes before rendering—for example, unsafe URL schemes, malformed email addresses, invalid coordinates, and incomplete phone numbers. Validation can confirm a format, but it cannot promise that an external page will stay online or that information on another service is correct.",
           "Review the destination as carefully as you would proofread printed copy. A static QR code stores the payload directly, so a typo becomes part of the downloaded symbol. If the destination changes later, you normally need to generate and print a new code.",
         ],
       },
@@ -199,7 +199,7 @@ export const blogArticles: Record<BlogArticleSlug, BlogArticle> = {
         heading: "Generate the code locally",
         id: "generate-locally",
         paragraphs: [
-          "Open the WiFi generator, enter the details, and watch the preview update. Qraft escapes punctuation that has a special meaning in WiFi QR payloads, such as semicolons and backslashes. The completed code is created in the browser; the network name and password are not sent to a Qraft database.",
+          "Open the WiFi generator, enter the details, and watch the preview update. Qraftt escapes punctuation that has a special meaning in WiFi QR payloads, such as semicolons and backslashes. The completed code is created in the browser; the network name and password are not sent to a Qraftt database.",
           "Choose a high-contrast foreground and background. If the code will sit near a kitchen, workshop, reception desk, or outdoor area where it may become dirty, a higher error-correction level can help—but it can also make the symbol denser, so allow more physical space.",
         ],
       },
@@ -256,7 +256,7 @@ export const blogArticles: Record<BlogArticleSlug, BlogArticle> = {
         label: "Create a free static QR code",
       },
       {
-        description: "Encode your final public URL without a Qraft redirect.",
+        description: "Encode your final public URL without a Qraftt redirect.",
         href: "/url-qr-code-generator",
         label: "Create a URL QR code",
       },

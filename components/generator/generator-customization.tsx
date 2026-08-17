@@ -6,42 +6,70 @@ import {
   bodyStyleOptions,
   defaultDesign,
   designTemplates,
-  eyeStyleOptions,
   frameOptions,
+  innerEyeStyleOptions,
+  noTemplate,
+  outerEyeStyleOptions,
   type QrDesignOptions,
   type QrDesignTemplate,
 } from "@/lib/qr/design";
-import { renderQrSvg } from "@/lib/qr/render";
+import { renderFramePreviewSvg, renderQrSvg } from "@/lib/qr/render";
 import type { ErrorCorrectionLevel } from "@/lib/qr/types";
 
 const correctionLevels: Array<{
+  description: string;
   label: string;
   value: ErrorCorrectionLevel;
 }> = [
-  { label: "Low · 7%", value: "L" },
-  { label: "Medium · 15%", value: "M" },
-  { label: "Quartile · 25%", value: "Q" },
-  { label: "High · 30%", value: "H" },
+  { description: "Best for simple codes displayed clearly.", label: "Low · 7%", value: "L" },
+  { description: "Safe default for everyday use.", label: "Medium · 15%", value: "M" },
+  { description: "More recovery for print and handling.", label: "Quartile · 25%", value: "Q" },
+  { description: "Maximum recovery and required for logos.", label: "High · 30%", value: "H" },
 ];
 
+type CustomizationTab = "frames" | "shapes" | "logo" | "level";
+
+const customizationTabs: Array<{ label: string; value: CustomizationTab }> = [
+  { label: "Frames", value: "frames" },
+  { label: "Shapes", value: "shapes" },
+  { label: "Logo", value: "logo" },
+  { label: "Level", value: "level" },
+];
+
+const INITIAL_TEMPLATE_COUNT = 12;
+const INITIAL_FRAME_COUNT = 10;
+
 function previewUrl(design: QrDesignOptions) {
-  const svg = renderQrSvg("https://qraft.app", "H", design);
+  const svg = renderQrSvg("https://qraftt.com", "H", design);
   return `url("data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}")`;
 }
 
-const templatePreviews = Object.fromEntries(
-  designTemplates.map((item) => [
-    item.id,
-    previewUrl({ ...item.design, logoDataUrl: null, logoSize: 16 }),
-  ]),
-) as Record<string, string>;
+function svgPreviewUrl(svg: string) {
+  return `url("data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}")`;
+}
 
-const framePreviews = Object.fromEntries(
-  frameOptions.map((item) => [
-    item.value,
-    previewUrl({ ...defaultDesign, frame: item.value }),
-  ]),
-) as Record<string, string>;
+const templatePreviewCache = new Map<string, string>();
+const framePreviewCache = new Map<string, string>();
+
+function getTemplatePreview(template: QrDesignTemplate) {
+  const cached = templatePreviewCache.get(template.id);
+  if (cached) return cached;
+  const preview = previewUrl({
+    ...template.design,
+    logoDataUrl: null,
+    logoSize: 16,
+  });
+  templatePreviewCache.set(template.id, preview);
+  return preview;
+}
+
+function getFramePreview(frame: (typeof frameOptions)[number]) {
+  const cached = framePreviewCache.get(frame.value);
+  if (cached) return cached;
+  const preview = svgPreviewUrl(renderFramePreviewSvg(frame.value));
+  framePreviewCache.set(frame.value, preview);
+  return preview;
+}
 
 function isTemplateActive(
   design: QrDesignOptions,
@@ -85,6 +113,38 @@ async function processLogo(file: File) {
   return canvas.toDataURL("image/png");
 }
 
+interface ColorControlProps {
+  ariaLabel: string;
+  disabled?: boolean;
+  label: string;
+  onChange: (value: string) => void;
+  value: string;
+}
+
+function ColorControl({
+  ariaLabel,
+  disabled = false,
+  label,
+  onChange,
+  value,
+}: ColorControlProps) {
+  return (
+    <label className={disabled ? "is-disabled" : undefined}>
+      <span className="generator-label">{label}</span>
+      <span className="color-input-wrap">
+        <input
+          aria-label={ariaLabel}
+          disabled={disabled}
+          onChange={(event) => onChange(event.target.value)}
+          type="color"
+          value={value}
+        />
+        <span>{value.toUpperCase()}</span>
+      </span>
+    </label>
+  );
+}
+
 interface GeneratorCustomizationProps {
   design: QrDesignOptions;
   errorCorrection: ErrorCorrectionLevel;
@@ -103,7 +163,11 @@ export function GeneratorCustomization({
   warnings,
 }: GeneratorCustomizationProps) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const tabListRef = useRef<HTMLDivElement>(null);
+  const [activeTab, setActiveTab] = useState<CustomizationTab>("frames");
+  const [framesExpanded, setFramesExpanded] = useState(false);
   const [logoName, setLogoName] = useState("");
+  const [templatesExpanded, setTemplatesExpanded] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
 
   async function handleLogo(file: File | undefined) {
@@ -135,289 +199,535 @@ export function GeneratorCustomization({
     onReset();
   }
 
+  function handleTabKeyDown(event: React.KeyboardEvent<HTMLButtonElement>) {
+    const currentIndex = customizationTabs.findIndex(
+      (tab) => tab.value === activeTab,
+    );
+    let nextIndex = currentIndex;
+
+    if (event.key === "ArrowRight") nextIndex = (currentIndex + 1) % customizationTabs.length;
+    if (event.key === "ArrowLeft") nextIndex = (currentIndex - 1 + customizationTabs.length) % customizationTabs.length;
+    if (event.key === "Home") nextIndex = 0;
+    if (event.key === "End") nextIndex = customizationTabs.length - 1;
+    if (nextIndex === currentIndex) return;
+
+    event.preventDefault();
+    const nextTab = customizationTabs[nextIndex];
+    setActiveTab(nextTab.value);
+    tabListRef.current
+      ?.querySelector<HTMLButtonElement>(`#customize-tab-${nextTab.value}`)
+      ?.focus();
+  }
+
+  const effectiveLevel = design.logoDataUrl ? "H" : errorCorrection;
+  const hasContrastWarning = warnings.some((warning) =>
+    warning.startsWith("Low color contrast"),
+  );
+  const visibleTemplates = templatesExpanded
+    ? [noTemplate, ...designTemplates]
+    : [noTemplate, ...designTemplates.slice(0, INITIAL_TEMPLATE_COUNT - 1)];
+  const visibleFrames = framesExpanded
+    ? frameOptions
+    : frameOptions.slice(0, INITIAL_FRAME_COUNT);
+
+  function applyTemplate(template: QrDesignTemplate) {
+    onDesignChange(template.design);
+    onErrorCorrectionChange(template.errorCorrection);
+  }
+
   return (
     <div className="generator-customize">
-      <div className="customize-heading customize-title-row">
-        <div>
-          <span className="generator-label">Design studio</span>
-          <p>Templates and controls update the preview instantly.</p>
+      <div className="customization-toolbar">
+        <div
+          aria-label="QR customization sections"
+          className="customization-tabs"
+          ref={tabListRef}
+          role="tablist"
+        >
+          {customizationTabs.map((tab) => (
+            <button
+              aria-controls={`customize-panel-${tab.value}`}
+              aria-selected={activeTab === tab.value}
+              className={activeTab === tab.value ? "active" : undefined}
+              id={`customize-tab-${tab.value}`}
+              key={tab.value}
+              onClick={() => setActiveTab(tab.value)}
+              onKeyDown={handleTabKeyDown}
+              role="tab"
+              tabIndex={activeTab === tab.value ? 0 : -1}
+              type="button"
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
         <button className="reset-design-button" onClick={resetDesign} type="button">
           Reset design
         </button>
       </div>
 
-      <fieldset className="design-fieldset">
-        <legend>Template gallery</legend>
-        <div className="design-template-gallery">
-          {designTemplates.map((template) => {
-            const active = isTemplateActive(design, template);
-            return (
-              <button
-                aria-pressed={active}
-                className={active ? "design-gallery-card active" : "design-gallery-card"}
-                key={template.id}
-                onClick={() => onDesignChange(template.design)}
-                type="button"
-              >
-                <span
-                  aria-hidden="true"
-                  className="design-gallery-preview"
-                  style={{ backgroundImage: templatePreviews[template.id] }}
-                />
-                <span className="design-gallery-copy">
-                  <strong>{template.name}</strong>
-                  <small>{template.description}</small>
-                </span>
-              </button>
-            );
-          })}
-        </div>
-      </fieldset>
-
-      <div className="design-style-grid">
-        <fieldset className="design-fieldset">
-          <legend>QR body pattern</legend>
-          <div className="design-choice-grid pattern-choices">
-            {bodyStyleOptions.map((option) => (
-              <button
-                aria-pressed={design.bodyStyle === option.value}
-                className={design.bodyStyle === option.value ? "active" : undefined}
-                key={option.value}
-                onClick={() => onDesignChange({ bodyStyle: option.value })}
-                type="button"
-              >
-                <span
-                  aria-hidden="true"
-                  className="pattern-swatch"
-                  data-body-style={option.value}
-                />
-                {option.label}
-              </button>
-            ))}
-          </div>
-        </fieldset>
-        <fieldset className="design-fieldset">
-          <legend>Corner style</legend>
-          <div className="design-choice-grid eye-choices">
-            {eyeStyleOptions.map((option) => (
-              <button
-                aria-pressed={design.eyeStyle === option.value}
-                className={design.eyeStyle === option.value ? "active" : undefined}
-                key={option.value}
-                onClick={() => onDesignChange({ eyeStyle: option.value })}
-                type="button"
-              >
-                <span
-                  aria-hidden="true"
-                  className="eye-swatch"
-                  data-eye-style={option.value}
-                />
-                {option.label}
-              </button>
-            ))}
-          </div>
-        </fieldset>
-      </div>
-
-      <fieldset className="design-fieldset color-fieldset">
-        <legend>Colors</legend>
-        <div className="color-controls">
-          <label>
-            <span className="generator-label">Foreground</span>
-            <span className="color-input-wrap">
-              <input
-                aria-label="QR foreground color"
-                onChange={(event) => onDesignChange({ foreground: event.target.value })}
-                type="color"
-                value={design.foreground}
-              />
-              <span>{design.foreground.toUpperCase()}</span>
-            </span>
-          </label>
-          <label>
-            <span className="generator-label">Background</span>
-            <span className="color-input-wrap">
-              <input
-                aria-label="QR background color"
-                onChange={(event) => onDesignChange({ background: event.target.value })}
-                type="color"
-                value={design.background}
-              />
-              <span>{design.background.toUpperCase()}</span>
-            </span>
-          </label>
-        </div>
-        <div className="gradient-control-row">
-          <label className="generator-checkbox gradient-toggle">
-            <input
-              checked={Boolean(design.gradientColor)}
-              onChange={(event) =>
-                onDesignChange({
-                  gradientColor: event.target.checked ? "#287a54" : null,
-                })
-              }
-              type="checkbox"
-            />
-            Foreground gradient
-          </label>
-          <button
-            className="text-button"
-            onClick={() =>
-              onDesignChange({
-                background: defaultDesign.background,
-                foreground: defaultDesign.foreground,
-                gradientColor: null,
-              })
-            }
-            type="button"
-          >
-            Reset colors
-          </button>
-        </div>
-        {design.gradientColor ? (
-          <label className="gradient-color-field">
-            <span className="generator-label">Gradient end</span>
-            <span className="color-input-wrap">
-              <input
-                aria-label="QR gradient end color"
-                onChange={(event) => onDesignChange({ gradientColor: event.target.value })}
-                type="color"
-                value={design.gradientColor}
-              />
-              <span>{design.gradientColor.toUpperCase()}</span>
-            </span>
-          </label>
-        ) : null}
-      </fieldset>
-
-      <fieldset className="design-fieldset">
-        <legend>Frame gallery</legend>
-        <div className="frame-gallery">
-          {frameOptions.map((option) => (
+      {activeTab === "frames" ? (
+        <div
+          aria-labelledby="customize-tab-frames"
+          className="customization-panel"
+          id="customize-panel-frames"
+          role="tabpanel"
+        >
+          <section className="editor-section">
+            <div className="editor-section-heading">
+              <div>
+                <h3>Pre-made templates</h3>
+                <p>Start with a complete original design, then fine-tune it.</p>
+              </div>
+              <span>{designTemplates.length} designs</span>
+            </div>
+            <div className="design-template-gallery design-library-grid">
+              {visibleTemplates.map((template) => {
+                const active = isTemplateActive(design, template);
+                return (
+                  <button
+                    aria-pressed={active}
+                    className={active ? "design-gallery-card active" : "design-gallery-card"}
+                    key={template.id}
+                    onClick={() => applyTemplate(template)}
+                    type="button"
+                  >
+                    <span
+                      aria-hidden="true"
+                      className="design-gallery-preview"
+                      style={{ backgroundImage: getTemplatePreview(template) }}
+                    />
+                    <span className="design-gallery-copy">
+                      <strong>{template.name}</strong>
+                      <small>{template.description}</small>
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
             <button
-              aria-pressed={design.frame === option.value}
-              className={design.frame === option.value ? "frame-gallery-card active" : "frame-gallery-card"}
-              key={option.value}
-              onClick={() => onDesignChange({ frame: option.value })}
+              aria-expanded={templatesExpanded}
+              className="library-expand-button"
+              onClick={() => setTemplatesExpanded((current) => !current)}
               type="button"
             >
-              <span
-                aria-hidden="true"
-                className="frame-gallery-preview"
-                style={{ backgroundImage: framePreviews[option.value] }}
-              />
-              <span>{option.label}</span>
+              {templatesExpanded
+                ? "Show fewer templates"
+                : `View all ${designTemplates.length} templates`}
             </button>
-          ))}
-        </div>
-        {design.frame !== "none" ? (
-          <div className="color-controls frame-color-controls">
-            <label>
-              <span className="generator-label">Frame background</span>
-              <span className="color-input-wrap">
-                <input
-                  aria-label="Frame background color"
-                  onChange={(event) =>
-                    onDesignChange({ frameBackground: event.target.value })
-                  }
-                  type="color"
-                  value={design.frameBackground}
-                />
-                <span>{design.frameBackground.toUpperCase()}</span>
-              </span>
-            </label>
-            <label>
-              <span className="generator-label">Frame text</span>
-              <span className="color-input-wrap">
-                <input
-                  aria-label="Frame text color"
-                  onChange={(event) =>
-                    onDesignChange({ frameTextColor: event.target.value })
-                  }
-                  type="color"
-                  value={design.frameTextColor}
-                />
-                <span>{design.frameTextColor.toUpperCase()}</span>
-              </span>
-            </label>
-          </div>
-        ) : null}
-      </fieldset>
+          </section>
 
-      <div className="logo-controls">
-        <div className="customize-heading">
-          <span className="generator-label">Logo</span>
-          <span>Processed locally</span>
-        </div>
-        <input
-          accept="image/*"
-          className="visually-hidden"
-          onChange={(event) => void handleLogo(event.target.files?.[0])}
-          ref={inputRef}
-          type="file"
-        />
-        <div className="logo-actions">
-          {design.logoDataUrl ? (
-            <span className="logo-preview">
-              <NextImage
-                alt="Uploaded logo preview"
-                height={48}
-                src={design.logoDataUrl}
-                unoptimized
-                width={48}
-              />
-            </span>
-          ) : null}
-          <button
-            className="button button-secondary"
-            onClick={() => inputRef.current?.click()}
-            type="button"
-          >
-            {design.logoDataUrl ? "Replace logo" : "Upload logo"}
-          </button>
-          {design.logoDataUrl ? (
-            <button className="text-button" onClick={removeLogo} type="button">
-              Remove
+          <section className="editor-section">
+            <div className="editor-section-heading">
+              <div>
+                <h3>Standard frames</h3>
+                <p>Choose a distinct structure, then customize its call to action.</p>
+              </div>
+              <span>{frameOptions.length} styles</span>
+            </div>
+            <div className="frame-gallery design-library-grid">
+              {visibleFrames.map((option) => (
+                <button
+                  aria-pressed={design.frame === option.value}
+                  className={design.frame === option.value ? "frame-gallery-card active" : "frame-gallery-card"}
+                  key={option.value}
+                  onClick={() => onDesignChange({ frame: option.value })}
+                  type="button"
+                >
+                  <span
+                    aria-hidden="true"
+                    className="frame-gallery-preview"
+                    style={{ backgroundImage: getFramePreview(option) }}
+                  />
+                  <span>{option.label}</span>
+                </button>
+              ))}
+            </div>
+            <button
+              aria-expanded={framesExpanded}
+              className="library-expand-button"
+              onClick={() => setFramesExpanded((current) => !current)}
+              type="button"
+            >
+              {framesExpanded
+                ? "Show fewer frames"
+                : `View all ${frameOptions.length} frames`}
             </button>
-          ) : null}
-          {logoName ? <span className="logo-file-name" title={logoName}>{logoName}</span> : null}
-        </div>
-        {uploadError ? <p className="customize-error">{uploadError}</p> : null}
-        {design.logoDataUrl ? (
-          <label className="logo-size-field">
-            <span>
-              <span className="generator-label">Logo size</span>
-              <output>{design.logoSize}%</output>
-            </span>
-            <input
-              max="18"
-              min="10"
-              onChange={(event) => onDesignChange({ logoSize: Number(event.target.value) })}
-              type="range"
-              value={design.logoSize}
-            />
-            <small>Centered with a safe cutout. High correction is applied automatically.</small>
-          </label>
-        ) : null}
-      </div>
+          </section>
 
-      <label className="generator-field correction-field">
-        <span className="generator-label">Error correction</span>
-        <select
-          disabled={Boolean(design.logoDataUrl)}
-          onChange={(event) =>
-            onErrorCorrectionChange(event.target.value as ErrorCorrectionLevel)
-          }
-          value={design.logoDataUrl ? "H" : errorCorrection}
+          <section className="editor-section frame-background-section">
+            <div className="editor-section-heading">
+              <div>
+                <h3>Frame background</h3>
+                <p>The QR quiet zone remains solid for reliable scanning.</p>
+              </div>
+            </div>
+            <div className="color-controls frame-color-controls">
+              <ColorControl
+                ariaLabel="Frame background color"
+                disabled={design.frame === "none" || design.frameTransparent}
+                label="Background"
+                onChange={(value) => onDesignChange({ frameBackground: value })}
+                value={design.frameBackground}
+              />
+              <ColorControl
+                ariaLabel="Frame accent color"
+                disabled={design.frame === "none"}
+                label="Frame"
+                onChange={(value) => onDesignChange({ frameColor: value })}
+                value={design.frameColor}
+              />
+              <ColorControl
+                ariaLabel="Frame text color"
+                disabled={design.frame === "none"}
+                label="Frame text"
+                onChange={(value) => onDesignChange({ frameTextColor: value })}
+                value={design.frameTextColor}
+              />
+            </div>
+            <label className="generator-field frame-label-field">
+              <span className="generator-label">Call-to-action text</span>
+              <input
+                disabled={design.frame === "none"}
+                maxLength={32}
+                onChange={(event) =>
+                  onDesignChange({ frameLabel: event.target.value || null })
+                }
+                placeholder="Use the frame default"
+                type="text"
+                value={design.frameLabel ?? ""}
+              />
+              <small>Up to 32 characters. Leave blank to use the frame label.</small>
+            </label>
+            <label className="generator-checkbox frame-transparency-toggle">
+              <input
+                checked={design.frameTransparent}
+                disabled={design.frame === "none"}
+                onChange={(event) =>
+                  onDesignChange({ frameTransparent: event.target.checked })
+                }
+                type="checkbox"
+              />
+              Transparent outer frame background
+            </label>
+            {design.frame === "none" ? (
+              <p className="editor-setting-note">Choose a frame to enable its background controls.</p>
+            ) : null}
+          </section>
+        </div>
+      ) : null}
+
+      {activeTab === "shapes" ? (
+        <div
+          aria-labelledby="customize-tab-shapes"
+          className="customization-panel"
+          id="customize-panel-shapes"
+          role="tabpanel"
         >
-          {correctionLevels.map((level) => (
-            <option key={level.value} value={level.value}>
-              {level.label}
-            </option>
-          ))}
-        </select>
-      </label>
+          <section className="editor-section">
+            <div className="editor-section-heading">
+              <div>
+                <h3>QR patterns</h3>
+                <p>Style the modules and corners without changing the encoded content.</p>
+              </div>
+            </div>
+            <div className="design-style-grid">
+              <fieldset className="design-fieldset">
+                <legend>QR body pattern</legend>
+                <div className="design-choice-grid pattern-choices">
+                  {bodyStyleOptions.map((option) => (
+                    <button
+                      aria-pressed={design.bodyStyle === option.value}
+                      className={design.bodyStyle === option.value ? "active" : undefined}
+                      key={option.value}
+                      onClick={() => onDesignChange({ bodyStyle: option.value })}
+                      type="button"
+                    >
+                      <span
+                        aria-hidden="true"
+                        className="pattern-swatch"
+                        data-body-style={option.value}
+                      />
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+              </fieldset>
+              <fieldset className="design-fieldset">
+                <legend>Outer Eye</legend>
+                <div className="design-choice-grid eye-choices">
+                  {outerEyeStyleOptions.map((option) => (
+                    <button
+                      aria-pressed={design.outerEyeStyle === option.value}
+                      className={design.outerEyeStyle === option.value ? "active" : undefined}
+                      key={option.value}
+                      onClick={() => onDesignChange({ outerEyeStyle: option.value })}
+                      type="button"
+                    >
+                      <span
+                        aria-hidden="true"
+                        className="eye-swatch"
+                        data-eye-style={option.value}
+                      />
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+              </fieldset>
+              <fieldset className="design-fieldset">
+                <legend>Inner Eye</legend>
+                <div className="design-choice-grid eye-choices">
+                  {innerEyeStyleOptions.map((option) => (
+                    <button
+                      aria-pressed={design.innerEyeStyle === option.value}
+                      className={design.innerEyeStyle === option.value ? "active" : undefined}
+                      key={option.value}
+                      onClick={() => onDesignChange({ innerEyeStyle: option.value })}
+                      type="button"
+                    >
+                      <span
+                        aria-hidden="true"
+                        className="inner-eye-swatch"
+                        data-eye-style={option.value}
+                      />
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+              </fieldset>
+            </div>
+          </section>
+
+          <section className="editor-section color-fieldset">
+            <div className="editor-section-heading">
+              <div>
+                <h3>QR colors</h3>
+                <p>Use a dark foreground and a light background for dependable scanning.</p>
+              </div>
+              <button
+                className="text-button"
+                onClick={() =>
+                  onDesignChange({
+                    background: defaultDesign.background,
+                    foreground: defaultDesign.foreground,
+                    gradientColor: null,
+                    innerEyeColor: defaultDesign.innerEyeColor,
+                    outerEyeColor: defaultDesign.outerEyeColor,
+                  })
+                }
+                type="button"
+              >
+                Reset colors
+              </button>
+            </div>
+            <div className="color-controls">
+              <ColorControl
+                ariaLabel="QR foreground color"
+                label="Foreground"
+                onChange={(value) =>
+                  onDesignChange({
+                    foreground: value,
+                    innerEyeColor:
+                      design.innerEyeColor === design.foreground
+                        ? value
+                        : design.innerEyeColor,
+                    outerEyeColor:
+                      design.outerEyeColor === design.foreground
+                        ? value
+                        : design.outerEyeColor,
+                  })
+                }
+                value={design.foreground}
+              />
+              <ColorControl
+                ariaLabel="QR background color"
+                label="Background"
+                onChange={(value) => onDesignChange({ background: value })}
+                value={design.background}
+              />
+              <ColorControl
+                ariaLabel="Outer eye color"
+                label="Outer Eye"
+                onChange={(value) => onDesignChange({ outerEyeColor: value })}
+                value={design.outerEyeColor}
+              />
+              <ColorControl
+                ariaLabel="Inner eye color"
+                label="Inner Eye"
+                onChange={(value) => onDesignChange({ innerEyeColor: value })}
+                value={design.innerEyeColor}
+              />
+            </div>
+            <div className="gradient-control-row">
+              <label className="generator-checkbox gradient-toggle">
+                <input
+                  checked={Boolean(design.gradientColor)}
+                  onChange={(event) =>
+                    onDesignChange({
+                      gradientColor: event.target.checked ? "#287a54" : null,
+                    })
+                  }
+                  type="checkbox"
+                />
+                Foreground gradient
+              </label>
+              {design.gradientColor ? (
+                <div className="gradient-color-field">
+                  <ColorControl
+                    ariaLabel="QR gradient end color"
+                    label="Gradient end"
+                    onChange={(value) => onDesignChange({ gradientColor: value })}
+                    value={design.gradientColor}
+                  />
+                </div>
+              ) : null}
+            </div>
+            <div className={hasContrastWarning ? "contrast-status warning" : "contrast-status"}>
+              <span aria-hidden="true">{hasContrastWarning ? "!" : "✓"}</span>
+              <div>
+                <strong>{hasContrastWarning ? "Improve color contrast" : "Scan-safe contrast"}</strong>
+                <p>
+                  {hasContrastWarning
+                    ? "Increase the difference between foreground and background before downloading."
+                    : "Current colors keep the QR modules clearly separated from the background."}
+                </p>
+              </div>
+            </div>
+          </section>
+        </div>
+      ) : null}
+
+      {activeTab === "logo" ? (
+        <div
+          aria-labelledby="customize-tab-logo"
+          className="customization-panel"
+          id="customize-panel-logo"
+          role="tabpanel"
+        >
+          <section className="editor-section logo-controls">
+            <div className="editor-section-heading">
+              <div>
+                <h3>Logo</h3>
+                <p>Processed only in your browser and centered inside a protected cutout.</p>
+              </div>
+              <span>Local only</span>
+            </div>
+            <input
+              accept="image/*"
+              className="visually-hidden"
+              onChange={(event) => void handleLogo(event.target.files?.[0])}
+              ref={inputRef}
+              type="file"
+            />
+            <div className="logo-editor">
+              <div className={design.logoDataUrl ? "logo-preview large" : "logo-preview large empty"}>
+                {design.logoDataUrl ? (
+                  <NextImage
+                    alt="Uploaded logo preview"
+                    height={96}
+                    src={design.logoDataUrl}
+                    unoptimized
+                    width={96}
+                  />
+                ) : (
+                  <span aria-hidden="true">+</span>
+                )}
+              </div>
+              <div className="logo-editor-copy">
+                <strong>{design.logoDataUrl ? "Logo ready" : "Add your logo"}</strong>
+                <p>PNG, JPEG, WebP, or another browser-readable image up to 5 MB.</p>
+                <div className="logo-actions">
+                  <button
+                    className="button button-secondary"
+                    onClick={() => inputRef.current?.click()}
+                    type="button"
+                  >
+                    {design.logoDataUrl ? "Replace logo" : "Upload logo"}
+                  </button>
+                  {design.logoDataUrl ? (
+                    <button className="text-button" onClick={removeLogo} type="button">
+                      Remove logo
+                    </button>
+                  ) : null}
+                </div>
+                {logoName ? <span className="logo-file-name" title={logoName}>{logoName}</span> : null}
+              </div>
+            </div>
+            {uploadError ? <p className="customize-error">{uploadError}</p> : null}
+            {design.logoDataUrl ? (
+              <label className="logo-size-field editor-setting-card">
+                <span>
+                  <span className="generator-label">Logo size</span>
+                  <output>{design.logoSize}%</output>
+                </span>
+                <input
+                  max="18"
+                  min="10"
+                  onChange={(event) =>
+                    onDesignChange({ logoSize: Number(event.target.value) })
+                  }
+                  type="range"
+                  value={design.logoSize}
+                />
+                <small>High error correction is applied automatically for safer scanning.</small>
+              </label>
+            ) : null}
+          </section>
+        </div>
+      ) : null}
+
+      {activeTab === "level" ? (
+        <div
+          aria-labelledby="customize-tab-level"
+          className="customization-panel"
+          id="customize-panel-level"
+          role="tabpanel"
+        >
+          <section className="editor-section">
+            <div className="editor-section-heading">
+              <div>
+                <h3>Error correction level</h3>
+                <p>Higher levels recover from more damage but create a denser code.</p>
+              </div>
+            </div>
+            <label className="generator-field correction-field">
+              <span className="generator-label">Correction level</span>
+              <select
+                disabled={Boolean(design.logoDataUrl)}
+                onChange={(event) =>
+                  onErrorCorrectionChange(event.target.value as ErrorCorrectionLevel)
+                }
+                value={effectiveLevel}
+              >
+                {correctionLevels.map((level) => (
+                  <option key={level.value} value={level.value}>
+                    {level.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <div className="correction-level-list">
+              {correctionLevels.map((level) => (
+                <div
+                  className={effectiveLevel === level.value ? "active" : undefined}
+                  key={level.value}
+                >
+                  <span>{level.value}</span>
+                  <div>
+                    <strong>{level.label}</strong>
+                    <p>{level.description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            {design.logoDataUrl ? (
+              <p className="editor-setting-note">
+                High correction is locked while a logo is present to protect scan reliability.
+              </p>
+            ) : null}
+          </section>
+        </div>
+      ) : null}
 
       {warnings.length ? (
         <ul className="design-warnings" aria-label="QR design warnings">
