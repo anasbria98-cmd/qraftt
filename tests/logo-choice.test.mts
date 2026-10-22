@@ -16,9 +16,8 @@ test("main QR choices precede unchanged customization tabs and template gallerie
     assert.match(markup, /Classic QR/);
     assert.match(markup, /Logo QR/);
     assert.equal((markup.match(/class="qr-mode-thumbnail[" ]/g) ?? []).length, 6);
-    assert.match(markup, /google-g\.svg/);
-    assert.match(markup, /qr-mode-instagram/);
-    assert.match(markup, /qr-mode-youtube/);
+    for (const logo of ["nike.svg", "mcdonalds.svg", "coca-cola.svg"]) assert.ok(markup.includes(`/images/brand/${logo}`));
+    assert.doesNotMatch(markup, /qr-mode-instagram|qr-mode-youtube|google-g\.svg/);
     assert.ok(markup.indexOf("qr-mode-choices") < markup.indexOf('role="tablist"'));
     for (const tab of ["frames", "shapes", "logo", "level"]) assert.ok(markup.includes(`id="customize-tab-${tab}"`));
     assert.match(markup, /Free templates/);

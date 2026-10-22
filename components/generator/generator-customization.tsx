@@ -4,7 +4,6 @@ import { T, useLanguage } from "@/components/i18n/language-provider";
 import NextImage from "next/image";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { ProBadge } from "@/components/generator/pro-badge";
-import { QrTypeIcon } from "@/components/generator/qr-type-icon";
 import {
   bodyStyleOptions,
   defaultDesign,
@@ -277,9 +276,9 @@ export function GeneratorCustomization({
           <span className="qr-mode-indicator" aria-hidden="true" />
           <strong><T text="Logo QR" /></strong><span className="qr-mode-badge"><ProBadge /></span>
           <span className="qr-mode-thumbnails" aria-hidden="true">
-            <span className="qr-mode-thumbnail qr-mode-brand"><NextImage src="/images/brand/google-g.svg" width={24} height={24} alt="" /></span>
-            <span className="qr-mode-thumbnail qr-mode-brand qr-mode-instagram"><QrTypeIcon type="instagram" /></span>
-            <span className="qr-mode-thumbnail qr-mode-brand qr-mode-youtube"><QrTypeIcon type="youtube" /></span>
+            <span className="qr-mode-thumbnail qr-mode-brand"><NextImage src="/images/brand/nike.svg" width={24} height={24} alt="" /></span>
+            <span className="qr-mode-thumbnail qr-mode-brand"><NextImage src="/images/brand/mcdonalds.svg" width={24} height={24} alt="" /></span>
+            <span className="qr-mode-thumbnail qr-mode-brand"><NextImage src="/images/brand/coca-cola.svg" width={24} height={24} alt="" /></span>
           </span>
         </button>
       </div>
