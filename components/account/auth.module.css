@@ -1,0 +1,40 @@
+.page { width:min(100% - 2rem,70rem); margin:clamp(1.5rem,5vw,4rem) auto; display:grid; grid-template-columns:1.2fr 1fr; border:1px solid var(--line); border-radius:1.5rem; overflow:hidden; background:#fff; box-shadow:0 20px 70px #073f3307; }
+.card { padding:clamp(1.5rem,4.5vw,4rem); min-width:0; }
+.eyebrow { text-transform:uppercase; letter-spacing:.13em; font-size:.65rem; font-weight:700; color:var(--mint-strong); margin:0 0 1rem; }
+.card h1 { font-weight:700; font-size:clamp(1.85rem,3vw,2.5rem); line-height:1.15; letter-spacing:-.045em; margin:0 0 .8rem; }
+.intro { font-size:.88rem; line-height:1.7; color:var(--ink-soft); margin:0 0 1.75rem; }
+.googleForm { margin-top:1.75rem; }
+.google { display:flex; gap:.75rem; justify-content:center; align-items:center; min-height:3.25rem; width:100%; border:1px solid var(--line); border-radius:.65rem; color:var(--ink); background:#fff; font:inherit; font-size:.88rem; font-weight:600; cursor:pointer; }
+.google:hover:not(:disabled) { background:var(--mint-pale); border-color:var(--mint-strong); }
+.google:disabled { cursor:not-allowed; color:var(--ink-soft); background:var(--surface-soft); }
+.googleMark { width:1.25rem; height:1.25rem; object-fit:contain; flex-shrink:0; }
+.separator { display:flex; align-items:center; gap:1rem; margin:1.5rem 0; font-size:.75rem; color:var(--ink-soft); }
+.separator::before,.separator::after { content:''; flex:1; height:1px; background:var(--line); }
+.form { display:grid; gap:1.15rem; margin:1.5rem 0 1rem; }
+.form label { display:grid; gap:.5rem; font-size:.8rem; font-weight:600; }
+.form input:not([type=checkbox]) { width:100%; min-width:0; border:1px solid var(--line); border-radius:.6rem; padding:.9rem; font:inherit; font-weight:400; background:#fff; color:var(--ink); }
+.form input:focus-visible { outline:3px solid var(--mint); outline-offset:2px; border-color:var(--mint-strong); }
+.password { display:flex; align-items:center; position:relative; }
+.form .password input { padding-inline-end:4rem; }
+.password button { position:absolute; inset-inline-end:.6rem; border:0; padding:.5rem; background:none; color:var(--ink-soft); font:inherit; font-size:.72rem; cursor:pointer; }
+.field { display:grid; gap:.5rem; }
+.hint { display:block; font-size:.7rem; font-weight:400; color:var(--ink-soft); line-height:1.6; margin-top:.5rem; }
+.options { display:flex; align-items:center; justify-content:space-between; gap:.75rem; font-size:.75rem; }
+.form .remember { display:flex; align-items:center; gap:.5rem; font-size:.75rem; font-weight:400; }
+.remember input { width:1rem; height:1rem; accent-color:var(--ink); }
+.options a,.switch a { color:var(--ink); font-weight:600; text-decoration:underline; text-underline-offset:3px; }
+.submit { width:100%; margin-top:.5rem; font-size:.9rem; min-height:3.25rem; }
+.submit:disabled { opacity:.65; cursor:wait; }
+.status { background:var(--mint-pale); border:1px solid var(--line); border-radius:.65rem; padding:.85rem; margin:1rem 0; font-size:.78rem; line-height:1.7; overflow-wrap:anywhere; }
+.switch { font-size:.8rem; color:var(--ink-soft); text-align:center; line-height:1.8; margin-top:1.5rem; }
+.switch a { margin-inline-start:.35rem; }
+.legal { font-size:.67rem; line-height:1.8; color:var(--ink-soft); margin-top:1.75rem; text-align:center; }
+.legal a { text-decoration:underline; text-underline-offset:2px; }
+.aside { background:var(--mint-pale); color:var(--ink); padding:clamp(1.75rem,4vw,3.25rem); display:flex; flex-direction:column; justify-content:space-between; gap:2.5rem; border-left:1px solid var(--line); background-image:radial-gradient(ellipse at 100% 0%,#b3ddc980,transparent 65%); }
+.aside h2 { font-weight:600; font-size:clamp(1.65rem,3vw,2.2rem); letter-spacing:-.045em; line-height:1.2; margin:.75rem 0 2.5rem; }
+.benefit { margin-top:1.75rem; padding-left:1.1rem; border-left:2px solid var(--mint-strong); }
+.benefit h3 { font-size:.9rem; font-weight:600; margin:0 0 .5rem; }
+.benefit p { color:var(--ink-soft); font-size:.8rem; line-height:1.8; margin:0; }
+.asideFoot { font-size:.7rem; color:var(--ink-soft); border-top:1px solid var(--line); padding-top:1.4rem; }
+.page a:focus-visible,.page button:focus-visible { outline:3px solid var(--mint-strong); outline-offset:3px; }
+@media(max-width:760px) { .page { max-width:34rem; grid-template-columns:1fr; margin:1.25rem auto 2.5rem; border-radius:1.15rem; } .card { padding:1.5rem; } .aside { display:none; } .options { flex-wrap:wrap; } }

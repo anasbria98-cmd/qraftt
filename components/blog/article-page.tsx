@@ -1,5 +1,6 @@
 import { Fragment } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { AdSlot } from "@/components/ads/ad-slot";
 import {
   Breadcrumbs,
@@ -8,7 +9,14 @@ import {
 } from "@/components/seo/breadcrumbs";
 import { JsonLd } from "@/components/seo/json-ld";
 import { Container } from "@/components/ui/container";
-import type { BlogArticle } from "@/lib/content/articles";
+import {
+  getRelatedBlogArticles,
+  type BlogArticle,
+} from "@/lib/content/articles";
+import {
+  createWebPageSchemaConnections,
+  schemaReferences,
+} from "@/lib/seo/schema";
 import { siteConfig } from "@/lib/site";
 
 interface ArticlePageProps {
@@ -27,6 +35,14 @@ function formatDate(value: string) {
 export function ArticlePage({ article }: ArticlePageProps) {
   const path = `/blog/${article.slug}` as const;
   const url = `${siteConfig.url}${path}`;
+  const imageUrl = `${siteConfig.url}${article.image.src}`;
+  const imageId = `${url}#primaryimage`;
+  const articleId = `${url}#article`;
+  const faqSection = article.sections.find(
+    (section) => section.faqs && section.faqs.length > 0,
+  );
+  const faqId = `${url}#faq`;
+  const relatedArticles = getRelatedBlogArticles(article.slug);
   const breadcrumbs: BreadcrumbItem[] = [
     { href: "/", label: "Home" },
     { href: "/blog", label: "Blog" },
@@ -41,25 +57,59 @@ export function ArticlePage({ article }: ArticlePageProps) {
           "@context": "https://schema.org",
           "@graph": [
             {
+              "@id": articleId,
               "@type": "Article",
-              author: { "@type": "Organization", name: siteConfig.name },
+              author: schemaReferences.organization,
               dateModified: article.updatedAt,
               datePublished: article.publishedAt,
               description: article.description,
+              mainEntity: faqSection ? { "@id": faqId } : undefined,
               headline: article.title,
+              image: { "@id": imageId },
               mainEntityOfPage: { "@id": `${url}#webpage` },
-              publisher: { "@type": "Organization", name: siteConfig.name },
+              publisher: schemaReferences.organization,
               url,
             },
             {
               "@id": `${url}#webpage`,
               "@type": "WebPage",
+              ...createWebPageSchemaConnections(),
               breadcrumb: { "@id": breadcrumbSchema["@id"] },
               description: article.description,
+              mainEntity: [
+                { "@id": articleId },
+                ...(faqSection ? [{ "@id": faqId }] : []),
+              ],
+              primaryImageOfPage: { "@id": imageId },
               name: article.title,
               url,
             },
+            {
+              "@id": imageId,
+              "@type": "ImageObject",
+              caption: article.image.alt,
+              contentUrl: imageUrl,
+              height: article.image.height,
+              url: imageUrl,
+              width: article.image.width,
+            },
             breadcrumbSchema,
+            ...(faqSection
+              ? [
+                  {
+                    "@id": faqId,
+                    "@type": "FAQPage",
+                    mainEntity: faqSection.faqs?.map((faq) => ({
+                      "@type": "Question",
+                      acceptedAnswer: {
+                        "@type": "Answer",
+                        text: faq.answer,
+                      },
+                      name: faq.question,
+                    })),
+                  },
+                ]
+              : []),
           ],
         }}
       />
@@ -80,6 +130,16 @@ export function ArticlePage({ article }: ArticlePageProps) {
               <span aria-hidden="true">·</span>
               <span>{article.readingMinutes} min read</span>
             </div>
+            <figure className="article-hero-visual">
+              <Image
+                alt={article.image.alt}
+                height={article.image.height}
+                priority
+                sizes="(max-width: 900px) calc(100vw - 2rem), 832px"
+                src={article.image.src}
+                width={article.image.width}
+              />
+            </figure>
           </Container>
         </header>
 
@@ -102,6 +162,18 @@ export function ArticlePage({ article }: ArticlePageProps) {
                   <h2>{section.heading}</h2>
                   {section.paragraphs.map((paragraph) => (
                     <p key={paragraph}>{paragraph}</p>
+                  ))}
+                  {section.contextualLinks?.map((link) => (
+                    <p key={link.href}>
+                      <Link href={link.href}>{link.label}</Link>
+                      {` — ${link.description}`}
+                    </p>
+                  ))}
+                  {section.faqs?.map((faq) => (
+                    <div key={faq.question}>
+                      <h3>{faq.question}</h3>
+                      <p>{faq.answer}</p>
+                    </div>
                   ))}
                   {section.bullets ? (
                     <ul>
@@ -148,6 +220,22 @@ export function ArticlePage({ article }: ArticlePageProps) {
                 {index === 2 ? <AdSlot placement="article" /> : null}
               </Fragment>
             ))}
+
+            <section className="article-related" aria-labelledby="related-guides-title">
+              <p className="eyebrow">Continue learning</p>
+              <h2 id="related-guides-title">Related QR code guides</h2>
+              <div>
+                {relatedArticles.map((relatedArticle) => (
+                  <Link
+                    href={`/blog/${relatedArticle.slug}`}
+                    key={relatedArticle.slug}
+                  >
+                    <strong>{relatedArticle.title}</strong>
+                    <span>{relatedArticle.excerpt}</span>
+                  </Link>
+                ))}
+              </div>
+            </section>
 
             <section className="article-generators" aria-labelledby="article-tools-title">
               <p className="eyebrow">Put it into practice</p>

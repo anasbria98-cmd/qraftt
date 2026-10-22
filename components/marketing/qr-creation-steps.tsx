@@ -1,3 +1,4 @@
+import { T } from "@/components/i18n/language-provider";
 import { Container } from "@/components/ui/container";
 
 const qrModules = [
@@ -117,7 +118,7 @@ function AddContentIllustration() {
       <path className="step-svg-accent-line" d="M61 105h6M64 102v6" />
       <text className="step-svg-text" x="78" y="109">https://qraftt.com</text>
       <rect className="step-svg-dark" height="34" rx="9" width="92" x="48" y="137" />
-      <text className="step-svg-button-text" x="75" y="158">Generate</text>
+      <text className="step-svg-button-text" x="75" y="158"><T text="Generate" /></text>
       <path className="step-svg-accent-line" d="M150 154h31m0 0-8-7m8 7-8 7" />
       <circle className="step-svg-progress" cx="254" cy="120" r="47" />
       <path className="step-svg-progress-active" d="M254 73a47 47 0 0 1 45 34" />
@@ -145,7 +146,7 @@ function CustomizeIllustration() {
       <path className="step-svg-accent-line" d="M62 158h11v11H62zM82 163h28" />
       <rect className="step-svg-frame" height="118" rx="18" width="132" x="168" y="68" />
       <rect className="step-svg-dark" height="19" rx="9.5" width="70" x="199" y="60" />
-      <text className="step-svg-button-text" x="213" y="73">SCAN ME</text>
+      <text className="step-svg-button-text" x="213" y="73"><T text="SCAN ME" /></text>
       <QrGlyph scale={1.15} x={194} y={88} />
       <circle className="step-svg-dark" cx="290" cy="177" r="22" />
       <path className="step-svg-download" d="M290 166v14m0 0-6-6m6 6 6-6m-13 12h14" />
@@ -164,8 +165,8 @@ export function QrCreationSteps() {
     <section className="section qr-steps-section" id="how-it-works">
       <Container>
         <div className="qr-steps-heading">
-          <p className="eyebrow">Simple from start to finish</p>
-          <h2>Create Your QR Code in 3 Simple Steps</h2>
+          <p className="eyebrow"><T text="Simple from start to finish" /></p>
+          <h2><T text="Create Your QR Code in 3 Simple Steps" /></h2>
         </div>
         <ol className="qr-steps-grid">
           {steps.map(({ Illustration, label, title }) => (
@@ -174,8 +175,8 @@ export function QrCreationSteps() {
                 <Illustration />
               </div>
               <div className="qr-step-copy">
-                <span>{label}</span>
-                <h3>{title}</h3>
+                <span><T text={label} /></span>
+                <h3><T text={title} /></h3>
               </div>
             </li>
           ))}

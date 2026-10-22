@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#f6fbf8"/>
+  <rect x="135" y="95" width="500" height="440" rx="44" fill="#fff" stroke="#addbc1" stroke-width="4"/>
+  <g transform="translate(210 140)" fill="#073c30">
+    <path d="M0 0h105v105H0zm25 25v55h55V25zM225 0h105v105H225zm25 25v55h55V25zM0 225h105v105H0zm25 25v55h55v-55z" fill-rule="evenodd"/>
+    <rect x="150" y="145" width="32" height="32"/><rect x="204" y="144" width="32" height="92"/><rect x="148" y="260" width="92" height="32"/><rect x="268" y="198" width="32" height="94"/>
+  </g>
+  <path d="M135 570h500M105 95v440" stroke="#22c984" stroke-width="7"/>
+  <path d="m135 570 24-15v30zm500 0-24-15v30zM105 95 90 119h30zm0 440-15-24h30z" fill="#22c984"/>
+  <g transform="translate(730 125)">
+    <rect width="340" height="390" rx="38" fill="#073c30"/>
+    <path d="M60 75h220M60 130h155M60 185h245" stroke="#4f8e74" stroke-width="18" stroke-linecap="round"/>
+    <rect x="60" y="250" width="70" height="70" rx="12" fill="#b9f5cf"/>
+    <rect x="155" y="230" width="90" height="90" rx="14" fill="#22c984"/>
+    <rect x="270" y="195" width="42" height="125" rx="12" fill="#fff"/>
+  </g>
+</svg>

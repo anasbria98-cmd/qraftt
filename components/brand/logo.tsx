@@ -13,7 +13,7 @@ export function Logo() {
         <rect className="brand-mark-accent" height="9" rx="2" width="9" x="13" y="27" />
         <rect className="brand-mark-accent" height="9" rx="2" width="9" x="27" y="27" />
       </svg>
-      <span className="brand-wordmark">Qraftt</span>
+      <span className="brand-wordmark" translate="no">Qraftt</span>
     </Link>
   );
 }

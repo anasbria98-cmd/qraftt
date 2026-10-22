@@ -1,4 +1,5 @@
 import { cn } from "@/lib/cn";
+import { T } from "@/components/i18n/language-provider";
 
 interface SectionHeadingProps {
   align?: "left" | "center";
@@ -23,9 +24,9 @@ export function SectionHeading({
         className,
       )}
     >
-      <p className="eyebrow">{eyebrow}</p>
-      <h2>{title}</h2>
-      {description ? <p>{description}</p> : null}
+      <p className="eyebrow"><T text={eyebrow} /></p>
+      <h2><T text={title} /></h2>
+      {description ? <p><T text={description} /></p> : null}
     </div>
   );
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import { T } from "@/components/i18n/language-provider";
 import { openConsentPreferences } from "@/components/privacy/consent-provider";
 
 export function CookieSettingsButton() {
@@ -8,8 +9,6 @@ export function CookieSettingsButton() {
       className="footer-cookie-button"
       onClick={openConsentPreferences}
       type="button"
-    >
-      Cookie settings
-    </button>
+    ><T text="Cookie settings" /></button>
   );
 }

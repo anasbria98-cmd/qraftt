@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">Restaurant menu QR code guide</title>
+  <desc id="desc">A restaurant table card with a QR code opens a readable menu on a mobile phone.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#f8fbf5"/>
+      <stop offset="1" stop-color="#e0f5e9"/>
+    </linearGradient>
+    <filter id="shadow" x="-25%" y="-25%" width="150%" height="160%">
+      <feDropShadow dx="0" dy="18" stdDeviation="20" flood-color="#113c31" flood-opacity=".14"/>
+    </filter>
+  </defs>
+  <rect width="1200" height="630" rx="42" fill="url(#bg)"/>
+  <circle cx="1048" cy="92" r="154" fill="#54d29f" opacity=".16"/>
+  <path d="M0 510c210-82 358-66 540 10s392 74 660-12v122H0Z" fill="#174f40" opacity=".08"/>
+  <g filter="url(#shadow)">
+    <path d="M104 482 248 138h286l142 344Z" fill="#fff" stroke="#badfd1" stroke-width="3"/>
+    <rect x="205" y="176" width="370" height="270" rx="28" fill="#0e493b"/>
+    <text x="390" y="219" fill="#fff" font-family="Arial, sans-serif" font-size="25" font-weight="700" text-anchor="middle">VIEW MENU</text>
+    <rect x="267" y="243" width="246" height="174" rx="14" fill="#fff"/>
+    <g fill="#0e493b">
+      <path d="M283 259h48v48h-48zm12 12v24h24v-24zM449 259h48v48h-48zm12 12v24h24v-24zM283 353h48v48h-48zm12 12v24h24v-24z"/>
+      <path d="M354 259h18v18h-18zm0 37h37v18h-37zm-19 19h19v37h-19zm38 0h18v19h-18zm37-7h18v38h-18zm-38 44h19v18h-19zm38 13h18v18h-18zm-56 18h19v18h-19zm38-31h18v49h-18zm38 18h48v31h-48z"/>
+    </g>
+  </g>
+  <path d="M676 315h70" fill="none" stroke="#43ba87" stroke-linecap="round" stroke-width="8"/>
+  <path d="m725 291 25 24-25 24" fill="none" stroke="#43ba87" stroke-linecap="round" stroke-linejoin="round" stroke-width="8"/>
+  <g filter="url(#shadow)">
+    <rect x="780" y="82" width="300" height="474" rx="44" fill="#113f34"/>
+    <rect x="800" y="105" width="260" height="420" rx="29" fill="#fff"/>
+    <rect x="890" y="118" width="80" height="8" rx="4" fill="#b9d9cc"/>
+    <text x="830" y="183" fill="#123f34" font-family="Arial, sans-serif" font-size="30" font-weight="700">Today’s Menu</text>
+    <text x="830" y="220" fill="#5b796f" font-family="Arial, sans-serif" font-size="18">Fresh · Seasonal · Local</text>
+    <g font-family="Arial, sans-serif">
+      <rect x="830" y="255" width="200" height="72" rx="18" fill="#e3f6ed"/>
+      <circle cx="866" cy="291" r="22" fill="#61d5a4"/>
+      <text x="902" y="286" fill="#123f34" font-size="18" font-weight="700">Garden Bowl</text>
+      <text x="902" y="310" fill="#547368" font-size="15">$12 · Vegetarian</text>
+      <rect x="830" y="344" width="200" height="72" rx="18" fill="#f2f7f4"/>
+      <circle cx="866" cy="380" r="22" fill="#f4b860"/>
+      <text x="902" y="375" fill="#123f34" font-size="18" font-weight="700">House Pasta</text>
+      <text x="902" y="399" fill="#547368" font-size="15">$16 · Chef’s pick</text>
+      <rect x="830" y="445" width="200" height="46" rx="16" fill="#21ad78"/>
+      <text x="930" y="475" fill="#fff" font-size="18" font-weight="700" text-anchor="middle">View full menu</text>
+    </g>
+  </g>
+  <g fill="#f4b860">
+    <circle cx="1088" cy="410" r="9"/><circle cx="1118" cy="447" r="6"/><circle cx="1094" cy="480" r="12"/>
+  </g>
+  <text x="600" y="592" fill="#0e493b" font-family="Arial, sans-serif" font-size="22" font-weight="700" text-anchor="middle">PUBLIC MENU · MOBILE FRIENDLY · TEST BEFORE PRINTING</text>
+</svg>

@@ -6,11 +6,12 @@ import { JsonLd } from "@/components/seo/json-ld";
 import { Container } from "@/components/ui/container";
 import { blogArticleList } from "@/lib/content/articles";
 import { createPageMetadata } from "@/lib/seo/metadata";
+import { createWebPageSchemaConnections } from "@/lib/seo/schema";
 import { siteConfig } from "@/lib/site";
 
 const title = "QR Code Guides";
 const description =
-  "Practical QR code guides covering creation, WiFi setup, lifespan, static and dynamic codes, sizing, printing, and testing.";
+  "Practical QR code guides covering creation, WiFi setup, logos, colors, error correction, sizing, Google Reviews, printing, and testing.";
 const breadcrumbs = [
   { href: "/", label: "Home" },
   { href: "/blog", label: "Blog" },
@@ -34,6 +35,7 @@ export default function BlogPage() {
             {
               "@id": `${siteConfig.url}/blog#collection`,
               "@type": "CollectionPage",
+              ...createWebPageSchemaConnections(),
               breadcrumb: { "@id": breadcrumbSchema["@id"] },
               description,
               hasPart: blogArticleList.map((article) => ({
@@ -51,14 +53,18 @@ export default function BlogPage() {
       <PageHero
         breadcrumbs={breadcrumbs}
         eyebrow="Learn before you print"
-        introduction="Clear, practical guidance for creating QR codes that open the right content, scan reliably, and remain maintainable after they are published."
+        introduction="Clear, practical guides for creating QR codes that scan reliably and work the way you expect."
         title="QR code guides without the jargon"
       />
       <section className="content-section">
         <Container>
           <div className="article-grid">
-            {blogArticleList.map((article) => (
-              <ArticleCard article={article} key={article.slug} />
+            {blogArticleList.map((article, index) => (
+              <ArticleCard
+                article={article}
+                key={article.slug}
+                priority={index === 0}
+              />
             ))}
           </div>
           <div className="content-cta">

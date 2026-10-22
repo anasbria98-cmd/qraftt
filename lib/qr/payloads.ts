@@ -379,6 +379,7 @@ function isGoogleReviewUrl(url: URL) {
   if (hostname === "g.page") {
     return path !== "/" && /\/review\/?$/.test(path);
   }
+  if (hostname === "share.google") return path !== "/";
   if (hostname === "maps.app.goo.gl") return path !== "/";
   if (hostname === "goo.gl") return path.startsWith("/maps/");
   if (hostname === "search.google.com") {
@@ -498,7 +499,9 @@ function buildLinkPayload(
     case "google-review":
       return isGoogleReviewUrl(url)
         ? normalized
-        : invalid("Use an official Google review or Google Maps URL.");
+        : invalid(
+            "Use a Google Review link from share.google, maps.app.goo.gl, or google.com/maps.",
+          );
     case "spotify":
       return isSpotifyUrl(url)
         ? normalized

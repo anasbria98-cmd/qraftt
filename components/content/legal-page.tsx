@@ -2,10 +2,12 @@ import {
   createBreadcrumbSchema,
   type BreadcrumbItem,
 } from "@/components/seo/breadcrumbs";
+import Link from "next/link";
 import { PageHero } from "@/components/content/page-hero";
 import { JsonLd } from "@/components/seo/json-ld";
 import { Container } from "@/components/ui/container";
 import type { LegalPageContent } from "@/lib/content/legal-pages";
+import { createWebPageSchemaConnections } from "@/lib/seo/schema";
 import { siteConfig } from "@/lib/site";
 
 interface LegalPageProps {
@@ -30,6 +32,7 @@ export function LegalPage({ page }: LegalPageProps) {
             {
               "@id": `${url}#webpage`,
               "@type": "WebPage",
+              ...createWebPageSchemaConnections(),
               breadcrumb: { "@id": breadcrumbSchema["@id"] },
               description: page.description,
               name: page.title,
@@ -61,6 +64,22 @@ export function LegalPage({ page }: LegalPageProps) {
                   <li key={point}>{point}</li>
                 ))}
               </ul>
+            ) : null}
+            {section.links ? (
+              <p>
+                {section.links.map((link, index) => (
+                  <span key={link.href}>
+                    {index > 0 ? " · " : null}
+                    {link.href.startsWith("/") ? (
+                      <Link href={link.href}>{link.label}</Link>
+                    ) : (
+                      <a href={link.href} rel="noopener noreferrer" target="_blank">
+                        {link.label}
+                      </a>
+                    )}
+                  </span>
+                ))}
+              </p>
             ) : null}
           </section>
         ))}

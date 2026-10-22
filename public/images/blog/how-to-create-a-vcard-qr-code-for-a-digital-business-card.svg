@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">vCard QR code for a digital business card</title>
+  <desc id="desc">A professional contact card connects a QR code to a save-contact panel.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#f5fbf7"/>
+      <stop offset="1" stop-color="#d9f3e8"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="18" stdDeviation="20" flood-color="#123c32" flood-opacity=".14"/>
+    </filter>
+  </defs>
+  <rect width="1200" height="630" rx="42" fill="url(#bg)"/>
+  <circle cx="1080" cy="98" r="150" fill="#55d4a1" opacity=".16"/>
+  <circle cx="92" cy="552" r="174" fill="#103f34" opacity=".07"/>
+  <g fill="none" stroke="#55cfa0" stroke-width="8" opacity=".5">
+    <path d="M70 125V82h43M1130 125V82h-43M70 505v43h43M1130 505v43h-43"/>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="108" y="130" width="604" height="370" rx="34" fill="#fff" stroke="#b9ddcf" stroke-width="3"/>
+    <rect x="108" y="130" width="190" height="370" rx="34" fill="#0d493b"/>
+    <path d="M264 130v370" stroke="#0d493b" stroke-width="58"/>
+    <circle cx="208" cy="238" r="60" fill="#63dca9"/>
+    <circle cx="208" cy="218" r="23" fill="#fff"/>
+    <path d="M165 289c10-34 76-34 86 0" fill="#fff"/>
+    <text x="342" y="224" fill="#123c32" font-family="Arial, sans-serif" font-size="34" font-weight="700">Alex Morgan</text>
+    <text x="342" y="265" fill="#4a7165" font-family="Arial, sans-serif" font-size="21">Product consultant</text>
+    <path d="M342 303h292" stroke="#d7e9e2" stroke-width="3"/>
+    <g fill="#286755" font-family="Arial, sans-serif" font-size="20">
+      <text x="342" y="348">Mobile  +44 7700 900123</text>
+      <text x="342" y="390">Email  alex@example.com</text>
+      <text x="342" y="432">Web  example.com</text>
+    </g>
+  </g>
+  <path d="M730 315h66" fill="none" stroke="#42b987" stroke-linecap="round" stroke-width="8"/>
+  <path d="m778 292 24 23-24 23" fill="none" stroke="#42b987" stroke-linecap="round" stroke-linejoin="round" stroke-width="8"/>
+  <g filter="url(#shadow)">
+    <rect x="824" y="110" width="270" height="410" rx="38" fill="#fff" stroke="#b9ddcf" stroke-width="3"/>
+    <g fill="#0d493b">
+      <path d="M862 153h62v62h-62zm15 15v32h32v-32zM994 153h62v62h-62zm15 15v32h32v-32zM862 285h62v62h-62zm15 15v32h32v-32z"/>
+      <path d="M947 153h22v22h-22zm0 43h43v22h-43zm-22 43h22v43h-22zm43 0h22v22h-22zm43-7h22v43h-22zm-50 50h29v22h-29zm43 14h22v22h-22zm-57 43h22v18h-22zm43-22h22v40h-22zm43 14h30v26h-30z"/>
+    </g>
+    <rect x="872" y="398" width="174" height="72" rx="22" fill="#e1f6ed"/>
+    <circle cx="906" cy="434" r="18" fill="#25ad78"/>
+    <path d="m898 434 6 7 11-14" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="4"/>
+    <text x="934" y="441" fill="#0d493b" font-family="Arial, sans-serif" font-size="20" font-weight="700">Save contact</text>
+  </g>
+  <text x="600" y="574" fill="#0d493b" font-family="Arial, sans-serif" font-size="23" font-weight="700" text-anchor="middle">STATIC · PRIVATE BY DESIGN · PNG &amp; SVG</text>
+</svg>

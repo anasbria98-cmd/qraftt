@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">Create a QR code for a Google Form</title>
+  <desc id="desc">A QR code connects a printed event card to a public response form on a phone.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#f6fbf8"/>
+      <stop offset="1" stop-color="#dff4e9"/>
+    </linearGradient>
+    <filter id="shadow" x="-25%" y="-25%" width="150%" height="160%">
+      <feDropShadow dx="0" dy="18" stdDeviation="20" flood-color="#123c32" flood-opacity=".14"/>
+    </filter>
+  </defs>
+  <rect width="1200" height="630" rx="42" fill="url(#bg)"/>
+  <circle cx="1100" cy="90" r="160" fill="#55d4a1" opacity=".16"/>
+  <circle cx="90" cy="550" r="180" fill="#123f34" opacity=".07"/>
+  <g filter="url(#shadow)">
+    <rect x="100" y="118" width="470" height="394" rx="34" fill="#fff" stroke="#b7dece" stroke-width="3"/>
+    <rect x="100" y="118" width="470" height="74" rx="34" fill="#0f493c"/>
+    <path d="M100 160h470v32H100Z" fill="#0f493c"/>
+    <text x="140" y="165" fill="#fff" font-family="Arial, sans-serif" font-size="27" font-weight="700">Event registration</text>
+    <g fill="#173f35" font-family="Arial, sans-serif">
+      <text x="140" y="238" font-size="19" font-weight="700">Your name</text>
+      <rect x="140" y="255" width="390" height="48" rx="13" fill="#f1f7f4" stroke="#c9ded6" stroke-width="2"/>
+      <text x="140" y="342" font-size="19" font-weight="700">Choose a session</text>
+      <rect x="140" y="360" width="390" height="48" rx="13" fill="#f1f7f4" stroke="#c9ded6" stroke-width="2"/>
+      <rect x="140" y="438" width="148" height="45" rx="15" fill="#24af79"/>
+      <text x="214" y="467" fill="#fff" font-size="18" font-weight="700" text-anchor="middle">Submit</text>
+    </g>
+  </g>
+  <path d="M590 315h70" fill="none" stroke="#43ba87" stroke-linecap="round" stroke-width="8"/>
+  <path d="m638 291 25 24-25 24" fill="none" stroke="#43ba87" stroke-linecap="round" stroke-linejoin="round" stroke-width="8"/>
+  <g filter="url(#shadow)">
+    <rect x="704" y="80" width="330" height="470" rx="44" fill="#113f34"/>
+    <rect x="725" y="103" width="288" height="423" rx="29" fill="#fff"/>
+    <rect x="815" y="116" width="108" height="8" rx="4" fill="#bbd9ce"/>
+    <text x="869" y="181" fill="#123f34" font-family="Arial, sans-serif" font-size="24" font-weight="700" text-anchor="middle">Scan to respond</text>
+    <rect x="770" y="215" width="198" height="198" rx="16" fill="#fff" stroke="#d3e6df" stroke-width="2"/>
+    <g fill="#0f493c">
+      <path d="M787 232h48v48h-48zm12 12v24h24v-24zM903 232h48v48h-48zm12 12v24h24v-24zM787 348h48v48h-48zm12 12v24h24v-24z"/>
+      <path d="M856 232h18v18h-18zm0 38h38v18h-38zm-19 19h19v38h-19zm38 0h18v19h-18zm38-7h18v38h-18zm-38 45h19v18h-19zm38 12h18v19h-18zm-57 20h19v37h-19zm38-14h18v51h-18zm38 26h20v25h-20z"/>
+    </g>
+    <rect x="770" y="447" width="198" height="44" rx="15" fill="#e2f6ed"/>
+    <circle cx="802" cy="469" r="14" fill="#25af79"/>
+    <path d="m795 469 5 5 9-11" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+    <text x="829" y="476" fill="#123f34" font-family="Arial, sans-serif" font-size="17" font-weight="700">Responder link</text>
+  </g>
+  <g fill="#f0b95d">
+    <circle cx="1082" cy="400" r="9"/><circle cx="1116" cy="436" r="6"/><circle cx="1089" cy="474" r="12"/>
+  </g>
+  <text x="600" y="590" fill="#0f493c" font-family="Arial, sans-serif" font-size="22" font-weight="700" text-anchor="middle">PUBLIC LINK · TEST SIGNED OUT · PNG &amp; SVG</text>
+</svg>

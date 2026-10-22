@@ -1,3 +1,4 @@
+import { T } from "@/components/i18n/language-provider";
 import Link from "next/link";
 import { Container } from "@/components/ui/container";
 
@@ -216,12 +217,9 @@ export function UseCaseGallery() {
     <section className="section use-case-section" id="formats">
       <Container className="use-case-container">
         <div className="use-case-heading">
-          <p className="eyebrow">Built for everyday moments</p>
-          <h2>One QR toolkit, made for the ways you share</h2>
-          <p>
-            Choose a practical starting point, then tailor the content and design
-            inside the same free Qraftt workspace.
-          </p>
+          <p className="eyebrow"><T text="Built for everyday moments" /></p>
+          <h2><T text="One QR toolkit, made for the ways you share" /></h2>
+          <p><T text="Choose a practical starting point, then tailor the content and design inside the same free Qraftt workspace." /></p>
         </div>
         <div className="use-case-grid">
           {useCases.map(({ description, href, kind, title }) => (
@@ -231,8 +229,8 @@ export function UseCaseGallery() {
               </div>
               <div className="use-case-copy">
                 <div>
-                  <h3>{title}</h3>
-                  <p>{description}</p>
+                  <h3><T text={title} /></h3>
+                  <p><T text={description} /></p>
                 </div>
                 <span aria-hidden="true" className="use-case-arrow">→</span>
               </div>

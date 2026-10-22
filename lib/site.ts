@@ -1,10 +1,11 @@
 export const siteConfig = {
   name: "Qraftt",
-  url: "https://qraftt.com",
+  url: "https://www.qraftt.com",
   description:
-    "Create polished QR codes for links, WiFi, WhatsApp, contact details, and more. Free, private, and no signup required.",
+    "Qraftt is a free browser-based static QR code generator. Downloaded QR codes encode their destination or content directly and do not depend on Qraftt redirects.",
   navigation: [
     ["QR Generators", "/qr-code-generator"],
+    ["Pricing", "/pricing"],
     ["Blog", "/blog"],
     ["About", "/about"],
     ["Contact", "/contact"],

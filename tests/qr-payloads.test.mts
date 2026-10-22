@@ -44,7 +44,7 @@ const values: QrFormValues = {
   vcardFirstName: "Ada",
   vcardLastName: "Lovelace",
   vcardOrganization: "Analytical Engines",
-  vcardPhone: "+44 20 7183 8750",
+  vcardPhone: "+44 7700 900123",
   vcardTitle: "Mathematician",
   vcardWebsite: "example.com",
   whatsappMessage: "Hello there",
@@ -103,7 +103,7 @@ test("creates an RFC 6350 vCard 4.0 payload", () => {
       "N:Lovelace;Ada;;;",
       "ORG:Analytical Engines",
       "TITLE:Mathematician",
-      "TEL;VALUE=uri;TYPE=cell:tel:+442071838750",
+      "TEL;VALUE=uri;TYPE=cell:tel:+447700900123",
       "EMAIL:ada@example.com",
       "URL:https://example.com/",
       "END:VCARD",
@@ -215,13 +215,31 @@ test("creates direct validated destination-link payloads", () => {
   }
 });
 
+test("accepts supported Google Review and business links", () => {
+  const links = [
+    "https://share.google/ExampleReviewLink",
+    "https://maps.app.goo.gl/ExampleBusinessLink",
+    "https://www.google.com/maps/place/Example+Business",
+  ];
+
+  for (const link of links) {
+    assert.deepEqual(
+      buildQrPayload("google-review", {
+        ...values,
+        "google-review": link,
+      }),
+      { error: null, payload: link },
+    );
+  }
+});
+
 test("rejects unsupported or non-public destination-link URLs", () => {
   assert.match(
     buildQrPayload("google-review", {
       ...values,
       "google-review": "https://google.example/maps/review",
     }).error ?? "",
-    /official Google/,
+    /share\.google, maps\.app\.goo\.gl, or google\.com\/maps/,
   );
   assert.match(
     buildQrPayload("spotify", {

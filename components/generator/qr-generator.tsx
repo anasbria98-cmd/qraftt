@@ -1,20 +1,23 @@
 "use client";
 
+import { T, useLanguage } from "@/components/i18n/language-provider";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { GeneratorCustomization } from "@/components/generator/generator-customization";
 import { GeneratorFields } from "@/components/generator/generator-fields";
 import { QrTypeSelector } from "@/components/generator/qr-type-selector";
+import { useEntitlement } from "@/components/billing/use-entitlement";
+import { UpgradePrompt } from "@/components/billing/upgrade-prompt";
+import upgradeStyles from "@/components/billing/upgrade.module.css";
+import Link from "next/link";
+import { pricingPlans } from "@/lib/pricing/plans";
+import { formatDisplayPrice } from "@/lib/pricing/currencies";
+import { freeDesign, validateExportAccess, isFreeDesign, designCorrection } from "@/lib/qr/access";
 import {
   defaultDesign,
   getDesignWarnings,
   type QrDesignOptions,
 } from "@/lib/qr/design";
 import { buildQrPayload } from "@/lib/qr/payloads";
-import {
-  drawSvgToCanvas,
-  renderQrSvg,
-  setSvgDimensions,
-} from "@/lib/qr/render";
 import type {
   ErrorCorrectionLevel,
   QrFormValues,
@@ -96,43 +99,59 @@ export function QrGenerator({
   catalogFirst = false,
   initialType = "url",
 }: QrGeneratorProps) {
+  const { t } = useLanguage();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const mobileCanvasRef = useRef<HTMLCanvasElement>(null);
   const previewPanelRef = useRef<HTMLDivElement>(null);
   const [type, setType] = useState<QrType>(initialType);
   const [values, setValues] = useState<QrFormValues>(initialValues);
-  const [design, setDesign] = useState<QrDesignOptions>(defaultDesign);
+  const [design, setDesign] = useState<QrDesignOptions>(freeDesign);
   const [errorCorrection, setErrorCorrection] =
     useState<ErrorCorrectionLevel>("M");
-  const [exportSize, setExportSize] = useState<ExportSize>(1_000);
+  const [exportSize, setExportSize] = useState<ExportSize>(512);
   const [exportFormat, setExportFormat] = useState<ExportFormat>("png");
   const [engineError, setEngineError] = useState<string | null>(null);
   const [downloading, setDownloading] = useState<"png" | "svg" | null>(null);
   const [mobilePreviewOpen, setMobilePreviewOpen] = useState(false);
+  const { access, refresh } = useEntitlement();
+  const [paywall, setPaywall] = useState("");
+  const [artwork, setArtwork] = useState<{ svg: string; error: string | null; key: string }>({ svg: "", error: null, key: "" });
+  const designAccess = Boolean(access?.pro || access?.templateReview);
+  const effectiveDesign = designAccess || isFreeDesign(design) ? design : freeDesign;
 
   const result = useMemo(() => buildQrPayload(type, values), [type, values]);
-  const designSafety = useMemo(() => getDesignWarnings(design), [design]);
+  const designSafety = useMemo(() => getDesignWarnings(effectiveDesign), [effectiveDesign]);
   const designError =
     designSafety.minimumContrast < 2.5
       ? "Increase the contrast between the QR foreground and background colors."
       : null;
   const validationError = result.error ?? designError;
   const payload = validationError ? "" : result.payload;
-  const effectiveCorrection = design.logoDataUrl ? "H" : errorCorrection;
-  const artwork = useMemo(() => {
-    if (!payload) return { error: null, svg: "" };
-    try {
-      return {
-        error: null,
-        svg: renderQrSvg(payload, effectiveCorrection, design),
-      };
-    } catch {
-      return {
-        error: "This content is too large for the selected error correction level.",
-        svg: "",
-      };
-    }
-  }, [design, effectiveCorrection, payload]);
+  const effectiveCorrection = designCorrection(effectiveDesign, errorCorrection);
+  const previewKey = JSON.stringify([payload, effectiveDesign, effectiveCorrection]);
+  const previewReady = artwork.key === previewKey && Boolean(artwork.svg);
+  useEffect(() => {
+    if (!access || !payload) return;
+    const controller = new AbortController();
+    const timer = window.setTimeout(async () => {
+      try {
+        const response = await fetch("/api/qr/render", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ payload, design: effectiveDesign, correction: effectiveCorrection, format: "png", size: 512, preview: true }),
+          signal: controller.signal,
+        });
+        if (!response.ok) throw new Error((await response.json()).error);
+        const blob = await response.blob();
+        const reader = new FileReader();
+        reader.onload = () => { if (!controller.signal.aborted) setArtwork({ svg: String(reader.result), error: null, key: previewKey }); };
+        reader.onerror = () => { if (!controller.signal.aborted) setArtwork({ svg: "", error: "Preview unavailable. Please retry.", key: previewKey }); };
+        reader.readAsDataURL(blob);
+      } catch (error) {
+        if (!controller.signal.aborted) setArtwork({ svg: "", error: error instanceof Error ? error.message : "Preview unavailable.", key: previewKey });
+      }
+    }, 250);
+    return () => { window.clearTimeout(timer); controller.abort(); };
+  }, [access, effectiveDesign, effectiveCorrection, payload, previewKey]);
 
   useEffect(() => {
     const canvases = [canvasRef.current, mobileCanvasRef.current].filter(
@@ -140,7 +159,7 @@ export function QrGenerator({
     );
     if (!canvases.length) return;
 
-    if (!artwork.svg) {
+    if (!payload || !previewReady) {
       for (const canvas of canvases) {
         canvas.getContext("2d")?.clearRect(0, 0, canvas.width, canvas.height);
       }
@@ -149,7 +168,12 @@ export function QrGenerator({
 
     let active = true;
     Promise.all(
-      canvases.map((canvas) => drawSvgToCanvas(canvas, artwork.svg, 640)),
+      canvases.map((canvas) => new Promise<void>((resolve, reject) => {
+        const image = new Image();
+        image.onload = () => { if (active) { canvas.width = image.naturalWidth; canvas.height = image.naturalHeight; canvas.getContext("2d")?.drawImage(image, 0, 0); } resolve(); };
+        image.onerror = reject;
+        image.src = artwork.svg;
+      })),
     )
       .then(() => {
         if (active) setEngineError(null);
@@ -165,7 +189,7 @@ export function QrGenerator({
     return () => {
       active = false;
     };
-  }, [artwork.svg, mobilePreviewOpen]);
+  }, [artwork.svg, mobilePreviewOpen, payload, previewReady]);
 
   function updateValue<Key extends keyof QrFormValues>(
     key: Key,
@@ -174,47 +198,31 @@ export function QrGenerator({
     setValues((current) => ({ ...current, [key]: value }));
   }
 
-  async function downloadPng() {
-    if (!artwork.svg || engineError) return;
-    setDownloading("png");
+  async function downloadSelectedFormat() {
+    if (!previewReady || engineError || !payload) return;
+    setDownloading(exportFormat);
     try {
-      const canvas = document.createElement("canvas");
-      await drawSvgToCanvas(canvas, artwork.svg, exportSize);
-      const blob = await new Promise<Blob | null>((resolve) =>
-        canvas.toBlob(resolve, "image/png"),
-      );
-      if (!blob) throw new Error("PNG export failed");
-      saveBlob(blob, `qraftt-${type}-qr.png`);
+      const response = await fetch("/api/qr/render", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ payload, design: effectiveDesign, correction: effectiveCorrection, format: exportFormat, size: exportSize }),
+      });
+      if (!response.ok) {
+        const data = await response.json();
+        if (data.upgrade) { setPaywall(data.error); return; }
+        throw new Error(data.error);
+      }
+      saveBlob(await response.blob(), `qraftt-${type}-qr.${exportFormat}`);
+      await refresh();
     } catch {
-      setEngineError("PNG export failed. Try reducing the content length.");
+      setEngineError("Export failed. Please retry.");
     } finally {
       setDownloading(null);
     }
   }
 
-  async function downloadSvg() {
-    if (!artwork.svg || engineError) return;
-    setDownloading("svg");
-    try {
-      saveBlob(
-        new Blob([setSvgDimensions(artwork.svg, exportSize)], {
-          type: "image/svg+xml;charset=utf-8",
-        }),
-        `qraftt-${type}-qr.svg`,
-      );
-    } catch {
-      setEngineError("SVG export failed. Try reducing the content length.");
-    } finally {
-      setDownloading(null);
-    }
-  }
 
-  function downloadSelectedFormat() {
-    return exportFormat === "png" ? downloadPng() : downloadSvg();
-  }
-
-  const currentError = validationError ?? artwork.error ?? engineError;
-  const canDownload = Boolean(artwork.svg) && !engineError && !downloading;
+  const currentError = validationError ?? (artwork.key === previewKey ? artwork.error : null) ?? engineError;
+  const canDownload = Boolean(payload && previewReady) && !engineError && !downloading;
 
   return (
     <section
@@ -222,17 +230,15 @@ export function QrGenerator({
       aria-labelledby="generator-title"
     >
       {catalogFirst ? (
-        <h2 className="visually-hidden" id="generator-title">
-          Create your QR code
-        </h2>
+        <h2 className="visually-hidden" id="generator-title"><T text="Create your QR code" /></h2>
       ) : null}
       {!catalogFirst ? (
         <div className="generator-heading">
           <div>
-            <p className="generator-kicker">QR workspace</p>
-            <h2 id="generator-title">Create your code</h2>
+            <p className="generator-kicker"><T text="QR workspace" /></p>
+            <h2 id="generator-title"><T text="Create your code" /></h2>
           </div>
-          <span className="local-badge">Local only</span>
+          <span className="local-badge"><T text={access?.pro ? "Pro" : "Free"} /></span>
         </div>
       ) : null}
 
@@ -242,18 +248,34 @@ export function QrGenerator({
         showSelectedSummary={!catalogFirst}
       />
 
+      {access?.templateReview ? <aside className={upgradeStyles.notice} aria-label="Local template review">
+        <div className={upgradeStyles.copy}>
+          <strong>LOCAL TEMPLATE REVIEW · Not production</strong>
+          <p>All 10 Pro templates, center-logo upload and exports are unlocked for review on this computer only. No payment or account upgrade is needed. Production access rules are unchanged.</p>
+        </div>
+      </aside> : <aside className={upgradeStyles.notice} aria-label={t("Free and Pro plans")}>
+        <div className={upgradeStyles.copy}>
+          <strong><T text={access?.pro ? "Qraftt Pro is active" : "Create with Free. Make it yours with Pro."} /></strong>
+          <p>{access?.pro ? <T text="Full customization, SVG and high-resolution exports. Unlimited downloads." /> : <T text="Free includes 20 original templates and basic PNG. Pro adds new premium templates, logos and SVG from {monthly}/month or {yearly}/year." values={{ monthly: formatDisplayPrice(pricingPlans[1].prices.monthly, "USD"), yearly: formatDisplayPrice(pricingPlans[1].prices.yearly, "USD") }} />}</p>
+        </div>
+        <div className={upgradeStyles.actions}>
+          <Link className={upgradeStyles.compare} href="/pricing"><T text="Compare plans" /></Link>
+          {access?.pro ? <Link className="button button-secondary" href="/dashboard"><T text="Your Pro account" /></Link> : <button className="button button-primary" type="button" onClick={() => setPaywall("Unlock new premium templates, center logos and advanced exports with Qraftt Pro.")}><T text="Upgrade to Pro" /></button>}
+        </div>
+      </aside>}
+
       <div className="generator-main">
         <div className="generator-controls">
           <div className="generator-stage-heading">
             <span>1</span>
             <div>
-              <h3>Add Content</h3>
-              <p>Enter exactly what the selected QR code should contain.</p>
+              <h3><T text="Add Content" /></h3>
+              <p><T text="Enter exactly what the selected QR code should contain." /></p>
             </div>
           </div>
 
           <GeneratorFields
-            error={currentError}
+            error={type === "google-review" ? result.error : currentError}
             onChange={updateValue}
             type={type}
             values={values}
@@ -262,8 +284,8 @@ export function QrGenerator({
           <div className="generator-stage-heading customization-stage-heading">
             <span>2</span>
             <div>
-              <h3>Customize QR</h3>
-              <p>Apply a template or shape the details while previewing every change.</p>
+              <h3><T text="Customize QR" /></h3>
+              <p><T text="Apply a template or shape the details while previewing every change." /></p>
             </div>
           </div>
 
@@ -274,22 +296,22 @@ export function QrGenerator({
               onClick={() => setMobilePreviewOpen((current) => !current)}
               type="button"
             >
-              <span>Live preview</span>
-              <strong>{mobilePreviewOpen ? "Hide" : "View QR"}</strong>
+              <span><T text="Live preview" /></span>
+              <strong><T text={mobilePreviewOpen ? "Hide" : "View QR"} /></strong>
             </button>
             {mobilePreviewOpen ? (
               <div className="mobile-preview-content">
                 <div className="mobile-preview-canvas">
                   <canvas
-                    aria-label={`Compact live ${type} QR code preview`}
-                    className={!artwork.svg || engineError ? "is-empty" : undefined}
+                    aria-label={t("Compact live {type} QR code preview", { type })}
+                    className={!previewReady || engineError ? "is-empty" : undefined}
                     ref={mobileCanvasRef}
                     role="img"
                   />
-                  {!artwork.svg || engineError ? <span>Complete the fields</span> : null}
+                  {!previewReady || engineError ? <span><T text="Complete the fields" /></span> : null}
                 </div>
                 <div>
-                  <span>{effectiveCorrection} correction</span>
+                  <span>{effectiveCorrection}{" "}<T text="correction" /></span>
                   <button
                     onClick={() => {
                       setMobilePreviewOpen(false);
@@ -299,35 +321,43 @@ export function QrGenerator({
                       });
                     }}
                     type="button"
-                  >
-                    Preview &amp; download
-                  </button>
+                  ><T text="Preview & download" /></button>
                 </div>
               </div>
             ) : null}
           </aside>
 
           <GeneratorCustomization
-            design={design}
-            errorCorrection={errorCorrection}
-            onDesignChange={(updates) =>
-              setDesign((current) => ({ ...current, ...updates }))
-            }
-            onErrorCorrectionChange={setErrorCorrection}
+            design={effectiveDesign}
+            pro={designAccess}
+            onRequestPro={() => setPaywall("Unlock Pro for new premium templates, center logos and advanced customization.")}
+            errorCorrection={effectiveCorrection}
+            onDesignChange={(updates) => {
+              const next = { ...effectiveDesign, ...updates };
+              try { validateExportAccess(designAccess, next, "png", 512); }
+              catch { setPaywall("Unlock Pro to apply this customization."); return; }
+              setDesign(next);
+            }}
+            onErrorCorrectionChange={(level) => {
+              if (!designAccess && level !== "M") { setPaywall("Unlock Pro for advanced error correction."); return; }
+              setErrorCorrection(level);
+            }}
             onReset={() => {
-              setDesign(defaultDesign);
+              setDesign(designAccess ? defaultDesign : freeDesign);
               setErrorCorrection("M");
             }}
             warnings={designSafety.warnings}
           />
 
-          <div
-            aria-live="polite"
-            className={currentError ? "generator-message error" : "generator-message"}
-            id="generator-validation"
-          >
-            {currentError ?? "QR preview is ready and updates automatically."}
-          </div>
+          {type !== "google-review" || !result.error ? (
+            <div
+              aria-live="polite"
+              className={currentError ? "generator-message error" : "generator-message"}
+              id="generator-validation"
+            >
+              <T text={currentError ?? "QR preview is ready and updates automatically."} />
+            </div>
+          ) : null}
         </div>
 
         <div className="generator-preview-panel" ref={previewPanelRef}>
@@ -335,52 +365,52 @@ export function QrGenerator({
             <div className="generator-stage-heading preview-stage-heading">
               <span>3</span>
               <div>
-                <h3>Generate &amp; download QR</h3>
-                <small>Every design detail is included in your file.</small>
+                <h3><T text="Generate & download QR" /></h3>
+                <small><T text="Every design detail is included in your file." /></small>
               </div>
             </div>
-            <span>{effectiveCorrection} correction</span>
+            <span>{effectiveCorrection}{" "}<T text="correction" /></span>
           </div>
           <div className="generator-canvas-wrap">
             <canvas
-              aria-label={`Live ${type} QR code preview`}
-              className={!artwork.svg || engineError ? "is-empty" : undefined}
+              aria-label={t("Live {type} QR code preview", { type })}
+              className={!previewReady || engineError ? "is-empty" : undefined}
               ref={canvasRef}
               role="img"
             />
-            {!artwork.svg || engineError ? (
-              <p>Complete the fields to preview your QR code.</p>
+            {!previewReady || engineError ? (
+              <p><T text="Complete the fields to preview your QR code." /></p>
             ) : null}
           </div>
-          <p className="generator-privacy-note">
-            Generated in your browser. Nothing is uploaded.
-          </p>
+          <p className="generator-privacy-note"><T text="QR content is sent securely for rendering and is not saved." /></p>
           <div className="generator-download-settings">
             <label className="export-select-field">
-              <span>Format</span>
+              <span><T text="Format" /></span>
               <select
-                aria-label="Export format"
-                onChange={(event) =>
-                  setExportFormat(event.target.value as ExportFormat)
-                }
+                aria-label={t("Export format")}
+                onChange={(event) => {
+                  if (event.target.value === "svg" && !designAccess) { setPaywall("Unlock Pro for SVG export."); return; }
+                  setExportFormat(event.target.value as ExportFormat);
+                }}
                 value={exportFormat}
               >
-                <option value="png">PNG</option>
-                <option value="svg">SVG</option>
+                <option value="png"><T text="PNG" /></option>
+                <option value="svg"><T text="SVG · PRO" /></option>
               </select>
             </label>
             <label className="export-select-field">
-              <span>Size</span>
+              <span><T text="Size" /></span>
               <select
-                aria-label="Export resolution"
-                onChange={(event) =>
-                  setExportSize(Number(event.target.value) as ExportSize)
-                }
+                aria-label={t("Export resolution")}
+                onChange={(event) => {
+                  if (Number(event.target.value) > 512 && !designAccess) { setPaywall("Unlock Pro for high-resolution exports."); return; }
+                  setExportSize(Number(event.target.value) as ExportSize);
+                }}
                 value={exportSize}
               >
                 {exportSizes.map((size) => (
                   <option key={size} value={size}>
-                    {size} × {size}
+                    {size} × {size}<T text={size > 512 ? " · PRO" : ""} />
                   </option>
                 ))}
               </select>
@@ -393,14 +423,15 @@ export function QrGenerator({
             type="button"
           >
             {downloading
-              ? "Preparing download…"
-              : `Download ${exportFormat.toUpperCase()}`}
+              ? t("Preparing download…")
+              : t("Download {format}", { format: exportFormat.toUpperCase() })}
           </button>
           <p className="generator-export-note">
-            Static file · no account · no server dependency
+            {access?.templateReview ? "Local review · unlimited test exports · no real Pro entitlement" : access?.pro ? t("Pro · unlimited downloads") : t("{count} free PNG downloads remaining today (UTC)", { count: access?.remaining ?? 3 })}
           </p>
         </div>
       </div>
+      {paywall ? <UpgradePrompt message={paywall} sandboxMonthlyTest={Boolean(access?.sandboxMonthlyTest)} onClose={() => setPaywall("")} /> : null}
     </section>
   );
 }

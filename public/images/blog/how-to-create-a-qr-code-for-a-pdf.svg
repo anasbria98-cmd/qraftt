@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">Create a QR code for a PDF</title>
+  <desc id="desc">A printed QR code connects to a public PDF document displayed on a mobile phone.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#f7fbf8"/>
+      <stop offset="1" stop-color="#dff4e9"/>
+    </linearGradient>
+    <filter id="shadow" x="-25%" y="-25%" width="150%" height="160%">
+      <feDropShadow dx="0" dy="18" stdDeviation="20" flood-color="#123c32" flood-opacity=".14"/>
+    </filter>
+  </defs>
+  <rect width="1200" height="630" rx="42" fill="url(#bg)"/>
+  <circle cx="1090" cy="92" r="155" fill="#55d4a1" opacity=".16"/>
+  <circle cx="85" cy="545" r="175" fill="#123f34" opacity=".07"/>
+  <g filter="url(#shadow)">
+    <path d="M120 112h340l100 100v326H120Z" fill="#fff" stroke="#b8dece" stroke-width="3"/>
+    <path d="M460 112v100h100" fill="#e1f5ec" stroke="#b8dece" stroke-width="3"/>
+    <rect x="168" y="170" width="154" height="48" rx="15" fill="#e65c59"/>
+    <text x="245" y="202" fill="#fff" font-family="Arial, sans-serif" font-size="23" font-weight="700" text-anchor="middle">PDF GUIDE</text>
+    <rect x="168" y="263" width="338" height="16" rx="8" fill="#c8ded6"/>
+    <rect x="168" y="301" width="285" height="16" rx="8" fill="#dceae5"/>
+    <rect x="168" y="339" width="318" height="16" rx="8" fill="#dceae5"/>
+    <rect x="168" y="396" width="148" height="95" rx="18" fill="#e1f5ec"/>
+    <path d="m197 465 31-34 24 24 17-18 22 28Z" fill="#58c899"/>
+    <rect x="340" y="396" width="166" height="15" rx="7" fill="#c8ded6"/>
+    <rect x="340" y="428" width="140" height="15" rx="7" fill="#dceae5"/>
+    <rect x="340" y="460" width="154" height="15" rx="7" fill="#dceae5"/>
+  </g>
+  <path d="M585 315h66" fill="none" stroke="#43ba87" stroke-linecap="round" stroke-width="8"/>
+  <path d="m631 291 25 24-25 24" fill="none" stroke="#43ba87" stroke-linecap="round" stroke-linejoin="round" stroke-width="8"/>
+  <g filter="url(#shadow)">
+    <rect x="698" y="78" width="340" height="476" rx="45" fill="#113f34"/>
+    <rect x="720" y="102" width="296" height="427" rx="29" fill="#fff"/>
+    <rect x="817" y="115" width="102" height="8" rx="4" fill="#bdd9cf"/>
+    <text x="868" y="175" fill="#123f34" font-family="Arial, sans-serif" font-size="24" font-weight="700" text-anchor="middle">Open document</text>
+    <rect x="769" y="208" width="198" height="198" rx="16" fill="#fff" stroke="#d3e6df" stroke-width="2"/>
+    <g fill="#0f493c">
+      <path d="M786 225h48v48h-48zm12 12v24h24v-24zM902 225h48v48h-48zm12 12v24h24v-24zM786 341h48v48h-48zm12 12v24h24v-24z"/>
+      <path d="M855 225h18v18h-18zm0 38h38v18h-38zm-19 19h19v38h-19zm38 0h18v19h-18zm38-7h18v38h-18zm-38 45h19v18h-19zm38 12h18v19h-18zm-57 20h19v37h-19zm38-14h18v51h-18zm38 26h20v25h-20z"/>
+    </g>
+    <rect x="769" y="440" width="198" height="49" rx="16" fill="#e45d59"/>
+    <path d="M798 452v19m-8-8 8 8 8-8M787 479h22" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+    <text x="830" y="471" fill="#fff" font-family="Arial, sans-serif" font-size="18" font-weight="700">Public PDF</text>
+  </g>
+  <g fill="#f0b95d">
+    <circle cx="1080" cy="403" r="9"/><circle cx="1115" cy="440" r="6"/><circle cx="1088" cy="478" r="12"/>
+  </g>
+  <text x="600" y="592" fill="#0f493c" font-family="Arial, sans-serif" font-size="22" font-weight="700" text-anchor="middle">DIRECT PDF LINK · MOBILE TESTED · PNG &amp; SVG</text>
+</svg>

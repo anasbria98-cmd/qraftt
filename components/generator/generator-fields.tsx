@@ -1,4 +1,7 @@
+"use client";
+
 import type { QrFormValues, QrType, WifiEncryption } from "@/lib/qr/types";
+import { T, useLanguage } from "@/components/i18n/language-provider";
 import {
   isLinkQrType,
   isSocialQrType,
@@ -25,9 +28,9 @@ interface FieldProps {
 function Field({ children, hint, label }: FieldProps) {
   return (
     <label className="generator-field">
-      <span className="generator-label">{label}</span>
+      <span className="generator-label"><T text={label} /></span>
       {children}
-      {hint ? <span className="generator-hint">{hint}</span> : null}
+      {hint ? <span className="generator-hint"><T text={hint} /></span> : null}
     </label>
   );
 }
@@ -38,6 +41,7 @@ export function GeneratorFields({
   type,
   values,
 }: GeneratorFieldsProps) {
+  const { t } = useLanguage();
   const invalidProps = {
     "aria-describedby": error ? "generator-validation" : undefined,
     "aria-invalid": Boolean(error),
@@ -67,12 +71,12 @@ export function GeneratorFields({
       ) : null}
 
       {type === "text" ? (
-        <Field label="Text" hint={`${values.text.length.toLocaleString()} / 2,000 characters`}>
+        <Field label="Text" hint={t("{count} / 2,000 characters", { count: values.text.length.toLocaleString() })}>
           <textarea
             {...invalidProps}
             maxLength={2_000}
             onChange={(event) => onChange("text", event.target.value)}
-            placeholder="Type the message you want to share"
+            placeholder={t("Type the message you want to share")}
             rows={6}
             value={values.text}
           />
@@ -87,7 +91,7 @@ export function GeneratorFields({
               autoComplete="off"
               maxLength={32}
               onChange={(event) => onChange("wifiSsid", event.target.value)}
-              placeholder="Guest WiFi"
+              placeholder={t("Guest WiFi")}
               type="text"
               value={values.wifiSsid}
             />
@@ -100,9 +104,9 @@ export function GeneratorFields({
                 }
                 value={values.wifiEncryption}
               >
-                <option value="WPA">WPA / WPA2</option>
-                <option value="WEP">WEP</option>
-                <option value="nopass">No password</option>
+                <option value="WPA"><T text="WPA / WPA2" /></option>
+                <option value="WEP"><T text="WEP" /></option>
+                <option value="nopass"><T text="No password" /></option>
               </select>
             </Field>
             <label className="generator-checkbox">
@@ -110,9 +114,7 @@ export function GeneratorFields({
                 checked={values.wifiHidden}
                 onChange={(event) => onChange("wifiHidden", event.target.checked)}
                 type="checkbox"
-              />
-              Hidden network
-            </label>
+              /><T text="Hidden network" /></label>
           </div>
           {values.wifiEncryption !== "nopass" ? (
             <Field
@@ -123,7 +125,7 @@ export function GeneratorFields({
                 {...invalidProps}
                 autoComplete="off"
                 onChange={(event) => onChange("wifiPassword", event.target.value)}
-                placeholder="Network password"
+                placeholder={t("Network password")}
                 type="text"
                 value={values.wifiPassword}
               />
@@ -140,7 +142,7 @@ export function GeneratorFields({
               autoComplete="tel"
               inputMode="tel"
               onChange={(event) => onChange("whatsappNumber", event.target.value)}
-              placeholder="+1 202 555 0147"
+              placeholder={t("+1 202 555 0147")}
               type="tel"
               value={values.whatsappNumber}
             />
@@ -149,7 +151,7 @@ export function GeneratorFields({
             <textarea
               maxLength={1_000}
               onChange={(event) => onChange("whatsappMessage", event.target.value)}
-              placeholder="Hi! I’d like to know more."
+              placeholder={t("Hi! I’d like to know more.")}
               rows={4}
               value={values.whatsappMessage}
             />
@@ -175,16 +177,16 @@ export function GeneratorFields({
             <input
               maxLength={200}
               onChange={(event) => onChange("emailSubject", event.target.value)}
-              placeholder="A quick question"
+              placeholder={t("A quick question")}
               type="text"
               value={values.emailSubject}
             />
           </Field>
-          <Field label="Message" hint={`${values.emailBody.length.toLocaleString()} / 1,000 characters`}>
+          <Field label="Message" hint={t("{count} / 1,000 characters", { count: values.emailBody.length.toLocaleString() })}>
             <textarea
               maxLength={1_000}
               onChange={(event) => onChange("emailBody", event.target.value)}
-              placeholder="Write a short pre-filled message"
+              placeholder={t("Write a short pre-filled message")}
               rows={4}
               value={values.emailBody}
             />
@@ -223,7 +225,7 @@ export function GeneratorFields({
               autoComplete="organization"
               maxLength={100}
               onChange={(event) => onChange("vcardOrganization", event.target.value)}
-              placeholder="Company name"
+              placeholder={t("Company name")}
               type="text"
               value={values.vcardOrganization}
             />
@@ -233,18 +235,21 @@ export function GeneratorFields({
               autoComplete="organization-title"
               maxLength={100}
               onChange={(event) => onChange("vcardTitle", event.target.value)}
-              placeholder="Product designer"
+              placeholder={t("Product designer")}
               type="text"
               value={values.vcardTitle}
             />
           </Field>
-          <Field label="Phone" hint="Optional · Include the international country code.">
+          <Field
+            label="Mobile phone"
+            hint="Optional · Include the international country code."
+          >
             <input
               {...invalidProps}
               autoComplete="tel"
               inputMode="tel"
               onChange={(event) => onChange("vcardPhone", event.target.value)}
-              placeholder="+44 20 7946 0958"
+              placeholder={t("+44 7700 900123")}
               type="tel"
               value={values.vcardPhone}
             />
@@ -284,16 +289,16 @@ export function GeneratorFields({
               autoComplete="tel"
               inputMode="tel"
               onChange={(event) => onChange("smsNumber", event.target.value)}
-              placeholder="+1 202 555 0147"
+              placeholder={t("+1 202 555 0147")}
               type="tel"
               value={values.smsNumber}
             />
           </Field>
-          <Field label="Pre-filled message" hint={`${values.smsMessage.length.toLocaleString()} / 1,000 characters`}>
+          <Field label="Pre-filled message" hint={t("{count} / 1,000 characters", { count: values.smsMessage.length.toLocaleString() })}>
             <textarea
               maxLength={1_000}
               onChange={(event) => onChange("smsMessage", event.target.value)}
-              placeholder="Write an optional SMS message"
+              placeholder={t("Write an optional SMS message")}
               rows={4}
               value={values.smsMessage}
             />
@@ -308,7 +313,7 @@ export function GeneratorFields({
             autoComplete="tel"
             inputMode="tel"
             onChange={(event) => onChange("phoneNumber", event.target.value)}
-            placeholder="+1 202 555 0147"
+            placeholder={t("+1 202 555 0147")}
             type="tel"
             value={values.phoneNumber}
           />
@@ -347,7 +352,7 @@ export function GeneratorFields({
               {...invalidProps}
               maxLength={200}
               onChange={(event) => onChange("calendarTitle", event.target.value)}
-              placeholder="Team workshop"
+              placeholder={t("Team workshop")}
               type="text"
               value={values.calendarTitle}
             />
@@ -375,21 +380,21 @@ export function GeneratorFields({
             <input
               maxLength={300}
               onChange={(event) => onChange("calendarLocation", event.target.value)}
-              placeholder="Conference room or address"
+              placeholder={t("Conference room or address")}
               type="text"
               value={values.calendarLocation}
             />
           </Field>
           <Field
             label="Description"
-            hint={`${values.calendarDescription.length.toLocaleString()} / 1,000 characters`}
+            hint={t("{count} / 1,000 characters", { count: values.calendarDescription.length.toLocaleString() })}
           >
             <textarea
               maxLength={1_000}
               onChange={(event) =>
                 onChange("calendarDescription", event.target.value)
               }
-              placeholder="Add optional event details"
+              placeholder={t("Add optional event details")}
               rows={4}
               value={values.calendarDescription}
             />
@@ -416,19 +421,31 @@ export function GeneratorFields({
       ) : null}
 
       {isLinkQrType(type) ? (
-        <Field label={linkQrConfig[type].fieldLabel} hint={linkQrConfig[type].hint}>
-          <input
-            {...invalidProps}
-            autoCapitalize="none"
-            autoComplete="url"
-            inputMode="url"
-            maxLength={2_000}
-            onChange={(event) => onChange(type, event.target.value)}
-            placeholder={linkQrConfig[type].placeholder}
-            type="url"
-            value={values[type]}
-          />
-        </Field>
+        <>
+          <Field label={linkQrConfig[type].fieldLabel} hint={linkQrConfig[type].hint}>
+            <input
+              {...invalidProps}
+              autoCapitalize="none"
+              autoComplete="url"
+              inputMode="url"
+              maxLength={2_000}
+              onChange={(event) => onChange(type, event.target.value)}
+              placeholder={linkQrConfig[type].placeholder}
+              type="url"
+              value={values[type]}
+            />
+          </Field>
+          {type === "google-review" && error ? (
+            <p
+              aria-live="polite"
+              className="generator-message error"
+              id="generator-validation"
+              role="alert"
+            >
+              <T text={error} />
+            </p>
+          ) : null}
+        </>
       ) : null}
     </div>
   );

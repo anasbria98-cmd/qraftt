@@ -1,6 +1,7 @@
 import QRCode from "qrcode";
 import {
   defaultDesign,
+  designTemplates,
   frameLabels,
   frameStructures,
   type QrDesignOptions,
@@ -8,6 +9,7 @@ import {
 } from "./design.ts";
 import { getQrArtworkLayout, renderQrArtwork } from "./artwork.ts";
 import type { ErrorCorrectionLevel } from "./types.ts";
+import { renderPremiumQrSvg } from "./premium-render.ts";
 
 export const QUIET_ZONE_MODULES = 4;
 const VIEWBOX_SIZE = 1_000;
@@ -82,6 +84,7 @@ function renderEye(
   outerFill: string,
   innerFill: string,
   background: string,
+  protectDiamond = false,
 ) {
   const centerX = x + moduleSize * 3.5;
   const centerY = y + moduleSize * 3.5;
@@ -111,7 +114,10 @@ function renderEye(
   if (innerStyle === "circle") {
     inner = `<circle data-qr-inner-eye="circle" cx="${centerX}" cy="${centerY}" r="${moduleSize * 1.5}" fill="${innerFill}"/>`;
   } else if (innerStyle === "diamond") {
-    inner = `<path data-qr-inner-eye="diamond" d="M${centerX} ${innerY} ${innerX + innerSize} ${centerY} ${centerX} ${innerY + innerSize} ${innerX} ${centerY}Z" fill="${innerFill}"/>`;
+    const cut = moduleSize * .35;
+    inner = protectDiamond
+      ? `<path data-qr-inner-eye="diamond" d="M${innerX + cut} ${innerY}H${innerX + innerSize - cut}L${innerX + innerSize} ${innerY + cut}V${innerY + innerSize - cut}L${innerX + innerSize - cut} ${innerY + innerSize}H${innerX + cut}L${innerX} ${innerY + innerSize - cut}V${innerY + cut}Z" fill="${innerFill}"/>`
+      : `<path data-qr-inner-eye="diamond" d="M${centerX} ${innerY} ${innerX + innerSize} ${centerY} ${centerX} ${innerY + innerSize} ${innerX} ${centerY}Z" fill="${innerFill}"/>`;
   } else {
     const innerRadius = innerStyle === "rounded" ? moduleSize * 0.72 : 0;
     inner = `<rect data-qr-inner-eye="${innerStyle}" x="${innerX}" y="${innerY}" width="${innerSize}" height="${innerSize}" rx="${innerRadius}" fill="${innerFill}"/>`;
@@ -253,8 +259,10 @@ export function renderQrSvg(
   payload: string,
   errorCorrectionLevel: ErrorCorrectionLevel,
   design: QrDesignOptions,
+  referenceImage?: string,
 ) {
-  const qr = QRCode.create(payload, { errorCorrectionLevel });
+  if (design.premiumTemplateId) return renderPremiumQrSvg(payload, design, referenceImage);
+  const qr = QRCode.create(payload, { errorCorrectionLevel: design.logoDataUrl ? "H" : errorCorrectionLevel });
   const matrixSize = qr.modules.size;
   const illustrated = design.artwork !== "none";
   const framed =
@@ -275,6 +283,9 @@ export function renderQrSvg(
   const originY = qrBoxY + QUIET_ZONE_MODULES * moduleSize;
   const fill = design.gradientColor ? "url(#qr-gradient)" : design.foreground;
   const body: string[] = [];
+  // Keep approved legacy templates byte-identical. For custom styles, timing,
+  // alignment and format modules must retain their full square scan geometry.
+  const legacyTemplate = designTemplates.some(template => Object.entries(template.design).every(([key, value]) => design[key as keyof QrDesignOptions] === value));
 
   for (let row = 0; row < matrixSize; row += 1) {
     for (let column = 0; column < matrixSize; column += 1) {
@@ -286,7 +297,7 @@ export function renderQrSvg(
           originX + column * moduleSize,
           originY + row * moduleSize,
           moduleSize,
-          design.bodyStyle,
+          !legacyTemplate && qr.modules.isReserved(row, column) ? "square" : design.bodyStyle,
           fill,
         ),
       );
@@ -309,6 +320,7 @@ export function renderQrSvg(
         design.outerEyeColor,
         design.innerEyeColor,
         design.background,
+        !legacyTemplate,
       ),
     )
     .join("");
@@ -325,7 +337,7 @@ export function renderQrSvg(
 
   let logo = "";
   if (design.logoDataUrl) {
-    const size = (qrBoxSize * design.logoSize) / 100;
+    const size = (qrBoxSize * Math.min(design.logoSize, 18)) / 100;
     const centerX = qrBoxX + qrBoxSize / 2;
     const centerY = qrBoxY + qrBoxSize / 2;
     const padding = Math.max(10, size * 0.12);
@@ -337,7 +349,15 @@ export function renderQrSvg(
       ? "transparent"
       : design.frameBackground
     : design.background;
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${VIEWBOX_SIZE}" height="${VIEWBOX_SIZE}" viewBox="0 0 ${VIEWBOX_SIZE} ${VIEWBOX_SIZE}" role="img" aria-label="QR code"><defs>${gradient}</defs><rect width="${VIEWBOX_SIZE}" height="${VIEWBOX_SIZE}" fill="${canvasBackground}"/>${artwork}${decoration}${frame}<rect x="${qrBoxX}" y="${qrBoxY}" width="${qrBoxSize}" height="${qrBoxSize}" rx="${framed ? 28 : 0}" fill="${design.background}"/>${body.join("")}${eyes}${logo}</svg>`;
+  const protectedPatterns: string[] = [];
+  if (design.logoDataUrl) {
+    const matrix = qr.modules as typeof qr.modules & { isReserved(row: number, col: number): boolean };
+    for (let row = 0; row < matrixSize; row++) for (let col = 0; col < matrixSize; col++) {
+      if (!matrix.isReserved(row, col) || isFinderModule(row, col, matrixSize)) continue;
+      protectedPatterns.push(`<rect x="${originX + col * moduleSize}" y="${originY + row * moduleSize}" width="${moduleSize}" height="${moduleSize}" fill="${matrix.get(row, col) ? design.foreground : design.background}"/>`);
+    }
+  }
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${VIEWBOX_SIZE}" height="${VIEWBOX_SIZE}" viewBox="0 0 ${VIEWBOX_SIZE} ${VIEWBOX_SIZE}" role="img" aria-label="QR code"><defs>${gradient}</defs><rect width="${VIEWBOX_SIZE}" height="${VIEWBOX_SIZE}" fill="${canvasBackground}"/>${artwork}${decoration}${frame}<rect x="${qrBoxX}" y="${qrBoxY}" width="${qrBoxSize}" height="${qrBoxSize}" rx="${framed ? 28 : 0}" fill="${design.background}"/>${body.join("")}${eyes}${logo}${protectedPatterns.join("")}</svg>`;
 }
 
 export function renderFramePreviewSvg(frame: QrFrame) {

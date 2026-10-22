@@ -126,6 +126,7 @@ export type QrFrame =
   | "premium-plaque";
 
 export interface QrDesignOptions {
+  premiumTemplateId?: string | null;
   artwork: QrArtwork;
   background: string;
   bodyStyle: QrBodyStyle;

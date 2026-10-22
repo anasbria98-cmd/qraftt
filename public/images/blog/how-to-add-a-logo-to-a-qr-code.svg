@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#f5faf7"/>
+  <circle cx="600" cy="315" r="270" fill="#e1f8ea"/>
+  <rect x="310" y="35" width="580" height="560" rx="56" fill="#fff" stroke="#aad9bf" stroke-width="5"/>
+  <g transform="translate(385 105)" fill="#073c30">
+    <path d="M0 0h125v125H0zm28 28v69h69V28zM305 0h125v125H305zm28 28v69h69V28zM0 305h125v125H0zm28 28v69h69v-69z" fill-rule="evenodd"/>
+    <rect x="170" y="25" width="36" height="36"/><rect x="222" y="79" width="36" height="90"/><rect x="154" y="183" width="55" height="36"/><rect x="275" y="180" width="36" height="95"/><rect x="165" y="318" width="36" height="75"/><rect x="250" y="310" width="90" height="36"/><rect x="360" y="250" width="36" height="110"/>
+  </g>
+  <rect x="500" y="215" width="200" height="200" rx="48" fill="#fff" stroke="#22c984" stroke-width="10"/>
+  <path d="M550 355V275c0-24 18-42 42-42h30c35 0 58 24 58 56 0 29-18 50-47 55l45 51h-58l-67-82h65c11 0 20-8 20-20 0-13-9-21-22-21h-24v83z" fill="#073c30"/>
+  <path d="M275 70v-35h80M925 70v-35h-80M275 560v35h80M925 560v35h-80" fill="none" stroke="#22c984" stroke-width="10" stroke-linecap="round"/>
+</svg>

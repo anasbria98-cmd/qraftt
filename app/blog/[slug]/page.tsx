@@ -21,6 +21,8 @@ export async function generateMetadata({
 
   return createPageMetadata({
     description: article.description,
+    image: article.image.src,
+    imageAlt: article.image.alt,
     path: `/blog/${article.slug}`,
     title: article.title,
     type: "article",

@@ -33,6 +33,7 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 !.env.example
+.qraftt-billing.db*
 
 # typescript
 *.tsbuildinfo
@@ -44,3 +45,8 @@ yarn-error.log*
 /.wrangler/
 /outputs/
 /work/
+
+# Local agent tooling and browser audit artifacts
+/.agents/
+/.codex/
+/.playwright-mcp/

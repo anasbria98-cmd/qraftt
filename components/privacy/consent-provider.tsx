@@ -1,5 +1,6 @@
 "use client";
 
+import { T } from "@/components/i18n/language-provider";
 import {
   createContext,
   useContext,
@@ -10,10 +11,7 @@ import {
 } from "react";
 import Link from "next/link";
 import Script from "next/script";
-import {
-  adSenseClientId,
-  googleAnalyticsId,
-} from "@/lib/integrations";
+import { adSenseClientId } from "@/lib/integrations";
 
 type ConsentChoice = "accepted" | "rejected";
 
@@ -84,6 +82,11 @@ export function ConsentProvider({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener(OPEN_CONSENT_EVENT, openPreferences);
   }, []);
 
+  useEffect(() => {
+    if (!hydrated || choice === null) return;
+    updateGoogleConsent(choice);
+  }, [choice, hydrated]);
+
   function saveChoice(nextChoice: ConsentChoice) {
     try {
       window.localStorage.setItem(CONSENT_STORAGE_KEY, nextChoice);
@@ -95,19 +98,6 @@ export function ConsentProvider({ children }: { children: React.ReactNode }) {
     updateGoogleConsent(nextChoice);
   }
 
-  function initializeAnalytics() {
-    if (!googleAnalyticsId) return;
-    window.dataLayer = window.dataLayer ?? [];
-    window.gtag =
-      window.gtag ??
-      function gtag(...args: unknown[]) {
-        window.dataLayer?.push(args);
-      };
-    updateGoogleConsent("accepted");
-    window.gtag("js", new Date());
-    window.gtag("config", googleAnalyticsId);
-  }
-
   const contextValue = useMemo(
     () => ({ adsReady, optionalServicesAllowed }),
     [adsReady, optionalServicesAllowed],
@@ -116,20 +106,6 @@ export function ConsentProvider({ children }: { children: React.ReactNode }) {
   return (
     <ConsentContext.Provider value={contextValue}>
       {children}
-
-      {optionalServicesAllowed && googleAnalyticsId ? (
-        <>
-          <Script id="qraft-google-consent-default" strategy="afterInteractive">
-            {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}window.gtag=window.gtag||gtag;gtag('consent','default',{analytics_storage:'denied',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied'});`}
-          </Script>
-          <Script
-            id="qraft-google-analytics"
-            onLoad={initializeAnalytics}
-            src={`https://www.googletagmanager.com/gtag/js?id=${googleAnalyticsId}`}
-            strategy="afterInteractive"
-          />
-        </>
-      ) : null}
 
       {optionalServicesAllowed && adSenseClientId ? (
         <Script
@@ -149,29 +125,21 @@ export function ConsentProvider({ children }: { children: React.ReactNode }) {
           role="dialog"
         >
           <div>
-            <strong id="consent-title">Optional cookies and services</strong>
-            <p id="consent-description">
-              Core QR tools work without optional tracking. With permission,
-              configured analytics and advertising services may load. You can
-              change this choice later in the footer.
-            </p>
-            <Link href="/cookie-policy">Read the cookie policy</Link>
+            <strong id="consent-title"><T text="Optional cookies and services" /></strong>
+            <p id="consent-description"><T text="Core QR tools work without optional tracking. With permission, configured analytics and advertising services may load. You can change this choice later in the footer." /></p>
+            <Link href="/cookie-policy"><T text="Read the cookie policy" /></Link>
           </div>
           <div className="consent-actions">
             <button
               className="button button-secondary"
               onClick={() => saveChoice("rejected")}
               type="button"
-            >
-              Reject optional
-            </button>
+            ><T text="Reject optional" /></button>
             <button
               className="button button-primary"
               onClick={() => saveChoice("accepted")}
               type="button"
-            >
-              Accept optional
-            </button>
+            ><T text="Accept optional" /></button>
           </div>
         </section>
       ) : null}

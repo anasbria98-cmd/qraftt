@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#f6faf7"/>
+  <g transform="translate(95 95)">
+    <rect width="440" height="440" rx="45" fill="#fff" stroke="#a9d8bd" stroke-width="5"/>
+    <g transform="translate(55 55)" fill="#073c30"><path d="M0 0h105v105H0zm25 25v55h55V25zM225 0h105v105H225zm25 25v55h55V25zM0 225h105v105H0zm25 25v55h55v-55z" fill-rule="evenodd"/><rect x="150" y="145" width="32" height="32"/><rect x="204" y="144" width="32" height="92"/><rect x="148" y="260" width="92" height="32"/><rect x="268" y="198" width="32" height="94"/></g>
+    <circle cx="385" cy="385" r="38" fill="#22c984"/><path d="m365 385 13 13 28-34" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g transform="translate(665 95)">
+    <rect width="440" height="440" rx="45" fill="#dce8df" stroke="#c2d1c7" stroke-width="5"/>
+    <g transform="translate(55 55)" fill="#a8bdb0"><path d="M0 0h105v105H0zm25 25v55h55V25zM225 0h105v105H225zm25 25v55h55V25zM0 225h105v105H0zm25 25v55h55v-55z" fill-rule="evenodd"/><rect x="150" y="145" width="32" height="32"/><rect x="204" y="144" width="32" height="92"/><rect x="148" y="260" width="92" height="32"/><rect x="268" y="198" width="32" height="94"/></g>
+    <circle cx="385" cy="385" r="38" fill="#e36e62"/><path d="m368 368 34 34m0-34-34 34" stroke="#fff" stroke-width="10" stroke-linecap="round"/>
+  </g>
+  <g transform="translate(465 45)"><circle cx="0" cy="0" r="28" fill="#073c30"/><circle cx="60" cy="0" r="28" fill="#22c984"/><circle cx="120" cy="0" r="28" fill="#b9f5cf"/><circle cx="180" cy="0" r="28" fill="#fff" stroke="#d1e5d9" stroke-width="3"/></g>
+</svg>

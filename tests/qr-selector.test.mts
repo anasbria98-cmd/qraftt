@@ -113,10 +113,23 @@ test("leads from the homepage hero into the full QR type selector", async () => 
     "utf8",
   );
 
-  assert.match(homepageSource, /Create &amp; Customize QR Codes for/);
-  assert.match(homepageSource, /Generate, customize and download professional QR codes/);
-  assert.match(homepageSource, /href="#qr-generator"/);
+  assert.match(homepageSource, /<T text="Create & Customize QR Codes for"/);
+  assert.match(
+    homepageSource,
+    /Qraftt — Free Browser-Based Static QR Code Generator/,
+  );
+  assert.match(
+    homepageSource,
+    /Qraftt is a free browser-based static QR code generator with 30 QR types, design customization, and PNG and SVG exports/,
+  );
+  const hero = homepageSource.split('<section className="home-hero"')[1].split("</section>")[0];
+  assert.doesNotMatch(hero, /home-hero-kicker|home-hero-lede|home-hero-proof|ButtonLink|<br/);
+  assert.match(homepageSource, /id="qr-generator"/);
   assert.match(homepageSource, /<QrGenerator catalogFirst \/>/);
+  assert.match(
+    homepageSource,
+    /Downloaded static QR codes encode their destination or content directly and do not depend on Qraftt redirects/,
+  );
   assert.doesNotMatch(homepageSource, /Choose Type/);
   assert.doesNotMatch(homepageSource, /All Types of QR Codes/);
   assert.doesNotMatch(homepageSource, /Make a QR code/);
@@ -188,8 +201,20 @@ test("places the premium promo between the visual steps and trust section", asyn
   assert.ok(promoPosition < trustPosition);
   assert.match(promoSource, /Design QR codes people/);
   assert.match(promoSource, /href="#qr-generator"/);
-  assert.match(promoSource, /qraftt-premium-promo\.png/);
+  assert.match(promoSource, /qraftt-premium-sculpture\.webp/);
+  assert.match(promoSource, /height=\{1086\}/);
+  assert.match(promoSource, /width=\{1448\}/);
   assert.match(promoSource, /unoptimized/);
-  assert.match(promoSource, /PNG &amp; SVG/);
+  assert.match(promoSource, /<T text="PNG & SVG"/);
   assert.match(promoSource, /Created locally/);
+});
+
+test("premium artwork is frameless and uses a balanced responsive composition", async () => {
+  const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
+  const shell = css.match(/\.premium-promo-image-shell\s*\{([^}]+)\}/)?.[1] ?? "";
+  assert.match(shell, /aspect-ratio:\s*4\s*\/\s*3/);
+  assert.match(shell, /background:\s*transparent/);
+  assert.doesNotMatch(shell, /border:|border-radius:|box-shadow:|overflow:\s*hidden/);
+  assert.match(css, /\.premium-promo-visual\s*\{[^}]*width:\s*100%/);
+  assert.match(css, /grid-template-columns:\s*minmax\(0,\s*0\.92fr\)\s*minmax\(0,\s*1\.08fr\)/);
 });

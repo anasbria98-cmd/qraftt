@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import test from "node:test";
 import {
   defaultDesign,
@@ -17,6 +18,17 @@ import {
 } from "../lib/qr/render.ts";
 
 const baseDesign: QrDesignOptions = { ...defaultDesign };
+
+test("keeps generated gallery artwork out of server-rendered HTML", async () => {
+  const source = await readFile(
+    new URL("../components/generator/generator-customization.tsx", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(source, /URL\.createObjectURL\(new Blob/);
+  assert.doesNotMatch(source, /data:image\/svg\+xml;charset=utf-8/);
+  assert.match(source, /previewsReady/);
+});
 
 test("renders reusable body, independent eyes, gradient, frame, and logo customization", () => {
   const svg = renderQrSvg("https://example.com", "H", {

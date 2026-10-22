@@ -1,5 +1,6 @@
 "use client";
 
+import { T, useLanguage } from "@/components/i18n/language-provider";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { QrTypeIcon } from "@/components/generator/qr-type-icon";
 import {
@@ -58,6 +59,7 @@ export function QrTypeSelector({
   selectedType,
   showSelectedSummary = true,
 }: QrTypeSelectorProps) {
+  const { t } = useLanguage();
   const [catalogOpen, setCatalogOpen] = useState(false);
   const [query, setQuery] = useState("");
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -67,9 +69,9 @@ export function QrTypeSelector({
   const visibleOptions = useMemo(
     () =>
       search
-        ? qrTypeOptions.filter((option) => matchesSearch(option, search))
+        ? qrTypeOptions.filter((option) => matchesSearch(option, search) || `${t(option.label)} ${t(option.category)}`.toLowerCase().includes(search))
         : qrTypeOptions,
-    [search],
+    [search, t],
   );
   const featuredOptions = useMemo(
     () =>
@@ -172,8 +174,7 @@ export function QrTypeSelector({
   return (
     <div className="qr-type-selector">
       <span className="visually-hidden" id="generator-selected-type-label">
-        {selectedOption?.label ?? selectedType} QR code content
-      </span>
+        <T text={selectedOption?.label ?? selectedType} />{" "}<T text="QR code content" /></span>
 
       {showSelectedSummary ? (
         <div aria-live="polite" className="selected-qr-type">
@@ -181,9 +182,9 @@ export function QrTypeSelector({
             <QrTypeIcon type={selectedType} />
           </span>
           <div>
-            <span>Selected QR type</span>
-            <strong>{selectedOption?.label ?? selectedType}</strong>
-            <small>{selectedOption?.category ?? "QR format"}</small>
+            <span><T text="Selected QR type" /></span>
+            <strong><T text={selectedOption?.label ?? selectedType} /></strong>
+            <small><T text={selectedOption?.category ?? "QR format"} /></small>
           </div>
         </div>
       ) : null}
@@ -191,10 +192,10 @@ export function QrTypeSelector({
       <section className="popular-type-panel" aria-labelledby="popular-types-heading">
         <div className="popular-type-heading">
           <div>
-            <p>Start creating</p>
-            <h2 id="popular-types-heading">Popular QR types</h2>
+            <p><T text="Start creating" /></p>
+            <h2 id="popular-types-heading"><T text="Popular QR types" /></h2>
           </div>
-          <span>{selectedOption?.label ?? selectedType} selected</span>
+          <span>{selectedOption?.label ?? selectedType}{" "}<T text="selected" /></span>
         </div>
         <div className="popular-type-scroll">
           {featuredOptions.map((option) => {
@@ -211,7 +212,7 @@ export function QrTypeSelector({
                 <span className={iconClass(option.value)}>
                   <QrTypeIcon type={option.value} />
                 </span>
-                <span>{option.label}</span>
+                <span><T text={option.label} /></span>
               </button>
             );
           })}
@@ -224,7 +225,7 @@ export function QrTypeSelector({
             type="button"
           >
             <span aria-hidden="true" className="view-all-icon">+</span>
-            <span>View All</span>
+            <span><T text="View All" /></span>
           </button>
         </div>
       </section>
@@ -235,6 +236,7 @@ export function QrTypeSelector({
           onMouseDown={(event) => {
             if (event.target === event.currentTarget) closeCatalog("trigger");
           }}
+          role="presentation"
         >
           <div
             aria-labelledby="all-qr-types-title"
@@ -245,11 +247,11 @@ export function QrTypeSelector({
           >
             <div className="qr-type-modal-heading">
               <div>
-                <p>Choose a format</p>
-                <h2 id="all-qr-types-title">All 30 QR types</h2>
+                <p><T text="Choose a format" /></p>
+                <h2 id="all-qr-types-title"><T text="All 30 QR types" /></h2>
               </div>
               <button
-                aria-label="Close QR type catalog"
+                aria-label={t("Close QR type catalog")}
                 className="qr-type-modal-close"
                 onClick={() => closeCatalog("trigger")}
                 type="button"
@@ -260,14 +262,14 @@ export function QrTypeSelector({
 
             <div className="qr-type-catalog" id="qr-type-catalog">
               <div className="qr-type-search">
-                <label htmlFor="qr-type-search">Find a QR type</label>
+                <label htmlFor="qr-type-search"><T text="Find a QR type" /></label>
                 <div className="qr-type-search-field">
                   <span aria-hidden="true">⌕</span>
                   <input
                     autoComplete="off"
                     id="qr-type-search"
                     onChange={(event) => setQuery(event.target.value)}
-                    placeholder="Search URL, social, PDF…"
+                    placeholder={t("Search URL, social, PDF…")}
                     ref={searchInputRef}
                     type="search"
                     value={query}
@@ -275,12 +277,12 @@ export function QrTypeSelector({
                 </div>
                 <span aria-live="polite" className="qr-type-result-count">
                   {visibleOptions.length}{" "}
-                  {visibleOptions.length === 1 ? "type" : "types"}
+                  <T text={visibleOptions.length === 1 ? "type" : "types"} />
                 </span>
               </div>
 
               <div
-                aria-label="All QR code types"
+                aria-label={t("All QR code types")}
                 aria-orientation="horizontal"
                 className="qr-type-tablist"
                 role="tablist"
@@ -294,8 +296,8 @@ export function QrTypeSelector({
                   return (
                     <section className="qr-type-category" key={category} role="presentation">
                       <div className="qr-type-category-heading">
-                        <h3>{category}</h3>
-                        {category === "Popular" && !search ? <span>Most used</span> : null}
+                        <h3><T text={category} /></h3>
+                        {category === "Popular" && !search ? <span><T text="Most used" /></span> : null}
                       </div>
                       <div className="qr-type-grid">
                         {options.map((option) => {
@@ -327,9 +329,9 @@ export function QrTypeSelector({
                                 →
                               </span>
                               <span className="qr-type-card-copy">
-                                <span className="qr-type-card-label">{option.label}</span>
+                                <span className="qr-type-card-label"><T text={option.label} /></span>
                                 <span className="qr-type-card-meta">
-                                  {selected ? "Selected" : "QR format"}
+                                  <T text={selected ? "Selected" : "QR format"} />
                                 </span>
                               </span>
                             </button>
@@ -342,9 +344,7 @@ export function QrTypeSelector({
               </div>
 
               {!visibleOptions.length ? (
-                <p className="qr-type-empty">
-                  No QR types match “{query.trim()}”. Try URL, PDF, or social.
-                </p>
+                <p className="qr-type-empty"><T text="No QR types match “" />{query.trim()}<T text="”. Try URL, PDF, or social." /></p>
               ) : null}
             </div>
           </div>

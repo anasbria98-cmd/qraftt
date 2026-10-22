@@ -14,6 +14,11 @@ import {
   generatorPages,
   type GeneratorPageContent,
 } from "@/lib/seo/generator-pages";
+import {
+  createPageMainEntityReferences,
+  createWebPageSchemaConnections,
+} from "@/lib/seo/schema";
+import { getGeneratorTechnicalCitations } from "@/lib/seo/technical-citations";
 import { siteConfig } from "@/lib/site";
 
 interface GeneratorLandingPageProps {
@@ -26,7 +31,15 @@ function createPageSchema(
 ) {
   const url = `${siteConfig.url}/${page.slug}`;
   const breadcrumb = createBreadcrumbSchema(breadcrumbs);
+  const mainEntities = createPageMainEntityReferences(url);
   const topic = page.topic ?? page.label;
+  const citations = getGeneratorTechnicalCitations(page.slug);
+  const citationReferences = citations.map(({ url: citationUrl }) => ({
+    "@id": citationUrl,
+  }));
+  const citationProperty = citationReferences.length
+    ? { citation: citationReferences }
+    : {};
 
   return {
     "@context": "https://schema.org",
@@ -34,16 +47,21 @@ function createPageSchema(
       {
         "@id": `${url}#webpage`,
         "@type": "WebPage",
+        ...createWebPageSchemaConnections(),
         breadcrumb: { "@id": breadcrumb["@id"] },
+        ...citationProperty,
         description: page.metaDescription,
+        mainEntity: [mainEntities.howTo, mainEntities.faqPage],
         name: page.seoTitle,
         url,
       },
       breadcrumb,
       {
+        "@id": mainEntities.howTo["@id"],
         "@type": "HowTo",
+        ...citationProperty,
         description: page.introduction,
-        name: `How to create your ${topic}`,
+        name: page.howToTitle ?? `How to create your ${topic}`,
         step: page.howTo.map((step, index) => ({
           "@type": "HowToStep",
           name: step.title,
@@ -52,7 +70,9 @@ function createPageSchema(
         })),
       },
       {
+        "@id": mainEntities.faqPage["@id"],
         "@type": "FAQPage",
+        ...citationProperty,
         mainEntity: page.faq.map((item) => ({
           "@type": "Question",
           acceptedAnswer: {
@@ -62,6 +82,12 @@ function createPageSchema(
           name: item.question,
         })),
       },
+      ...citations.map((citation) => ({
+        "@id": citation.url,
+        "@type": "CreativeWork",
+        name: citation.name,
+        url: citation.url,
+      })),
     ],
   };
 }
@@ -102,7 +128,12 @@ export function GeneratorLandingPage({ page }: GeneratorLandingPageProps) {
           <SectionHeading
             align="center"
             eyebrow="Three simple steps"
-            title={`How to create your ${topic}`}
+            title={
+              page.howToTitle ??
+              (page.slug === "qr-code-generator"
+                ? "How to create a QR code"
+                : `How to create your ${topic}`)
+            }
           />
           <ol className="steps-grid seo-steps">
             {page.howTo.map((step, index) => (
@@ -116,8 +147,33 @@ export function GeneratorLandingPage({ page }: GeneratorLandingPageProps) {
         </Container>
       </section>
 
-      {page.guidance ? (
+      {page.explainer ? (
         <section className="section">
+          <Container>
+            <SectionHeading
+              eyebrow="From scan to response"
+              title={page.explainer.title}
+              description={page.explainer.description}
+            />
+            <div className="format-grid seo-use-cases">
+              {page.explainer.items.map((item, index) => (
+                <article className="format-card" key={item.title}>
+                  <span className="format-number">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <div>
+                    <h3>{item.title}</h3>
+                    <p>{item.description}</p>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </Container>
+        </section>
+      ) : null}
+
+      {page.guidance ? (
+        <section className={`section${page.explainer ? " section-muted" : ""}`}>
           <Container>
             <SectionHeading
               eyebrow="Before you publish"
@@ -132,7 +188,23 @@ export function GeneratorLandingPage({ page }: GeneratorLandingPageProps) {
                   </span>
                   <div>
                     <h3>{item.title}</h3>
-                    <p>{item.description}</p>
+                    <p>
+                      {item.descriptionParts
+                        ? item.descriptionParts.map((part, partIndex) =>
+                            part.href ? (
+                              <Link
+                                className="seo-inline-link"
+                                href={part.href}
+                                key={partIndex}
+                              >
+                                {part.text}
+                              </Link>
+                            ) : (
+                              part.text
+                            ),
+                          )
+                        : item.description}
+                    </p>
                   </div>
                 </article>
               ))}
@@ -169,7 +241,7 @@ export function GeneratorLandingPage({ page }: GeneratorLandingPageProps) {
         <Container className="seo-faq-layout">
           <SectionHeading
             eyebrow="Helpful answers"
-            title={`${topic} FAQ`}
+            title={page.faqTitle ?? `${topic} FAQ`}
             description="Clear answers to the questions people usually ask before creating and sharing this type of QR code."
           />
           <div className="seo-faq-list">

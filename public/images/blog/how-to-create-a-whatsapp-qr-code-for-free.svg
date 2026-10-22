@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">Create a WhatsApp QR code for free</title>
+  <desc id="desc">A phone displays a WhatsApp conversation beside a QR code and a completed download card.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#effbf5"/>
+      <stop offset="1" stop-color="#d8f5e7"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="16" stdDeviation="18" flood-color="#0a352c" flood-opacity=".12"/>
+    </filter>
+  </defs>
+  <rect width="1200" height="630" rx="42" fill="url(#bg)"/>
+  <circle cx="1040" cy="112" r="138" fill="#53d39d" opacity=".16"/>
+  <circle cx="112" cy="540" r="180" fill="#0b4a3b" opacity=".07"/>
+  <g fill="none" stroke="#55cfa0" stroke-width="8" opacity=".45">
+    <path d="M72 126v-42h42M1128 126v-42h-42M72 504v42h42M1128 504v42h-42"/>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="112" y="122" width="430" height="386" rx="34" fill="#fff" stroke="#b6dfcf" stroke-width="3"/>
+    <rect x="150" y="162" width="354" height="62" rx="18" fill="#0b4a3b"/>
+    <circle cx="184" cy="193" r="16" fill="#62dda8"/>
+    <path d="M178 191c5-8 14-3 11 3-2 4-7 8-9 7-5-2-7-6-2-10Z" fill="#fff"/>
+    <text x="214" y="202" fill="#fff" font-family="Arial, sans-serif" font-size="25" font-weight="700">WhatsApp chat</text>
+    <rect x="180" y="258" width="266" height="58" rx="20" fill="#e3f7ed"/>
+    <rect x="218" y="342" width="240" height="58" rx="20" fill="#c8f0df"/>
+    <rect x="180" y="428" width="290" height="44" rx="15" fill="#f2f7f4" stroke="#c9ded5" stroke-width="2"/>
+    <circle cx="476" cy="450" r="25" fill="#1fb779"/>
+    <path d="m467 450 8 8 13-18" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="5"/>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="650" y="105" width="360" height="360" rx="38" fill="#fff" stroke="#b6dfcf" stroke-width="3"/>
+    <rect x="700" y="155" width="260" height="260" rx="16" fill="#fff"/>
+    <g fill="#0b4a3b">
+      <path d="M716 171h70v70h-70zm17 17v36h36v-36zM874 171h70v70h-70zm17 17v36h36v-36zM716 329h70v70h-70zm17 17v36h36v-36z"/>
+      <path d="M812 171h24v24h-24zm0 48h48v24h-48zm-24 48h24v48h-24zm48 0h24v24h-24zm48-8h24v48h-24zm-56 56h32v24h-32zm48 16h24v24h-24zm-64 48h24v20h-24zm48-24h24v44h-24zm48 16h36v28h-36z"/>
+    </g>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="704" y="488" width="252" height="72" rx="24" fill="#1fb779"/>
+    <path d="M748 512v21m-10-9 10 10 10-10M735 542h26" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="4"/>
+    <text x="778" y="534" fill="#fff" font-family="Arial, sans-serif" font-size="24" font-weight="700">PNG · SVG</text>
+  </g>
+  <text x="1044" y="292" fill="#0b4a3b" font-family="Arial, sans-serif" font-size="24" font-weight="700" text-anchor="middle">FREE</text>
+  <text x="1044" y="326" fill="#3e6c5e" font-family="Arial, sans-serif" font-size="18" text-anchor="middle">NO SIGNUP</text>
+</svg>

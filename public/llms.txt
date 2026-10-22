@@ -1,0 +1,31 @@
+# Qraftt
+
+> Qraftt is a free browser-based static QR code generator at https://www.qraftt.com
+
+Qraftt supports 30 QR types, live preview, design customization, local logo use, and PNG and SVG export. QR payloads and downloads are generated locally in the browser whenever possible. No signup, subscription, account, hosted redirect, scan-tracking backend, or file hosting is required. Downloaded static QR codes encode their destination or content directly and do not depend on Qraftt after download.
+
+## Core pages
+
+- [Qraftt home](https://www.qraftt.com/): Main browser-based QR generator.
+- [All QR code generators](https://www.qraftt.com/qr-code-generator): Generator hub and supported formats.
+- [About Qraftt](https://www.qraftt.com/about): Product scope, privacy, and static-generation principles.
+- [Contact Qraftt](https://www.qraftt.com/contact): Support information.
+
+## Key generator pages
+
+- [URL QR code generator](https://www.qraftt.com/url-qr-code-generator)
+- [WiFi QR code generator](https://www.qraftt.com/wifi-qr-code-generator)
+- [WhatsApp QR code generator](https://www.qraftt.com/whatsapp-qr-code-generator)
+- [vCard QR code generator](https://www.qraftt.com/vcard-qr-code-generator)
+- [Google Review QR code generator](https://www.qraftt.com/google-review-qr-code-generator)
+- [Menu QR code generator](https://www.qraftt.com/menu-qr-code-generator)
+- [PDF QR code generator](https://www.qraftt.com/pdf-qr-code-generator)
+- [Instagram QR code generator](https://www.qraftt.com/instagram-qr-code-generator)
+
+## Guides and policies
+
+- [QR code guides](https://www.qraftt.com/blog)
+- [Privacy policy](https://www.qraftt.com/privacy-policy)
+- [Terms of use](https://www.qraftt.com/terms)
+- [Cookie policy](https://www.qraftt.com/cookie-policy)
+- [Complete canonical URL index](https://www.qraftt.com/sitemap.xml)
