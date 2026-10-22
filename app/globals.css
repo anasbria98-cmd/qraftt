@@ -1368,27 +1368,31 @@ html[dir=rtl] input[type=email],html[dir=rtl] input[type=url],html[dir=rtl] inpu
 }
 
 .qr-mode-choices { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; }
-.qr-mode-choice { display: flex; align-items: center; gap: .65rem; min-width: 0; min-height: 5rem; padding: .9rem 1rem; border: 1px solid var(--line); border-radius: 14px; background: #f0f6f2; color: var(--ink); cursor: pointer; font: inherit; text-align: start; }
-.qr-mode-choice strong { font-size: clamp(.9rem, 1.3vw, 1.15rem); line-height: 1.2; }
-.qr-mode-choice[aria-pressed="true"] { border-color: var(--mint-strong); box-shadow: inset 0 0 0 1px var(--mint-strong); }
+.qr-mode-choice { display: flex; align-items: center; gap: .65rem; min-width: 0; height: 4.5rem; padding: .75rem 1rem; border: 1px solid #d7eade; border-radius: 10px; background: #e8f5ed; color: #205e46; cursor: pointer; font: inherit; text-align: start; }
+.qr-mode-choice strong { flex-shrink: 0; font-size: clamp(.95rem, 1.3vw, 1.15rem); line-height: 1.2; white-space: nowrap; }
+.qr-mode-choice[aria-pressed="true"] { border-color: #b6ddc6; }
 .qr-mode-choice:hover { border-color: var(--mint-strong); }
 .qr-mode-choice:focus-visible { outline: 3px solid var(--mint-strong); outline-offset: 3px; }
-.qr-mode-logo { background: linear-gradient(120deg, #123d32, #24684d); color: #fff; }
-.qr-mode-indicator { flex: 0 0 auto; width: 1rem; height: 1rem; border: 1px solid currentColor; border-radius: 50%; }
-.qr-mode-choice[aria-pressed="true"] .qr-mode-indicator { background: currentColor; box-shadow: inset 0 0 0 3px #f0f6f2; }
+.qr-mode-logo { background: linear-gradient(110deg, #103d32 0%, #247250 62%, #78bd96 100%); color: #fff; border-color: #347b59; }
+.qr-mode-indicator { flex: 0 0 auto; width: 1.1rem; height: 1.1rem; border: 1px solid currentColor; border-radius: 50%; }
+.qr-mode-choice[aria-pressed="true"] .qr-mode-indicator { background: currentColor; box-shadow: inset 0 0 0 4px #e8f5ed; }
 .qr-mode-logo[aria-pressed="true"] .qr-mode-indicator { box-shadow: inset 0 0 0 3px #123d32; }
-.qr-mode-art { position: relative; flex: 0 0 2.6rem; height: 2.6rem; margin-inline-start: auto; opacity: .9; }
-.qr-mode-art > span { position: absolute; width: .9rem; height: .9rem; border: 3px solid currentColor; border-radius: 3px; }
-.qr-mode-art > span:nth-child(1) { top: 0; left: 0; }
-.qr-mode-art > span:nth-child(2) { top: 0; right: 0; }
-.qr-mode-art > span:nth-child(3) { bottom: 0; left: 0; }
-.qr-mode-art i { position: absolute; right: 0; bottom: 0; width: 1.35rem; height: 1.35rem; display: grid; place-items: center; border-radius: 4px; background: currentColor; font-style: normal; }
-.qr-mode-logo .qr-mode-art i { background: #c4f2d5; color: #123d32; font-weight: 800; }
+.qr-mode-badge { display: flex; flex: 0 0 auto; }
+.qr-mode-thumbnails { display: flex; align-items: center; gap: .3rem; margin-inline-start: auto; flex: 0 0 auto; }
+.qr-mode-thumbnail { display: block; width: 2rem; height: 2.35rem; border-radius: 6px; background-color: #fff; background-position: center; background-size: contain; background-repeat: no-repeat; box-shadow: 0 1px 3px #123d3210; }
+.qr-mode-brand { display: grid; place-items: center; padding: 4px; }
+.qr-mode-brand img, .qr-mode-brand svg { width: 1.5rem; height: 1.5rem; }
+.qr-mode-instagram { color: #d33c83; }
+.qr-mode-youtube { color: #e6252a; }
 @media (max-width: 540px) {
   .qr-mode-choices { gap: .5rem; }
-  .qr-mode-choice { min-height: 4.5rem; gap: .4rem; padding: .75rem .6rem; flex-wrap: wrap; }
-  .qr-mode-art { display: none; }
-  .qr-mode-choice strong { font-size: .92rem; }
+  .qr-mode-choice { display: grid; grid-template-columns: auto auto 1fr; align-content: center; height: 5.25rem; gap: .4rem .3rem; padding: .6rem; }
+  .qr-mode-choice strong { font-size: .8rem; }
+  .qr-mode-indicator { width: .85rem; height: .85rem; }
+  .qr-mode-badge > span { font-size: .5rem !important; margin-left: 0 !important; padding: 1px 3px !important; }
+  .qr-mode-thumbnails { grid-column: 2 / -1; justify-self: end; gap: .25rem; }
+  .qr-mode-thumbnail { width: 1.3rem; height: 1.5rem; border-radius: 4px; }
+  .qr-mode-brand img, .qr-mode-brand svg { width: 1rem; height: 1rem; }
 }
 
 .customize-heading,

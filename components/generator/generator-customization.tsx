@@ -4,6 +4,7 @@ import { T, useLanguage } from "@/components/i18n/language-provider";
 import NextImage from "next/image";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { ProBadge } from "@/components/generator/pro-badge";
+import { QrTypeIcon } from "@/components/generator/qr-type-icon";
 import {
   bodyStyleOptions,
   defaultDesign,
@@ -267,13 +268,19 @@ export function GeneratorCustomization({
           onClick={() => { if (design.logoDataUrl) removeLogo(); setActiveTab("frames"); }}>
           <span className="qr-mode-indicator" aria-hidden="true" />
           <strong><T text="Classic QR" /></strong>
-          <span className="qr-mode-art" aria-hidden="true"><span /><span /><span /><i /></span>
+          <span className="qr-mode-thumbnails" aria-hidden="true">
+            {designTemplates.slice(0, 3).map(template => <span key={template.id} className="qr-mode-thumbnail" style={previewsReady ? { backgroundImage: getTemplatePreview(template) } : undefined} />)}
+          </span>
         </button>
         <button type="button" className="qr-mode-choice qr-mode-logo" aria-pressed={activeTab === "logo" || Boolean(design.logoDataUrl)}
           onClick={() => { if (!pro) { onRequestPro?.(); return; } setActiveTab("logo"); }}>
           <span className="qr-mode-indicator" aria-hidden="true" />
-          <strong><T text="Logo QR" /></strong><ProBadge />
-          <span className="qr-mode-art" aria-hidden="true"><span /><span /><span /><i>+</i></span>
+          <strong><T text="Logo QR" /></strong><span className="qr-mode-badge"><ProBadge /></span>
+          <span className="qr-mode-thumbnails" aria-hidden="true">
+            <span className="qr-mode-thumbnail qr-mode-brand"><NextImage src="/images/brand/google-g.svg" width={24} height={24} alt="" /></span>
+            <span className="qr-mode-thumbnail qr-mode-brand qr-mode-instagram"><QrTypeIcon type="instagram" /></span>
+            <span className="qr-mode-thumbnail qr-mode-brand qr-mode-youtube"><QrTypeIcon type="youtube" /></span>
+          </span>
         </button>
       </div>
       <div className="customization-toolbar">
