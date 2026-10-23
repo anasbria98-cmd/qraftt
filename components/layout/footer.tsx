@@ -14,16 +14,22 @@ export function Footer() {
           <div className="footer-brand">
             <Logo />
             <p><T text="Simple, private QR tools for people who just want to get things shared." /></p>
+            <a className="directree-badge" href="https://www.directree.io" rel="noopener noreferrer" target="_blank">
+              <Image alt="Verified on directree" height={22} src="https://www.directree.io/badge/directree-badge-lightmode.svg" unoptimized style={{ width: "auto", height: 22 }} width={120} />
+            </a>
           </div>
           <nav className="footer-links" aria-label="Footer navigation">
-            {[...siteConfig.navigation, ...siteConfig.legalNavigation].map(([label, href]) => (
-              <Link href={href} key={href}>
-                <T text={label} />
-              </Link>
-            ))}
+            <div className="footer-link-group">
+              {siteConfig.navigation.map(([label, href]) => <Link href={href} key={href}><T text={label} /></Link>)}
+            </div>
+            <div className="footer-link-group">
+              {siteConfig.legalNavigation.map(([label, href]) => <Link href={href} key={href}><T text={label} /></Link>)}
+              <CookieSettingsButton />
+            </div>
+          </nav>
+          <div className="footer-contact">
             <a href="mailto:support@qraftt.com">support@qraftt.com</a>
-            <CookieSettingsButton />
-            <span className="footer-socials">
+            <nav className="footer-socials" aria-label="Qraftt social media">
               <a href="https://www.youtube.com/@qraftt.generator" target="_blank" rel="noopener noreferrer" aria-label="Qraftt on YouTube (opens in a new tab)">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8ZM9.6 15.6V8.4l6.3 3.6-6.3 3.6Z" /></svg>
               </a>
@@ -33,29 +39,14 @@ export function Footer() {
               <a href="https://www.instagram.com/qraftt.generator/" target="_blank" rel="noopener noreferrer" aria-label="Qraftt on Instagram (opens in a new tab)">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true" focusable="false"><rect x="3" y="3" width="18" height="18" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" /></svg>
               </a>
-            </span>
-          </nav>
+            </nav>
+          </div>
         </div>
         <div className="footer-bottom">
           <p>
             © {new Date().getFullYear()} {siteConfig.name}<T text=". All rights reserved." /></p>
           <p><T text="Free to create. Free to share." /></p>
         </div>
-        <a
-          className="directree-badge"
-          href="https://www.directree.io"
-          rel="noopener noreferrer"
-          target="_blank"
-        >
-          <Image
-            alt="Verified on directree"
-            height={22}
-            src="https://www.directree.io/badge/directree-badge-lightmode.svg"
-            unoptimized
-            style={{ width: "auto", height: 22 }}
-            width={120}
-          />
-        </a>
       </Container>
     </footer>
   );
