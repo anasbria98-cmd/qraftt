@@ -11,7 +11,7 @@ import upgradeStyles from "@/components/billing/upgrade.module.css";
 import Link from "next/link";
 import { pricingPlans } from "@/lib/pricing/plans";
 import { formatDisplayPrice } from "@/lib/pricing/currencies";
-import { freeDesign, validateExportAccess, isFreeDesign, designCorrection } from "@/lib/qr/access";
+import { freeDesign, validateExportAccess, isFreeDesign, designCorrection, freeTemplateForDesign } from "@/lib/qr/access";
 import {
   defaultDesign,
   getDesignWarnings,
@@ -158,7 +158,7 @@ export function QrGenerator({
   const result = useMemo(() => buildQrPayload(type, values), [type, values]);
   const designSafety = useMemo(() => getDesignWarnings(effectiveDesign), [effectiveDesign]);
   const designError =
-    designSafety.minimumContrast < 2.5
+    designSafety.minimumContrast < 2.5 && !freeTemplateForDesign(effectiveDesign)?.design.uploadedFrameId
       ? "Increase the contrast between the QR foreground and background colors."
       : null;
   const validationError = result.error ?? designError;

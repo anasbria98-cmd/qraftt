@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
   // Keep its native paths intact and include those assets in serverless traces.
   serverExternalPackages: ["pdfkit", "svg-to-pdfkit"],
   outputFileTracingIncludes: {
-    "/api/qr/render": ["./node_modules/pdfkit/js/data/**/*"],
+    "/api/qr/render": ["./node_modules/pdfkit/js/data/**/*", "./public/images/free-frames/*.png"],
   },
 };
 

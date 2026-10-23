@@ -6,6 +6,7 @@ import { normalizeLogoDataUrl } from "@/lib/qr/logo";
 import { premiumTemplate } from "@/lib/qr/premium-templates";
 import { referenceImages } from "@/lib/qr/reference-images";
 import { localTemplateReview } from "@/lib/qr/local-review";
+import { uploadedFrameImage } from "@/lib/qr/uploaded-frame-image";
 
 export const runtime = "nodejs";
 
@@ -32,7 +33,8 @@ export async function POST(request: Request) {
     const source = premiumTemplate(design.premiumTemplateId)?.sourceId;
     // Artistic scan cores lose essential detail at 256px. Keep a high-density
     // preview; CSS controls its displayed size without destroying source pixels.
-    const svg = setSvgDimensions(renderQrSvg(payload, designCorrection(design, correction), design, source ? referenceImages[source] : undefined), preview === true ? (source ? 1000 : 512) : size);
+    const artwork = source ? referenceImages[source] : design.uploadedFrameId ? uploadedFrameImage(design.uploadedFrameId) : undefined;
+    const svg = setSvgDimensions(renderQrSvg(payload, designCorrection(design, correction), design, artwork), preview === true ? (source ? 1000 : 512) : size);
     const outputFormat: ExportFormat = preview === true ? "png" : format;
     const data = await exportQr(svg, outputFormat, preview === true ? (source ? 1000 : 512) : size);
     if (preview !== true && !designAccess && db && !(await db.consumeFreeDownload(customerId))) {

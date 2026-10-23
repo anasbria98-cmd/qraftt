@@ -18,6 +18,7 @@ import {
 import { renderFramePreviewSvg, renderQrSvg } from "@/lib/qr/render";
 import type { ErrorCorrectionLevel } from "@/lib/qr/types";
 import { premiumTemplates } from "@/lib/qr/premium-templates";
+import { uploadedFramePath } from "@/lib/qr/uploaded-frames";
 
 const correctionLevels: Array<{
   description: string;
@@ -59,6 +60,7 @@ const templatePreviewCache = new Map<string, string>();
 const framePreviewCache = new Map<string, string>();
 
 function getTemplatePreview(template: QrDesignTemplate) {
+  if (template.design.uploadedFrameId) return `url("${uploadedFramePath(template.design.uploadedFrameId)}")`;
   if (template.design.premiumTemplateId) return `url("/images/qr-references/${template.id.replace("pro-", "")}-preview.png")`;
   const cached = templatePreviewCache.get(template.id);
   if (cached) return cached;
@@ -84,6 +86,7 @@ function isTemplateActive(
   template: QrDesignTemplate,
 ) {
   if ((design.premiumTemplateId ?? null) !== (template.design.premiumTemplateId ?? null)) return false;
+  if ((design.uploadedFrameId ?? null) !== (template.design.uploadedFrameId ?? null)) return false;
   return Object.entries(template.design).every(
     ([key, value]) =>
       design[key as keyof QrDesignOptions] === value,
@@ -256,7 +259,7 @@ export function GeneratorCustomization({
   function applyTemplate(template: QrDesignTemplate) {
     if (template.id === noTemplate.id) { onReset(); return; }
     if (template.design.premiumTemplateId && !pro) { onRequestPro?.(); return; }
-    onDesignChange({ ...template.design, premiumTemplateId: template.design.premiumTemplateId ?? null, logoDataUrl: pro ? design.logoDataUrl : null, logoSize: pro ? design.logoSize : 16 });
+    onDesignChange({ ...template.design, uploadedFrameId: template.design.uploadedFrameId ?? null, premiumTemplateId: template.design.premiumTemplateId ?? null, logoDataUrl: pro ? design.logoDataUrl : null, logoSize: pro ? design.logoSize : 16 });
     if (pro) onErrorCorrectionChange(template.errorCorrection);
   }
 

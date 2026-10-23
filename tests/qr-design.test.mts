@@ -70,17 +70,21 @@ test("presets maintain safe foreground and background contrast", () => {
 });
 
 test("template and frame libraries stay reduced, distinct, and scan-safe", () => {
-  assert.equal(designTemplates.length, 20);
+  assert.equal(designTemplates.length, 30);
   assert.equal(noTemplate.id, "none");
   assert.equal(frameOptions.length, 30);
   assert.equal(new Set(designTemplates.map((template) => template.id)).size, designTemplates.length);
-  assert.equal(new Set(designTemplates.map((template) => template.design.artwork)).size, 20);
+  assert.equal(new Set(designTemplates.filter(t => !t.design.uploadedFrameId).map((template) => template.design.artwork)).size, 20);
   assert.equal(new Set(frameOptions.map((frame) => frame.value)).size, frameOptions.length);
   assert.equal(new Set(frameOptions.map((frame) => frame.structure)).size, frameOptions.length);
 
   const renderedTemplates = new Set<string>();
 
   for (const template of designTemplates) {
+    if (template.design.uploadedFrameId) {
+      renderedTemplates.add(renderQrSvg("https://example.com", template.errorCorrection, { ...defaultDesign, ...template.design }));
+      continue;
+    }
     const design = {
       ...template.design,
       logoDataUrl: null,

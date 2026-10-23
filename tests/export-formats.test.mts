@@ -11,6 +11,7 @@ import { renderQrSvg } from "../lib/qr/render.ts";
 import { referenceImages } from "../lib/qr/reference-images.ts";
 import { validateExportAccess, freeDesign } from "../lib/qr/access.ts";
 import type { ErrorCorrectionLevel } from "../lib/qr/types.ts";
+import { uploadedFrameImage } from "../lib/qr/uploaded-frame-image.ts";
 
 const { exportQr } = componentFixture("lib/qr/exports.ts");
 const payload = "https://example.com/export-check?value=actual-content";
@@ -96,7 +97,7 @@ test("all 20 Free and 10 Pro templates, gradient and center logo decode in every
   ];
   for (const item of designs) {
     const source = premiumTemplate(item.design.premiumTemplateId)?.sourceId;
-    const svg = renderQrSvg(payload, item.correction as ErrorCorrectionLevel, item.design as QrDesignOptions, source ? referenceImages[source] : undefined);
+    const svg = renderQrSvg(payload, item.correction as ErrorCorrectionLevel, item.design as QrDesignOptions, source ? referenceImages[source] : item.design.uploadedFrameId ? uploadedFrameImage(item.design.uploadedFrameId) : undefined);
     for (const format of ["png", "jpg", "svg", "pdf", "eps"]) {
       let exported: Buffer;
       try { exported = await exportQr(svg, format, 1000); }

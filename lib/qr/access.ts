@@ -1,5 +1,6 @@
 import { defaultDesign, bodyStyleOptions, outerEyeStyleOptions, innerEyeStyleOptions, frameOptions, designTemplates, type QrDesignOptions } from "./design.ts";
 import { premiumTemplate } from "./premium-templates.ts";
+import { uploadedFrame } from "./uploaded-frames.ts";
 
 export const freeDesign: QrDesignOptions = {
   ...defaultDesign, foreground: "#000000", outerEyeColor: "#000000", innerEyeColor: "#000000",
@@ -13,12 +14,12 @@ export function validateExportAccess(pro: boolean, design: QrDesignOptions, form
 
 export function freeTemplateForDesign(design: QrDesignOptions) {
   if (design.premiumTemplateId || design.logoDataUrl || design.logoSize !== freeDesign.logoSize) return undefined;
-  return designTemplates.find((template) => Object.entries(template.design).every(([key, value]) => design[key as keyof QrDesignOptions] === value));
+  return designTemplates.find((template) => (template.design.uploadedFrameId ?? null) === (design.uploadedFrameId ?? null) && Object.entries(template.design).every(([key, value]) => design[key as keyof QrDesignOptions] === value));
 }
 
 export function isFreeDesign(design: QrDesignOptions) {
   if (design.premiumTemplateId) return false;
-  return Object.keys(freeDesign).every((key) => design[key as keyof QrDesignOptions] === freeDesign[key as keyof QrDesignOptions]) || Boolean(freeTemplateForDesign(design));
+  return (!design.uploadedFrameId && Object.keys(freeDesign).every((key) => design[key as keyof QrDesignOptions] === freeDesign[key as keyof QrDesignOptions])) || Boolean(freeTemplateForDesign(design));
 }
 
 export function designCorrection(design: QrDesignOptions, requested: "L" | "M" | "Q" | "H") {
@@ -29,6 +30,10 @@ export function validatedDesign(value: unknown): QrDesignOptions {
   if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error("Invalid design.");
   const input = value as Record<string, unknown>;
   const result = { ...freeDesign };
+  if (input.uploadedFrameId != null) {
+    if (typeof input.uploadedFrameId !== "string" || !uploadedFrame(input.uploadedFrameId)) throw new Error("Invalid uploaded frame.");
+    result.uploadedFrameId = input.uploadedFrameId;
+  }
   if (input.premiumTemplateId != null) {
     if (typeof input.premiumTemplateId !== "string" || !premiumTemplate(input.premiumTemplateId)) throw new Error("Invalid premium template.");
     result.premiumTemplateId = input.premiumTemplateId;

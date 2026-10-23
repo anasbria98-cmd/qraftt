@@ -10,6 +10,7 @@ import {
 import { getQrArtworkLayout, renderQrArtwork } from "./artwork.ts";
 import type { ErrorCorrectionLevel } from "./types.ts";
 import { renderPremiumQrSvg } from "./premium-render.ts";
+import { uploadedFrame, uploadedFramePath } from "./uploaded-frames.ts";
 
 export const QUIET_ZONE_MODULES = 4;
 const VIEWBOX_SIZE = 1_000;
@@ -260,8 +261,18 @@ export function renderQrSvg(
   errorCorrectionLevel: ErrorCorrectionLevel,
   design: QrDesignOptions,
   referenceImage?: string,
-) {
+): string {
   if (design.premiumTemplateId) return renderPremiumQrSvg(payload, design, referenceImage);
+  if (design.uploadedFrameId) {
+    const frame = uploadedFrame(design.uploadedFrameId);
+    if (!frame) throw new Error("Invalid uploaded frame.");
+    const [x, y, right, bottom] = frame.bounds;
+    const core = renderQrSvg(payload, errorCorrectionLevel, {
+      ...design, uploadedFrameId: null, artwork: "none", frame: "none", decoration: "none",
+    }).replace('<svg ', `<svg x="${x}" y="${y}" `)
+      .replace('width="1000" height="1000"', `width="${right - x}" height="${bottom - y}"`);
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1000" viewBox="0 0 1000 1000"><rect width="1000" height="1000" fill="white"/><g transform="scale(${1000 / 1254})"><image href="${referenceImage ?? uploadedFramePath(frame.id)}" width="1254" height="1254"/>${core}</g></svg>`;
+  }
   const qr = QRCode.create(payload, { errorCorrectionLevel: design.logoDataUrl ? "H" : errorCorrectionLevel });
   const matrixSize = qr.modules.size;
   const illustrated = design.artwork !== "none";

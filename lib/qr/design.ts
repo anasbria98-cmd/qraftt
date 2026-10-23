@@ -1,3 +1,5 @@
+import { uploadedFrames } from "./uploaded-frames.ts";
+
 export type QrBodyStyle =
   | "square"
   | "rounded"
@@ -126,6 +128,7 @@ export type QrFrame =
   | "premium-plaque";
 
 export interface QrDesignOptions {
+  uploadedFrameId?: string | null;
   premiumTemplateId?: string | null;
   artwork: QrArtwork;
   background: string;
@@ -1032,13 +1035,16 @@ const phaseATemplateIds = [
   "geometry",
 ] as const;
 
-export const designTemplates: QrDesignTemplate[] = phaseATemplateIds.map((id) => {
+export const designTemplates: QrDesignTemplate[] = [...uploadedFrames.map((frame): QrDesignTemplate => ({
+  id: frame.id, name: frame.name, description: "Uploaded illustrated frame", errorCorrection: "H",
+  design: { ...defaultDesign, uploadedFrameId: frame.id, foreground: frame.color, outerEyeColor: frame.color, innerEyeColor: frame.color },
+})), ...phaseATemplateIds.map((id) => {
   const selected = completeTemplateArtworkLibrary.find(
     (candidate) => candidate.id === id,
   );
   if (!selected) throw new Error(`Missing Phase A template: ${id}`);
   return selected;
-});
+})];
 
 export interface QrDesignPreset {
   design: TemplateDesign;

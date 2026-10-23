@@ -11,10 +11,11 @@ import { referenceImages } from "../lib/qr/reference-images.ts";
 import { componentFixture } from "./helpers/render-component.mjs";
 import { normalizeLogoDataUrl } from "../lib/qr/logo.ts";
 import { pricingPlans } from "../lib/pricing/plans.ts";
+import { uploadedFrameImage } from "../lib/qr/uploaded-frame-image.ts";
 
 const renderQrSvg: typeof renderBaseSvg = (payload, correction, design) => {
   const source = premiumTemplate(design.premiumTemplateId)?.sourceId;
-  return renderBaseSvg(payload, correction, design, source ? referenceImages[source] : undefined);
+  return renderBaseSvg(payload, correction, design, source ? referenceImages[source] : design.uploadedFrameId ? uploadedFrameImage(design.uploadedFrameId) : undefined);
 };
 
 const originalHashes = [
@@ -31,8 +32,9 @@ const originalHashes = [
 ];
 
 test("all 20 old templates remain byte-identical and allow Free PNG exports", () => {
-  assert.equal(designTemplates.length, originalHashes.length);
-  designTemplates.forEach((template, index) => {
+  const originals = designTemplates.filter(template => !template.design.uploadedFrameId);
+  assert.equal(originals.length, originalHashes.length);
+  originals.forEach((template, index) => {
     const design = { ...template.design, logoDataUrl: null, logoSize: 16 };
     assert.equal(createHash("sha256").update(renderQrSvg("https://example.com", template.errorCorrection, design)).digest("hex"), originalHashes[index]);
     assert.doesNotThrow(() => validateExportAccess(false, design, "png", 512));
