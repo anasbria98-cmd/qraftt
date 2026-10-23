@@ -16,7 +16,6 @@ export async function POST(request: Request) {
     const user = await currentUser();
     const { interval } = await request.json();
     if (interval !== "monthly" && interval !== "yearly") return Response.json({ error: "Invalid billing interval." }, { status: 400 });
-    if (process.env.PAYPAL_ENV === "live" && interval === "yearly") return Response.json({ error: "Yearly checkout is not available. Choose monthly billing." }, { status: 400 });
     stage = "resolve_plan";
     const planId = getProPlanId(interval);
     stage = "read_pending_checkout";
@@ -49,7 +48,7 @@ export async function POST(request: Request) {
     }
     stage = "create_paypal_subscription";
     const subscription = await getPayPalClient().createSubscription({
-      planId, customerId,
+      planId, customerId, interval,
       cancelUrl: `${origin}/pricing?paypal=cancelled`,
       returnUrl: `${origin}/pricing?paypal=approved`,
     });

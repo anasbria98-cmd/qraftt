@@ -1,4 +1,5 @@
-import { getPayPalClient, getProPlanId } from "@/lib/paypal/server";
+import { getPayPalClient } from "@/lib/paypal/server";
+import { currentPayPalPlanIds } from "@/lib/paypal/plans";
 import { billingCustomer, getBillingStore, sameOrigin } from "@/lib/billing/server";
 import { adminClient, currentUser } from "@/lib/supabase/server";
 import { pendingCheckout } from "@/lib/paypal/guest-checkout";
@@ -34,7 +35,9 @@ export async function POST(request: Request) {
     const stored = await db.subscription(id);
     if (customer.startsWith("guest:") || !stored || stored.customer_id !== customer) return Response.json({ error: "Subscription not found." }, { status: 404 });
     const subscription = await getPayPalClient().getSubscription(id);
-    if (subscription.customerId !== stored.paypal_custom_id || subscription.planId !== stored.plan_id || (!stored.paypal_custom_id.startsWith("checkout:") && subscription.planId !== getProPlanId(stored.interval as "monthly" | "yearly"))) throw new Error("Subscription mismatch.");
+    // Existing agreements keep their verified stored plan; the current checkout
+    // plan may have changed. Still require ownership and a same-environment allowlist.
+    if (subscription.customerId !== stored.paypal_custom_id || subscription.planId !== stored.plan_id || !currentPayPalPlanIds(process.env).includes(subscription.planId)) throw new Error("Subscription mismatch.");
     await db.updateSubscription(id, subscription.status, subscription.email, undefined, subscription.period, observedAt);
     return Response.json({ id: subscription.id, ...await db.entitlement(customer) }, { headers: { "Cache-Control": "no-store" } });
   } catch {

@@ -37,7 +37,7 @@ test("converts all six display currencies while preserving the USD source prices
     }
   }
   assert.deepEqual(pricingPlans.map((plan) => plan.prices), [
-    { monthly: 0, yearly: 0 }, { monthly: 2, yearly: 19.99 },
+    { monthly: 0, yearly: 0 }, { monthly: 4.99, yearly: 19.99 },
   ]);
 });
 
@@ -46,7 +46,7 @@ test("local Sandbox display overrides only monthly Pro and preserves final price
   const free = pricingPlans.find(plan => plan.id === "free")!;
   assert.equal(pricingDisplayAmount(pro, "monthly", true), 1);
   assert.equal(pricingDisplayAmount(pro, "yearly", true), 19.99);
-  assert.equal(pricingDisplayAmount(pro, "monthly", false), 2);
+  assert.equal(pricingDisplayAmount(pro, "monthly", false), 4.99);
   assert.equal(pricingDisplayAmount(free, "monthly", true), 0);
-  assert.deepEqual(pro.prices, { monthly: 2, yearly: 19.99 });
+  assert.deepEqual(pro.prices, { monthly: 4.99, yearly: 19.99 });
 });

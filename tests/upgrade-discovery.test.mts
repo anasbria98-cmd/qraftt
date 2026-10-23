@@ -39,7 +39,7 @@ test("all reusable generator workspaces expose Free and Pro without hiding premi
 
 test("premium prompts reuse the PayPal-first flow and retain accurate final pricing", () => {
   const prompt = source("components/billing/upgrade-prompt.tsx");
-  for (const period of ["monthly"] as const) {
+  for (const period of ["monthly", "yearly"] as const) {
     assert.equal(safeReturnPath(checkoutReturnPath(period)), `/pricing?checkout=${period}`);
     assert.ok(prompt.includes(`checkoutReturnPath("${period}")`));
   }
@@ -49,6 +49,6 @@ test("premium prompts reuse the PayPal-first flow and retain accurate final pric
   assert.match(prompt, /Keep using Free/);
   assert.doesNotMatch(prompt, /href="\/login|href="\/signup|api\/paypal/);
   assert.deepEqual(pricingPlans.map(plan => plan.id), ["free", "pro"]);
-  assert.deepEqual(pricingPlans[1].prices, { monthly: 2, yearly: 19.99 });
-  assert.doesNotMatch(prompt, /checkoutReturnPath\("yearly"\)/);
+  assert.deepEqual(pricingPlans[1].prices, { monthly: 4.99, yearly: 19.99 });
+  assert.match(prompt, /checkoutReturnPath\("yearly"\)/);
 });

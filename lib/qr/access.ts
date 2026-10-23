@@ -6,7 +6,7 @@ export const freeDesign: QrDesignOptions = {
 };
 
 export function validateExportAccess(pro: boolean, design: QrDesignOptions, format: string, size: number) {
-  if (!pro && (format !== "png" || size > 512 || !isFreeDesign(design))) {
+  if (!pro && (!["png", "jpg"].includes(format) || size > 512 || !isFreeDesign(design))) {
     throw new Error("Unlock Pro for this design or export.");
   }
 }

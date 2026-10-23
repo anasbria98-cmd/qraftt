@@ -15,7 +15,7 @@ const navigation = [
   ["Payment & Subscription", "/dashboard/billing", "billing"], ["Support", "/dashboard/support", "support"],
   ["FAQ", "/dashboard/faq", "faq"],
 ] as const;
-const comingSoon = new Set(["/dashboard/my-qr-codes", "/dashboard/statistics", "/dashboard/import", "/dashboard/archive", "/dashboard/domains", "/dashboard/api"]);
+const comingSoon = new Set(["/dashboard/statistics", "/dashboard/import", "/dashboard/archive", "/dashboard/domains", "/dashboard/api"]);
 
 export function DashboardShell({ email, pro, children }: { email: string; pro: boolean; children: React.ReactNode }) {
   const pathname = usePathname();

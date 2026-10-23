@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
-import { pricingBenefits, pricingPlans, type BillingPeriod, type BenefitValue } from "@/lib/pricing/plans";
+import { pricingBenefits, pricingPlans, planBenefits, type BillingPeriod, type BenefitValue } from "@/lib/pricing/plans";
 import { checkoutPeriod } from "@/lib/pricing/checkout";
 import styles from "./pricing.module.css";
 import { useEntitlement } from "@/components/billing/use-entitlement";
@@ -101,7 +101,6 @@ export function PricingComparison({ embedded = false }: { embedded?: boolean }) 
     const task = window.setTimeout(() => {
       resumed.current = true;
       window.history.replaceState(null, "", "/pricing");
-      if (interval !== "monthly") { setNotice("Yearly checkout is not available. Please choose monthly billing."); return; }
       setPeriod(interval);
       void upgrade(interval);
     }, 0);
@@ -116,14 +115,14 @@ export function PricingComparison({ embedded = false }: { embedded?: boolean }) 
         <p className="eyebrow"><T text="Qraftt pricing" /></p>
         <Heading id="pricing-heading"><T text="Choose the plan that fits your next idea." /></Heading>
         <p><T text="Create for free, or unlock every design option and unlimited downloads with Pro." /></p>
-        <span className={styles.preview}><T text="Pro · monthly subscription" /></span>
+        <span className={styles.preview}><T text="Pro · monthly or yearly subscription" /></span>
       </div>
       <div className={styles.controls}>
         <div className={styles.toggle} role="group" aria-label={t("Billing period")}>
-          {(["monthly"] as const).map((value) => (
+          {(["monthly", "yearly"] as const).map((value) => (
             <button type="button" key={value} aria-pressed={period === value}
               onClick={() => { setPeriod(value); setNotice(""); }}>
-              <T text={value === "monthly" ? "Monthly" : "Yearly · save 44%"} />
+              <T text={value === "monthly" ? "Monthly" : "Yearly"} />
             </button>
           ))}
         </div>
@@ -133,7 +132,7 @@ export function PricingComparison({ embedded = false }: { embedded?: boolean }) 
         </select>
       </div>
       <p className={styles.disclosure}><T text="Free QR creation for everyone. Pro adds full design control and unlimited downloads." /></p>
-      <p className={styles.currencyNote}><T text="PayPal checkout is charged in USD. The monthly subscription renews until cancelled." />{sandboxPriceTest ? <>{" "}<T text="Testing offer: monthly checkout uses the $1/month Sandbox plan, not the displayed final price. Pro pricing is $2/month. No real payments." /></> : null}
+      <p className={styles.currencyNote}><T text="PayPal checkout is charged in USD. Subscriptions renew until cancelled." />{sandboxPriceTest ? <>{" "}<T text="Testing offer: monthly checkout uses the $1/month Sandbox plan, not the displayed final price. Pro pricing is $4.99/month. No real payments." /></> : null}
         {currency !== "USD" ? <>{" "}<T text="Converted prices are estimates using reference rates dated" />{" "}{displayRateDate}. <a href="https://www.exchangerate-api.com" target="_blank" rel="noopener noreferrer"><T text="ExchangeRate-API" /></a>.</> : null}
       </p>
       <section className={styles.comparison} aria-label={t("Compare Qraftt plans")}>
@@ -169,7 +168,7 @@ export function PricingComparison({ embedded = false }: { embedded?: boolean }) 
                 <li key={benefit.id}>
                   <span className={styles.mobileLabel}><T text={benefit.label} /></span>
                   <span className="visually-hidden"><T text={benefit.label} />: </span>
-                  <Benefit value={plan.benefits[benefit.id]} />
+                  <Benefit value={planBenefits(plan, period)[benefit.id]} />
                 </li>
               ))}
             </ul>

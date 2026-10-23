@@ -5,11 +5,12 @@ import { PayPalSandboxClient } from "../lib/paypal/client.ts";
 import { payPalEnvironment, validApprovalUrl } from "../lib/paypal/environment.ts";
 import { currentPayPalPlanIds, resolveProPlanId } from "../lib/paypal/plans.ts";
 
-test("Live rejects Sandbox overrides, yearly checkout and unknown environments", () => {
+test("Live rejects Sandbox overrides and unknown environments but allows configured yearly plans", () => {
   const env = { PAYPAL_ENV: "live", PAYPAL_PRO_MONTHLY_PLAN_ID: "P-LIVE", PAYPAL_PRO_YEARLY_PLAN_ID: "P-OLD", PAYPAL_SANDBOX_TEST_PLAN_ID: "P-TEST", PAYPAL_SANDBOX_PRODUCTION_TEST: "true" };
   assert.equal(resolveProPlanId("monthly", env), "P-LIVE");
-  assert.throws(() => resolveProPlanId("yearly", env));
-  assert.deepEqual(currentPayPalPlanIds(env), ["P-LIVE"]);
+  assert.equal(resolveProPlanId("yearly", env), "P-OLD");
+  assert.deepEqual(currentPayPalPlanIds(env), ["P-LIVE", "P-OLD"]);
+  assert.deepEqual(currentPayPalPlanIds({ ...env, PAYPAL_LIVE_LEGACY_PLAN_IDS: "P-PREVIOUS, invalid", PAYPAL_SANDBOX_LEGACY_PLAN_IDS: "P-SANDBOX" }), ["P-LIVE", "P-OLD", "P-PREVIOUS"]);
   assert.deepEqual(currentPayPalPlanIds({ ...env, PAYPAL_ENV: "invalid" }), []);
   assert.throws(() => payPalEnvironment(undefined));
   assert.throws(() => payPalEnvironment("production"));
@@ -19,7 +20,7 @@ test("Live rejects Sandbox overrides, yearly checkout and unknown environments",
 });
 
 const plan = { status: "ACTIVE", billing_cycles: [{ tenure_type: "REGULAR", total_cycles: 0,
-  frequency: { interval_unit: "MONTH", interval_count: 1 }, pricing_scheme: { fixed_price: { currency_code: "USD", value: "2.00" } } }] };
+  frequency: { interval_unit: "MONTH", interval_count: 1 }, pricing_scheme: { fixed_price: { currency_code: "USD", value: "4.99" } } }] };
 
 test("Live subscription creation checks the price and uses only Live endpoints", async () => {
   const urls: string[] = [];
@@ -47,6 +48,21 @@ test("Live fails closed before creating subscriptions for wrong prices, fees or 
       return Response.json(url.endsWith("token") ? { access_token: "token" } : invalid);
     } });
     await assert.rejects(client.createSubscription({ planId: "P-LIVE", returnUrl: "https://www.qraftt.com/pricing", cancelUrl: "https://www.qraftt.com/pricing" }));
+  }
+});
+
+test("yearly creation validates USD 19.99/year and rejects monthly metadata without touching real PayPal", async () => {
+  for (const valid of [true, false]) {
+    let created = false;
+    const yearly = { ...plan, billing_cycles: [{ ...plan.billing_cycles[0], frequency: { interval_unit: "YEAR", interval_count: 1 }, pricing_scheme: { fixed_price: { currency_code: "USD", value: "19.99" } } }] };
+    const client = new PayPalSandboxClient({ environment: "live", clientId: "fixture", clientSecret: "fixture", fetch: async input => {
+      const url = String(input);
+      if (url.endsWith("/billing/subscriptions")) { created = true; return Response.json({ id: "I-FIXTURE", status: "APPROVAL_PENDING", links: [{ rel: "approve", href: "https://www.paypal.com/checkout" }] }); }
+      return Response.json(url.endsWith("token") ? { access_token: "fixture" } : valid ? yearly : plan);
+    } });
+    const result = client.createSubscription({ planId: "P-YEARLY", interval: "yearly", returnUrl: "https://qraftt.test/pricing", cancelUrl: "https://qraftt.test/pricing" });
+    if (valid) await result; else await assert.rejects(result);
+    assert.equal(created, valid);
   }
 });
 

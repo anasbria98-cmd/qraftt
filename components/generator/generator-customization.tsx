@@ -321,7 +321,7 @@ export function GeneratorCustomization({
             <div className="editor-section-heading">
               <div>
                 <h3><T text="Free templates" /></h3>
-                <p><T text="All 20 original designs stay free. Choose a design and download a basic PNG." /></p>
+                <p><T text="All 20 original designs stay free. Choose a design and download a basic PNG or JPG." /></p>
               </div>
               <span>{designTemplates.length}{" "}<T text="designs" /></span>
             </div>

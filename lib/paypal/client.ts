@@ -1,6 +1,7 @@
 import { Buffer } from "node:buffer";
 import { createHash } from "node:crypto";
 import { payPalApiOrigin, payPalEnvironment, type PayPalEnvironment } from "./environment.ts";
+import { pricingPlans } from "../pricing/plans.ts";
 
 export const PAYPAL_SANDBOX_API_ORIGIN = "https://api-m.sandbox.paypal.com";
 
@@ -44,6 +45,7 @@ export interface CreatePayPalSubscriptionInput {
   customerId?: string;
   cancelUrl: string;
   planId: string;
+  interval?: "monthly" | "yearly";
   returnUrl: string;
 }
 
@@ -121,7 +123,7 @@ export class PayPalClient {
   }
 
   async createSubscription(input: CreatePayPalSubscriptionInput) {
-    if (this.options.environment === "live") await this.verifyLiveMonthlyPlan(input.planId);
+    if (this.options.environment === "live") await this.verifyLivePlan(input.planId, input.interval ?? "monthly");
     const { accessToken } = await this.getAccessToken();
     const response = await this.fetch(
       `${this.apiOrigin}/v1/billing/subscriptions`,
@@ -184,7 +186,8 @@ export class PayPalClient {
     };
   }
 
-  async verifyLiveMonthlyPlan(planId: string) {
+  async verifyLivePlan(planId: string, interval: "monthly" | "yearly" = "monthly") {
+    const expectedPrice = pricingPlans.find(plan => plan.id === "pro")!.prices[interval];
     if (!/^P-[A-Z0-9]+$/.test(planId)) throw new Error("Invalid PayPal plan.");
     const { accessToken } = await this.getAccessToken();
     const response = await this.fetch(`${this.apiOrigin}/v1/billing/plans/${planId}`, {
@@ -202,12 +205,12 @@ export class PayPalClient {
     const cycle = cycles?.[0];
     if (!response.ok || plan.status !== "ACTIVE" || cycles?.length !== 1
       || cycle?.tenure_type !== "REGULAR" || cycle.total_cycles !== 0
-      || cycle.frequency?.interval_unit !== "MONTH" || cycle.frequency.interval_count !== 1
+      || cycle.frequency?.interval_unit !== (interval === "yearly" ? "YEAR" : "MONTH") || cycle.frequency.interval_count !== 1
       || cycle.pricing_scheme?.fixed_price?.currency_code !== "USD"
-      || Number(cycle.pricing_scheme.fixed_price.value) !== 2
+      || Number(cycle.pricing_scheme.fixed_price.value) !== expectedPrice
       || Number(plan.payment_preferences?.setup_fee?.value ?? 0) !== 0
       || Number(plan.taxes?.percentage ?? 0) !== 0) {
-      throw new Error("Live PayPal plan must match the displayed USD 2 monthly price without extra fees.");
+      throw new Error(`Live PayPal plan must match the displayed USD ${expectedPrice} ${interval} price without extra fees.`);
     }
   }
 

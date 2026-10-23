@@ -11,7 +11,6 @@ export function sandboxTestPlan(env: PlanEnvironment) {
 }
 
 export function resolveProPlanId(interval: "monthly" | "yearly", env: PlanEnvironment) {
-  if (env.PAYPAL_ENV === "live" && interval === "yearly") throw new Error("Yearly subscriptions are not available.");
   const id = interval === "monthly" && sandboxTestPlan(env)
     || env[interval === "monthly" ? "PAYPAL_PRO_MONTHLY_PLAN_ID" : "PAYPAL_PRO_YEARLY_PLAN_ID"]?.trim();
   if (!id || !/^P-[A-Z0-9]+$/.test(id)) throw new Error("Invalid Pro plan configuration.");
@@ -22,6 +21,8 @@ export function resolveProPlanId(interval: "monthly" | "yearly", env: PlanEnviro
 export function currentPayPalPlanIds(env: PlanEnvironment) {
   if (env.PAYPAL_ENV !== "live" && env.PAYPAL_ENV !== "sandbox") return [];
   return [...new Set([env.PAYPAL_PRO_MONTHLY_PLAN_ID,
-    ...(env.PAYPAL_ENV === "sandbox" ? [env.PAYPAL_PRO_YEARLY_PLAN_ID, env.PAYPAL_SANDBOX_TEST_PLAN_ID] : []),
+    env.PAYPAL_PRO_YEARLY_PLAN_ID,
+    ...(env[`PAYPAL_${env.PAYPAL_ENV.toUpperCase()}_LEGACY_PLAN_IDS`]?.split(",") ?? []),
+    ...(env.PAYPAL_ENV === "sandbox" ? [env.PAYPAL_SANDBOX_TEST_PLAN_ID] : []),
   ].map(id => id?.trim()).filter((id): id is string => Boolean(id && /^P-[A-Z0-9]+$/.test(id))))];
 }

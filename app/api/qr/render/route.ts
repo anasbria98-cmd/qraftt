@@ -1,4 +1,4 @@
-import sharp from "sharp";
+import { exportFormats, exportMime, exportQr, type ExportFormat } from "@/lib/qr/exports";
 import { billingCustomer, getBillingStore, sameOrigin } from "@/lib/billing/server";
 import { validatedDesign, validateExportAccess, designCorrection, freeTemplateForDesign } from "@/lib/qr/access";
 import { renderQrSvg, setSvgDimensions } from "@/lib/qr/render";
@@ -15,7 +15,7 @@ export async function POST(request: Request) {
     const text = await request.text();
     if (text.length > 1_100_000) return Response.json({ error: "Request too large." }, { status: 413 });
     const { payload, design: input, format, size, preview, correction = "M" } = JSON.parse(text);
-    if (typeof payload !== "string" || !payload || payload.length > 8000 || ![512, 1000, 2000].includes(size) || !["png", "svg"].includes(format)) {
+    if (typeof payload !== "string" || !payload || payload.length > 8000 || ![512, 1000, 2000].includes(size) || !exportFormats.includes(format)) {
       return Response.json({ error: "Invalid export request." }, { status: 400 });
     }
     const review = localTemplateReview(request);
@@ -33,11 +33,12 @@ export async function POST(request: Request) {
     // Artistic scan cores lose essential detail at 256px. Keep a high-density
     // preview; CSS controls its displayed size without destroying source pixels.
     const svg = setSvgDimensions(renderQrSvg(payload, designCorrection(design, correction), design, source ? referenceImages[source] : undefined), preview === true ? (source ? 1000 : 512) : size);
-    const data = format === "svg" && preview !== true ? Buffer.from(svg) : await sharp(Buffer.from(svg), { limitInputPixels: 16_000_000 }).png().toBuffer();
+    const outputFormat: ExportFormat = preview === true ? "png" : format;
+    const data = await exportQr(svg, outputFormat, preview === true ? (source ? 1000 : 512) : size);
     if (preview !== true && !designAccess && db && !(await db.consumeFreeDownload(customerId))) {
-      return Response.json({ error: "Your 3 free PNG downloads for today have been used. Unlock Pro for unlimited downloads.", upgrade: true }, { status: 429 });
+      return Response.json({ error: "Your 3 free downloads for today have been used. Unlock Pro for unlimited downloads.", upgrade: true }, { status: 429 });
     }
-    return new Response(new Uint8Array(data), { headers: { "Content-Type": format === "svg" && preview !== true ? "image/svg+xml" : "image/png", "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff" } });
+    return new Response(new Uint8Array(data), { headers: { "Content-Type": exportMime[outputFormat], "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff" } });
   } catch {
     return Response.json({ error: "Could not render this QR code. Check your design or retry." }, { status: 400 });
   }

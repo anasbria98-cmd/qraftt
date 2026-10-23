@@ -17,25 +17,27 @@ test("Free and Pro subscription cards use real supplied state without unnecessar
   assert.doesNotMatch(pro, /Upgrade to Pro/);
   assert.match(pro, /Not supplied/);
 });
-test("billing plans reuse pricing and checkout, show current membership and disable unavailable yearly billing", () => {
+test("billing plans reuse pricing and checkout and support both billing periods", () => {
   const { BillingPlans } = componentFixture("components/account/billing-plans.tsx");
   const free = renderToStaticMarkup(createElement(BillingPlans, { pro: false }));
-  assert.match(free, /\$2/); assert.match(free, /Yearly · unavailable/); assert.match(free, /disabled/);
+  assert.match(free, /\$4.99/); assert.match(free, /Yearly/); assert.match(free, /disabled/);
   assert.match(free, /\/pricing\?checkout=monthly/); assert.doesNotMatch(free, /checkout=yearly/);
   assert.match(free, /20 original templates/);
   assert.match(free, /20 original \+ 10 Pro templates/);
-  assert.match(source("components/account/billing-plans.tsx"), /String\(plan.benefits.templates\)/);
+  assert.match(source("components/account/billing-plans.tsx"), /String\(benefits.templates\)/);
+  const yearly = renderToStaticMarkup(createElement(BillingPlans, { pro: true, interval: "yearly" }));
+  assert.match(yearly, /\$19.99/); assert.match(yearly, /500 QR codes/); assert.match(yearly, /1 GB/);
   const pro = renderToStaticMarkup(createElement(BillingPlans, { pro: true }));
   assert.doesNotMatch(pro, /Upgrade to Pro/); assert.match(pro, /Current plan/);
 });
-test("dashboard navigation is complete and accessible without pretending future tools exist", () => {
+test("dashboard navigation is complete and storage does not invent usage", async () => {
   const { DashboardShell } = componentFixture("components/account/dashboard-shell.tsx");
   const markup = renderToStaticMarkup(createElement(DashboardShell, { email: "fixture@example.test", pro: false }, "Dashboard fixture"));
   for (const text of ["Dashboard", "My QR Codes", "Statistics", "Import from CSV", "Archived QR Codes", "Custom Domain", "API Integration", "Profile", "Payment &amp; Subscription", "Support", "FAQ", "Log out"]) assert.ok(markup.includes(text), text);
   assert.match(markup, /aria-current="page"/); assert.match(markup, /aria-controls="dashboard-navigation"/);
-  const storage = componentFixture("components/account/storage-card.tsx").StorageCard;
-  const state = renderToStaticMarkup(createElement(storage));
-  assert.match(state, /Coming soon/); assert.match(state, /Not available yet/); assert.doesNotMatch(state, /0 GB|100 MB/);
+  const storage = componentFixture("components/account/storage-card.tsx", { "@/lib/account/saved-qr": { savedQr: async () => { throw new Error("offline"); } } }).StorageCard;
+  const state = renderToStaticMarkup(await storage());
+  assert.match(state, /Storage usage is temporarily unavailable/); assert.doesNotMatch(state, /0 GB|100 MB/);
 });
 test("dashboard pages enforce auth, RLS ownership and environment-isolated billing without mutations", () => {
   assert.match(source("app/(account)/layout.tsx"), /await requireUser\(\)/);
