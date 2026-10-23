@@ -20,7 +20,7 @@ export function Footer() {
           </div>
           <nav className="footer-links" aria-label="Footer navigation">
             <div className="footer-link-group">
-              {siteConfig.navigation.map(([label, href]) => <Link href={href} key={href}><T text={label} /></Link>)}
+              {siteConfig.navigation.filter(([, href]) => href !== "/contact").map(([label, href]) => <Link href={href} key={href}><T text={label} /></Link>)}
             </div>
             <div className="footer-link-group">
               {siteConfig.legalNavigation.map(([label, href]) => <Link href={href} key={href}><T text={label} /></Link>)}
@@ -28,6 +28,7 @@ export function Footer() {
             </div>
           </nav>
           <div className="footer-contact">
+            <h2><T text="Contact" /></h2>
             <a href="mailto:support@qraftt.com">support@qraftt.com</a>
             <nav className="footer-socials" aria-label="Qraftt social media">
               <a href="https://www.youtube.com/@qraftt.generator" target="_blank" rel="noopener noreferrer" aria-label="Qraftt on YouTube (opens in a new tab)">

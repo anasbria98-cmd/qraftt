@@ -3474,6 +3474,15 @@ html[dir=rtl] input[type=email],html[dir=rtl] input[type=url],html[dir=rtl] inpu
   text-align: start;
 }
 
+.footer-contact h2 {
+  margin: 0;
+  font: inherit;
+}
+
+.footer-contact .footer-socials {
+  margin-top: 0.5rem;
+}
+
 .site-footer .footer-links a:hover,
 .site-footer .footer-cookie-button:hover,
 .site-footer .footer-contact a:hover {

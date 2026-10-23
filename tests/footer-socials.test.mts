@@ -25,11 +25,12 @@ test("footer social icons use the exact Qraftt URLs, accessible names and safe n
     assert.ok(tag.includes(`aria-label="Qraftt on ${name} (opens in a new tab)"`));
   }
   assert.equal((html.match(/focusable="false"/g) ?? []).length, 3);
-  for (const [, href] of [...siteConfig.navigation, ...siteConfig.legalNavigation]) {
+  for (const [, href] of [...siteConfig.navigation, ...siteConfig.legalNavigation].filter(([, href]) => href !== "/contact")) {
     assert.equal(html.split(`href="${href}"`).length - 1, 1, href);
   }
   assert.match(html, /class="footer-link-group"><a href="\/privacy-policy"[\s\S]*?Cookie settings<\/button><\/div>/);
-  assert.match(html, /class="footer-contact"><a href="mailto:support@qraftt.com"/);
+  assert.doesNotMatch(html, /href="\/contact"/);
+  assert.match(html, /class="footer-contact"><h2>Contact<\/h2><a href="mailto:support@qraftt.com"/);
   assert.match(html, /aria-label="Qraftt social media"/);
   assert.match(html, /href="https:\/\/www.directree.io"/);
   assert.match(html, /Free to create. Free to share./);
