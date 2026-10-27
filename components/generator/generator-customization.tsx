@@ -395,7 +395,7 @@ export function GeneratorCustomization({
           <section className="editor-section">
             <div className="editor-section-heading">
               <div>
-                <h3><T text="Standard frames" />{" "}<ProBadge /></h3>
+                <h3><T text="Standard frames" /></h3>
                 <p><T text="Choose a distinct structure, then customize its call to action." /></p>
               </div>
               <span>{frameOptions.length}{" "}<T text="styles" /></span>
@@ -420,9 +420,9 @@ export function GeneratorCustomization({
                         : undefined
                     }
                   />
-                  <span><T text={option.label} />{option.value !== "none" ? <ProBadge /> : null}</span>
+                  <span><T text={option.label} /></span>
                 </button>
-                {option.value !== "none" ? <button className="text-button" type="button" aria-label={t("Preview {name} frame", { name: t(option.label) })} onClick={() => setStylePreview({ name: option.label, image: getFramePreview(option) })}><T text="Preview" /></button> : null}
+                {option.value !== "none" ? <button className="text-button" type="button" aria-label={t("Preview {name} frame", { name: t(option.label) })} onClick={() => setStylePreview({ name: option.label, image: getFramePreview(option), free: true })}><T text="Preview" /></button> : null}
                 </div>
               ))}
             </div>

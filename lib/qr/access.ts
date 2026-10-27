@@ -14,12 +14,14 @@ export function validateExportAccess(pro: boolean, design: QrDesignOptions, form
 
 export function freeTemplateForDesign(design: QrDesignOptions) {
   if (design.premiumTemplateId || design.logoDataUrl || design.logoSize !== freeDesign.logoSize) return undefined;
-  return designTemplates.find((template) => (template.design.uploadedFrameId ?? null) === (design.uploadedFrameId ?? null) && Object.entries(template.design).every(([key, value]) => design[key as keyof QrDesignOptions] === value));
+  if (!frameOptions.some(option => option.value === design.frame)) return undefined;
+  return designTemplates.find((template) => (template.design.uploadedFrameId ?? null) === (design.uploadedFrameId ?? null) && Object.entries(template.design).every(([key, value]) => key === "frame" || design[key as keyof QrDesignOptions] === value));
 }
 
 export function isFreeDesign(design: QrDesignOptions) {
   if (design.premiumTemplateId) return false;
-  return (!design.uploadedFrameId && Object.keys(freeDesign).every((key) => design[key as keyof QrDesignOptions] === freeDesign[key as keyof QrDesignOptions])) || Boolean(freeTemplateForDesign(design));
+  if (!frameOptions.some(option => option.value === design.frame)) return false;
+  return (!design.uploadedFrameId && Object.keys(freeDesign).every((key) => key === "frame" || design[key as keyof QrDesignOptions] === freeDesign[key as keyof QrDesignOptions])) || Boolean(freeTemplateForDesign(design));
 }
 
 export function designCorrection(design: QrDesignOptions, requested: "L" | "M" | "Q" | "H") {
