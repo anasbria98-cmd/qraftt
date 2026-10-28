@@ -1517,36 +1517,35 @@ html[dir=rtl] input[type=email],html[dir=rtl] input[type=url],html[dir=rtl] inpu
   background-size: contain;
 }
 
-.design-gallery-copy {
-  display: grid;
-  gap: 0.1rem;
-  padding: 0.45rem 0.2rem 0.15rem;
-}
-
-.design-gallery-copy strong,
-.frame-gallery-card > span:last-child {
-  overflow: hidden;
-  font-size: 0.65rem;
-  font-weight: 820;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.design-gallery-copy small {
-  overflow: hidden;
-  color: var(--ink-soft);
-  font-size: 0.55rem;
-  font-weight: 650;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 .frame-gallery-card {
-  grid-auto-rows: auto;
-  gap: 0.4rem;
-  padding-bottom: 0.6rem;
+  gap: 0;
   text-align: center;
 }
+
+.gallery-tile { position: relative; min-width: 0; }
+.gallery-preview-button {
+  position: absolute;
+  inset-block-start: 5px;
+  inset-inline-end: 5px;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 140ms ease;
+}
+.gallery-tile:hover .gallery-preview-button,
+.gallery-tile:focus-within .gallery-preview-button { opacity: 1; pointer-events: auto; }
+.gallery-preview-button:focus-visible,
+.design-gallery-card:focus-visible,
+.frame-gallery-card:focus-visible { outline: 2px solid var(--mint-strong); outline-offset: 2px; }
 
 .gallery-more-card {
   display: grid;
@@ -1586,28 +1585,6 @@ html[dir=rtl] input[type=email],html[dir=rtl] input[type=url],html[dir=rtl] inpu
 .design-library-grid .frame-gallery-card {
   min-height: 0;
   scroll-snap-align: none;
-}
-
-.premium-template-section .design-template-gallery.design-library-grid {
-  grid-template-columns: repeat(auto-fit, minmax(min(136px, 100%), 1fr));
-}
-
-.premium-template-badge {
-  display: flex;
-  justify-content: flex-end;
-  padding-top: 0.25rem;
-}
-
-.premium-template-section .design-gallery-copy strong {
-  white-space: normal;
-  font-size: 0.75rem;
-  line-height: 1.35;
-}
-
-.premium-template-section .design-gallery-copy small {
-  white-space: normal;
-  font-size: 0.625rem;
-  line-height: 1.4;
 }
 
 .library-expand-button {

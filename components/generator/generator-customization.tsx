@@ -325,9 +325,10 @@ export function GeneratorCustomization({
               {visibleTemplates.map((template) => {
                 const active = isTemplateActive(design, template);
                 return (
-                  <div key={template.id}>
+                  <div className="gallery-tile" key={template.id}>
                   <button
                     style={{ width: "100%" }}
+                    aria-label={t(template.name)}
                     aria-pressed={active}
                     className={active ? "design-gallery-card active" : "design-gallery-card"}
                     key={template.id}
@@ -343,12 +344,8 @@ export function GeneratorCustomization({
                           : undefined
                       }
                     />
-                    <span className="design-gallery-copy">
-                      <strong><T text={template.name} /></strong>
-                      <small><T text={template.description} /></small>
-                    </span>
                   </button>
-                  {template.id !== noTemplate.id ? <button className="text-button" type="button" aria-label={t("Preview {name}", { name: t(template.name) })} onClick={() => setStylePreview({ name: template.name, image: getTemplatePreview(template), free: true })}><T text="Preview" /></button> : null}
+                  {template.id !== noTemplate.id ? <GalleryPreviewButton label={t("Preview {name}", { name: t(template.name) })} onClick={() => setStylePreview({ name: template.name, image: getTemplatePreview(template), free: true })} /> : null}
                   </div>
                 );
               })}
@@ -372,13 +369,11 @@ export function GeneratorCustomization({
             </div>
             <div className="design-template-gallery design-library-grid">
               {(premiumExpanded ? premiumTemplates : premiumTemplates.slice(0, 8)).map((template) => (
-                <div key={template.id}>
-                  <button type="button" style={{ width: "100%" }} className={isTemplateActive(design, template) ? "design-gallery-card active" : "design-gallery-card"} aria-pressed={isTemplateActive(design, template)} onClick={() => applyTemplate(template)}>
+                <div className="gallery-tile" key={template.id}>
+                  <button type="button" aria-label={t(template.name)} style={{ width: "100%" }} className={isTemplateActive(design, template) ? "design-gallery-card active" : "design-gallery-card"} aria-pressed={isTemplateActive(design, template)} onClick={() => applyTemplate(template)}>
                     <span aria-hidden="true" className="design-gallery-preview" style={previewsReady ? { backgroundImage: getTemplatePreview(template) } : undefined} />
-
-                    <span className="design-gallery-copy"><strong><T text={template.name} /></strong><small><T text={template.description} /></small></span>
                   </button>
-                  <button type="button" className="text-button" aria-label={t("Preview {name}", { name: template.name })} onClick={() => setStylePreview({ name: template.name, image: getTemplatePreview(template) })}><T text="Preview" /></button>
+                  <GalleryPreviewButton label={t("Preview {name}", { name: t(template.name) })} onClick={() => setStylePreview({ name: template.name, image: getTemplatePreview(template) })} />
                 </div>
               ))}
             </div>
@@ -395,9 +390,10 @@ export function GeneratorCustomization({
             </div>
             <div className="frame-gallery design-library-grid">
               {visibleFrames.map((option) => (
-                <div key={option.value}>
+                <div className="gallery-tile" key={option.value}>
                 <button
                   style={{ width: "100%" }}
+                  aria-label={t(option.label)}
                   aria-pressed={design.frame === option.value}
                   className={design.frame === option.value ? "frame-gallery-card active" : "frame-gallery-card"}
                   key={option.value}
@@ -413,9 +409,8 @@ export function GeneratorCustomization({
                         : undefined
                     }
                   />
-                  <span><T text={option.label} /></span>
                 </button>
-                {option.value !== "none" ? <button className="text-button" type="button" aria-label={t("Preview {name} frame", { name: t(option.label) })} onClick={() => setStylePreview({ name: option.label, image: getFramePreview(option), free: true })}><T text="Preview" /></button> : null}
+                {option.value !== "none" ? <GalleryPreviewButton label={t("Preview {name} frame", { name: t(option.label) })} onClick={() => setStylePreview({ name: option.label, image: getFramePreview(option), free: true })} /> : null}
                 </div>
               ))}
             </div>
@@ -811,6 +806,12 @@ export function GeneratorCustomization({
         onClose={() => setStylePreview(null)} /> : null}
     </div>
   );
+}
+
+function GalleryPreviewButton({ label, onClick }: { label: string; onClick: () => void }) {
+  return <button className="gallery-preview-button" type="button" aria-label={label} onClick={onClick}>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6.5" /><path d="m16 16 4.5 4.5M7.5 10.5h6m-3-3v6" /></svg>
+  </button>;
 }
 
 function StylePreview({ name, image, onClose }: {
