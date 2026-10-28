@@ -37,8 +37,8 @@ export function Footer() {
               <a href="https://www.facebook.com/profile.php?id=61595929613573" target="_blank" rel="noopener noreferrer" aria-label="Qraftt on Facebook (opens in a new tab)">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M24 12a12 12 0 1 0-13.875 11.855V15.47H7.078V12h3.047V9.356c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953h-1.513c-1.49 0-1.956.925-1.956 1.875V12h3.328l-.532 3.469h-2.796v8.386A12.003 12.003 0 0 0 24 12Z" /></svg>
               </a>
-              <a href="https://www.instagram.com/qraftt.generator/" target="_blank" rel="noopener noreferrer" aria-label="Qraftt on Instagram (opens in a new tab)">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true" focusable="false"><rect x="3" y="3" width="18" height="18" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" /></svg>
+              <a href="https://www.facebook.com/profile.php?id=61586264129845" target="_blank" rel="noopener noreferrer" aria-label="Qraftt on Facebook (opens in a new tab)">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M24 12a12 12 0 1 0-13.875 11.855V15.47H7.078V12h3.047V9.356c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953h-1.513c-1.49 0-1.956.925-1.956 1.875V12h3.328l-.532 3.469h-2.796v8.386A12.003 12.003 0 0 0 24 12Z" /></svg>
               </a>
             </nav>
           </div>

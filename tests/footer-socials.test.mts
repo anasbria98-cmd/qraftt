@@ -16,7 +16,7 @@ test("footer social icons use the exact Qraftt URLs, accessible names and safe n
   for (const [name, url] of [
     ["YouTube", "https://www.youtube.com/@qraftt.generator"],
     ["Facebook", "https://www.facebook.com/profile.php?id=61595929613573"],
-    ["Instagram", "https://www.instagram.com/qraftt.generator/"],
+    ["Facebook", "https://www.facebook.com/profile.php?id=61586264129845"],
   ]) {
     const tag = html.match(new RegExp(`<a href="${url.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}"[^>]*>`))?.[0];
     assert.ok(tag, name);
@@ -25,6 +25,14 @@ test("footer social icons use the exact Qraftt URLs, accessible names and safe n
     assert.ok(tag.includes(`aria-label="Qraftt on ${name} (opens in a new tab)"`));
   }
   assert.equal((html.match(/focusable="false"/g) ?? []).length, 3);
+  assert.doesNotMatch(html, /instagram\.com|Qraftt on Instagram/);
+  const socials = html.match(/<nav class="footer-socials"[^>]*>([\s\S]*?)<\/nav>/)![1];
+  assert.deepEqual([...socials.matchAll(/href="([^"]+)"/g)].map(match => match[1]), [
+    "https://www.youtube.com/@qraftt.generator",
+    "https://www.facebook.com/profile.php?id=61595929613573",
+    "https://www.facebook.com/profile.php?id=61586264129845",
+  ]);
+  assert.equal((socials.match(/d="M24 12a12 12/g) ?? []).length, 2);
   for (const [, href] of [...siteConfig.navigation, ...siteConfig.legalNavigation].filter(([, href]) => href !== "/contact")) {
     assert.equal(html.split(`href="${href}"`).length - 1, 1, href);
   }
