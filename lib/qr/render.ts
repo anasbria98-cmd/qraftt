@@ -11,6 +11,7 @@ import { getQrArtworkLayout, renderQrArtwork } from "./artwork.ts";
 import type { ErrorCorrectionLevel } from "./types.ts";
 import { renderPremiumQrSvg } from "./premium-render.ts";
 import { uploadedFrame, uploadedFramePath } from "./uploaded-frames.ts";
+import { outlineFrameCaption } from "./frame-caption.ts";
 
 export const QUIET_ZONE_MODULES = 4;
 const VIEWBOX_SIZE = 1_000;
@@ -182,15 +183,14 @@ function renderDecoration(design: QrDesignOptions) {
 function renderFrame(design: QrDesignOptions) {
   if (design.frame === "none") return "";
 
-  const label = escapeXml(
-    design.frameLabel?.trim().slice(0, 32) || frameLabels[design.frame],
-  );
+  const caption = design.frameLabel?.trim().slice(0, 32) || frameLabels[design.frame];
+  const label = escapeXml(caption);
   const structure = frameStructures[design.frame];
   const color = design.frameColor;
   const text = design.frameTextColor;
   const fontSize = Math.max(24, 42 - Math.max(0, label.length - 14) * 1.15);
   const labelText = (y: number, fill = text, size = fontSize) =>
-    `<text x="500" y="${y}" text-anchor="middle" fill="${fill}" font-family="Arial, sans-serif" font-size="${size}" font-weight="800" letter-spacing="2">${label}</text>`;
+    outlineFrameCaption(caption, y, fill, size) ?? `<text x="500" y="${y}" text-anchor="middle" fill="${fill}" font-family="Arial, sans-serif" font-size="${size}" font-weight="800" letter-spacing="2">${label}</text>`;
 
   switch (structure) {
     case "pill-bottom":

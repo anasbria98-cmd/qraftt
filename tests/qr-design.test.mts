@@ -51,7 +51,7 @@ test("renders reusable body, independent eyes, gradient, frame, and logo customi
   assert.match(svg, /data-qr-inner-eye="diamond"/);
   assert.match(svg, /#164e63/);
   assert.match(svg, /#7c2d12/);
-  assert.match(svg, />SCAN ME<\/text>/);
+  assert.match(svg, /data-frame-caption="SCAN ME"/);
   assert.match(svg, /<image href="data:image\/png;base64,iVBORw0KGgo="/);
 });
 

@@ -12,6 +12,7 @@ import { componentFixture } from "./helpers/render-component.mjs";
 import { normalizeLogoDataUrl } from "../lib/qr/logo.ts";
 import { pricingPlans } from "../lib/pricing/plans.ts";
 import { uploadedFrameImage } from "../lib/qr/uploaded-frame-image.ts";
+import { captionUnits } from "../lib/qr/frame-caption-glyphs.ts";
 
 const renderQrSvg: typeof renderBaseSvg = (payload, correction, design) => {
   const source = premiumTemplate(design.premiumTemplateId)?.sourceId;
@@ -31,12 +32,16 @@ const originalHashes = [
   "3ee850fca5abeabea541a558a2fd631fbd8925a34acd81dd1199cf60fbb7ef56", "590869b718c56f726fcbc5c35c0ce401357fce4c566755fe8cf3e4d06ffdb4e5",
 ];
 
-test("all 20 old templates remain byte-identical and allow Free PNG exports", () => {
+test("all 20 old templates remain byte-identical apart from repaired caption outlines and allow Free PNG exports", () => {
   const originals = designTemplates.filter(template => !template.design.uploadedFrameId);
   assert.equal(originals.length, originalHashes.length);
   originals.forEach((template, index) => {
     const design = { ...template.design, logoDataUrl: null, logoSize: 16 };
-    assert.equal(createHash("sha256").update(renderQrSvg("https://example.com", template.errorCorrection, design)).digest("hex"), originalHashes[index]);
+    // Normalize only the caption's new font-independent geometry back to its
+    // previous text element. The historic hash still protects all other artwork.
+    const svg = renderQrSvg("https://example.com", template.errorCorrection, design).replace(/<g data-frame-caption="([^"]*)" role="img" aria-label="[^"]*" fill="([^"]*)" transform="translate\([^ ]+ ([^)]+)\) scale\(([^ ]+) [^)]+\)">[\s\S]*?<\/g>/g,
+      (_, label, fill, y, scale) => `<text x="500" y="${y}" text-anchor="middle" fill="${fill}" font-family="Arial, sans-serif" font-size="${Number((Number(scale) * captionUnits).toFixed(6))}" font-weight="800" letter-spacing="2">${label}</text>`);
+    assert.equal(createHash("sha256").update(svg).digest("hex"), originalHashes[index]);
     assert.doesNotThrow(() => validateExportAccess(false, design, "png", 512));
     assert.equal(designCorrection(design, "M"), template.errorCorrection);
     assert.equal(freeTemplateForDesign(design)?.id, template.id);
