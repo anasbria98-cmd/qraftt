@@ -36,7 +36,54 @@
 .sidebar { position:sticky; top:6rem; align-self:start; max-height:calc(100dvh - 7.5rem); overflow-y:auto; }
 .navigation .createLink { background:var(--ink); color:var(--canvas); font-weight:700; margin-bottom:.5rem; }
 .navigation .createLink:hover { background:var(--mint-dark); color:var(--canvas); }
+.shell { background:var(--depth-recess); box-shadow:var(--depth-panel); }
+.sidebar { background:var(--depth-surface); box-shadow:var(--depth-edge); }
+.topbar { background:var(--depth-surface); box-shadow:var(--depth-edge); }
+.card { background:var(--depth-surface); border-radius:var(--depth-radius-card); box-shadow:var(--depth-level-2); }
+.subscription,.sidebarPlan { background:var(--depth-mint); border-color:#b3ccba; box-shadow:var(--depth-tile); }
+.storage { background:var(--depth-recess); border-color:#b5c9b8; box-shadow:var(--depth-input); }
+.workspaceMark { background:var(--depth-dark); box-shadow:var(--depth-button); }
+.avatar,.pill,.emptyIcon { background:var(--depth-mint); box-shadow:var(--depth-tile); }
+.navigation svg,.emptyIcon svg { filter:drop-shadow(0 1px 1px #1b4d3326); }
+.navigation a,.navigation button { transition:box-shadow 180ms var(--depth-ease),background-color 180ms ease; }
+.navigation a[aria-current=page] { background:var(--depth-mint); box-shadow:var(--depth-tile-active); }
+.navigation .createLink,.navigation .createLink:hover { background:var(--depth-dark); box-shadow:var(--depth-button); }
+.table th { background:var(--depth-recess); box-shadow:var(--depth-edge); }
+.table td { background:linear-gradient(170deg,#ffffff70,#e8f0e44d); border-color:#c1d1c0; }
+.table tbody tr:hover td { background:var(--depth-mint); }
+.table button { box-shadow:var(--depth-edge); }
+.facts { background:transparent; box-shadow:var(--depth-level-0); }
+.faq details { background:linear-gradient(120deg,#ffffff8c,#dfebdd4d); box-shadow:inset 0 1px 0 #fff9; }
+.faq details[open] { background:var(--depth-surface); }
+.storage progress { border:0; border-radius:999px; background:#e2ece5; box-shadow:inset 0 2px 3px #073f3312,0 1px 0 #fff; overflow:hidden; }
+.storage progress::-webkit-progress-bar { background:#e2ece5; border-radius:999px; box-shadow:inset 0 2px 3px #073f3312; }
+.storage progress::-webkit-progress-value { background:linear-gradient(180deg,#a6d7b2,#4d926a 55%,#367b54); border-radius:999px; box-shadow:inset 0 1px 1px #ffffff8c,inset 0 -1px 1px #164a3026; }
+.storage progress::-moz-progress-bar { background:linear-gradient(180deg,#79ccaa,#2b8b67); border-radius:999px; }
+.menuToggle { background:var(--depth-mint); box-shadow:var(--depth-tile); }
+@media(prefers-reduced-motion:reduce) { .navigation a,.navigation button { transition:none; } }
 .soon { margin-inline-start:auto; font-size:.55rem; font-weight:600; color:var(--ink-soft); background:var(--surface-soft); border-radius:.3rem; padding:.2rem .3rem; }
 @media(max-width:760px) { .sidebar { position:static; max-height:none; overflow:visible; } .navigation .createLink { margin-bottom:0; } .soon { font-size:.5rem; } }
 @media(max-width:1100px) { .shell { grid-template-columns:13.5rem minmax(0,1fr); } .email { display:none; } .twoColumns { grid-template-columns:1fr; } .facts { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 @media(max-width:760px) { .shell { width:calc(100% - 1rem); margin:.5rem auto 2rem; grid-template-columns:1fr; border-radius:1rem; } .sidebar { padding:1rem; border-inline-end:0; border-bottom:1px solid var(--line); } .workspace,.sidebarPlan { display:none; } .menuToggle { display:flex; justify-content:space-between; width:100%; align-items:center; border:0; background:var(--surface-soft); border-radius:.6rem; padding:.8rem; font:inherit; color:var(--ink); font-size:.85rem; font-weight:600; } .navigation { display:none; margin-top:.75rem; } .navigation[data-open=true] { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); } .navigation form { margin:0; padding:0; border:0; } .navigation a,.navigation button { font-size:.72rem; } .topbar { min-height:4rem; padding:1rem; } .topbar p { font-size:.68rem; } .avatar { display:none; } .content { padding:1.1rem; gap:1rem; } .cardHeader { align-items:flex-start; flex-wrap:wrap; } .planGrid { grid-template-columns:1fr; } .facts { grid-template-columns:1fr; gap:.8rem; } .subscription { padding:1rem; } .storageMeta { flex-wrap:wrap; } }
+
+/* Paint-only completion of sidebar, embedded disclosures and saved-QR actions. */
+.sidebar .menuToggle { background:var(--depth-surface); box-shadow:var(--depth-level-2); }
+.navigation a:not(.createLink):not([aria-current=page]),.navigation button { background:linear-gradient(110deg,#ffffff40,#d7e9d61a); box-shadow:inset 0 1px 0 #ffffff4d; }
+.navigation a:hover:not(.createLink),.navigation button:hover { background:var(--depth-mint); box-shadow:var(--depth-level-3); }
+.faq details { background:var(--depth-surface); box-shadow:var(--depth-level-1); }
+.faq summary { background:linear-gradient(110deg,#ffffffa6,#d7e9d64d); box-shadow:var(--depth-edge); }
+.faq details[open] { background:var(--depth-recess); }
+.faq details[open] summary,.faq summary:hover { background:var(--depth-mint); }
+.storage summary { background:var(--depth-surface); border-radius:.35rem; box-shadow:var(--depth-edge); }
+.storage details[open] { background:linear-gradient(110deg,#ffffff70,#d7e9d629); }
+.table td a,.table td button { background:var(--depth-surface); border-radius:.3rem; box-shadow:var(--depth-edge); }
+.table td a:hover,.table td button:hover:not(:disabled) { background:var(--depth-mint); box-shadow:var(--depth-level-3); }
+.table td button:active:not(:disabled) { box-shadow:var(--depth-input); }
+.empty { background:radial-gradient(ellipse at 50% 30%,#d4ebd980,transparent 70%); }
+.emptyIcon { background:var(--depth-mint); box-shadow:var(--depth-level-3); }
+.navigation a,.navigation button,.table td button,.storage summary,.faq summary { transition:transform 180ms var(--depth-ease),box-shadow 180ms var(--depth-ease),background-color 180ms ease; }
+@media(hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference) {
+  .navigation a:hover,.navigation button:hover { transform:translateY(-1px); }
+  .navigation a:active,.navigation button:active { transform:none; box-shadow:var(--depth-input); }
+}
+@media(prefers-reduced-motion:reduce) { .navigation a,.navigation button,.table td button,.storage summary,.faq summary { transition:none; } }

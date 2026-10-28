@@ -1,6 +1,7 @@
 import { T } from "@/components/i18n/language-provider";
 import Link from "next/link";
 import { Container } from "@/components/ui/container";
+import { IllustrationMaterials, illustrationMaterialStyle } from "@/components/marketing/illustration-materials";
 
 type UseCaseKind =
   | "restaurant"
@@ -95,8 +96,10 @@ function MiniQr({ size = 60, x, y }: { size?: number; x: number; y: number }) {
 }
 
 function UseCaseArtwork({ kind }: { kind: UseCaseKind }) {
+  const materialId = `use-case-${kind}`;
   return (
-    <svg aria-hidden="true" viewBox="0 0 360 210">
+    <svg aria-hidden="true" style={illustrationMaterialStyle(materialId)} viewBox="0 0 360 210">
+      <IllustrationMaterials id={materialId} />
       <circle className="use-svg-glow" cx="180" cy="105" r="88" />
 
       {kind === "restaurant" ? (

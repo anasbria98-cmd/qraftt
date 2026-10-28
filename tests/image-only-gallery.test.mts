@@ -13,7 +13,7 @@ test("gallery cards contain only artwork while retaining names for assistive tec
     onDesignChange() {}, onErrorCorrectionChange() {}, onReset() {},
   }));
   const cards = [...html.matchAll(/<button\b[^>]*class="(?:design|frame)-gallery-card[^>]*>[\s\S]*?<\/button>/g)].map(match => match[0]);
-  assert.equal(cards.length, 32); // 12 original/uploaded slots, all 10 art slots and 10 Standard Frame slots.
+  assert.equal(cards.length, 32); // 11 Free slots, all 10 art slots and 11 Standard Frame slots.
   for (const card of cards) {
     assert.match(card, /aria-label="[^"]+"/);
     assert.match(card, /aria-pressed="(?:true|false)"/);
@@ -24,7 +24,7 @@ test("gallery cards contain only artwork while retaining names for assistive tec
   assert.match(html, /class="design-gallery-card active"/);
   const names = [...html.matchAll(/<button\b[^>]*aria-label="([^"]+)"[^>]*class="design-gallery-card/g)].map(match => match[1]);
   assert.equal(names[1], designTemplates[0].name);
-  assert.equal(names[12].replaceAll("&amp;", "&"), premiumTemplates[0].name);
+  assert.equal(names[11].replaceAll("&amp;", "&"), premiumTemplates[0].name);
   assert.match(html, /aria-label="Preview Shopping cart"/);
   assert.match(html, /class="gallery-preview-button"/);
   const decorative = html.split('aria-label="Decorative templates"')[1].split('</section>')[0];
@@ -33,4 +33,9 @@ test("gallery cards contain only artwork while retaining names for assistive tec
   assert.doesNotMatch(decorative, /library-expand-button|View all|Show fewer/);
   assert.match(html, /View all 30 templates/);
   assert.match(html, /View all 30 frames/);
+  for (const id of ["free-template-gallery", "standard-frame-gallery"]) {
+    const sectionEnd = html.slice(html.indexOf(`id="${id}"`)).split("</section>")[0].trim();
+    assert.match(sectionEnd, /class="library-expand-button gallery-more-card"[\s\S]*<\/button><\/div>$/);
+    assert.match(sectionEnd, new RegExp(`aria-controls="${id}"`));
+  }
 });

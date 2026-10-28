@@ -1606,6 +1606,33 @@ html[dir=rtl] input[type=email],html[dir=rtl] input[type=url],html[dir=rtl] inpu
   color: var(--ink);
 }
 
+/* Expand is a normal gallery tile, not a separate full-width or dashed callout. */
+.design-library-grid .gallery-more-card {
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  aspect-ratio: 1;
+  align-content: center;
+  border-style: solid;
+  padding: .5rem;
+  overflow-wrap: anywhere;
+}
+.gallery-more-card:focus-visible {
+  outline: 2px solid var(--mint-strong);
+  outline-offset: 2px;
+}
+
+.style-preview-dialog {
+  margin: auto;
+  max-width: calc(100vw - 32px);
+  max-height: calc(100dvh - 32px);
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--depth-radius-panel, 1.15rem);
+  padding: 24px;
+  color: var(--ink);
+}
+
 .design-choice-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

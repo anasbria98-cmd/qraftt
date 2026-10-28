@@ -13,6 +13,7 @@ import {
 } from "@/lib/seo/schema";
 import { siteConfig } from "@/lib/site";
 import "./globals.css";
+import "./premium-depth.css";
 import { LanguageProvider } from "@/components/i18n/language-provider";
 
 export const metadata: Metadata = {

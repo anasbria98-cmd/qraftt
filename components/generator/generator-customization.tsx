@@ -39,8 +39,9 @@ const customizationTabs: Array<{ label: string; value: CustomizationTab }> = [
   { label: "Level", value: "level" },
 ];
 
-const INITIAL_TEMPLATE_COUNT = 12;
-const INITIAL_FRAME_COUNT = 10;
+// Eleven designs plus the expand tile make complete rows at 2, 4 and 6 columns.
+const INITIAL_TEMPLATE_COUNT = 11;
+const INITIAL_FRAME_COUNT = 11;
 
 function previewUrl(design: QrDesignOptions) {
   const svg = renderQrSvg("https://qraftt.com", "H", design);
@@ -320,7 +321,7 @@ export function GeneratorCustomization({
               </div>
               <span>{designTemplates.length}{" "}<T text="designs" /></span>
             </div>
-            <div className="design-template-gallery design-library-grid">
+            <div className="design-template-gallery design-library-grid" id="free-template-gallery">
               {visibleTemplates.map((template) => {
                 const active = isTemplateActive(design, template);
                 return (
@@ -348,10 +349,10 @@ export function GeneratorCustomization({
                   </div>
                 );
               })}
-            </div>
             <button
+              aria-controls="free-template-gallery"
               aria-expanded={templatesExpanded}
-              className="library-expand-button"
+              className="library-expand-button gallery-more-card"
               onClick={() => setTemplatesExpanded((current) => !current)}
               type="button"
             >
@@ -359,6 +360,7 @@ export function GeneratorCustomization({
                 ? t("Show fewer templates")
                 : t("View all {count} templates", { count: designTemplates.length })}
             </button>
+            </div>
           </section>
 
           <section className="editor-section premium-template-section" aria-label="Decorative templates">
@@ -386,7 +388,7 @@ export function GeneratorCustomization({
               </div>
               <span>{frameOptions.length}{" "}<T text="styles" /></span>
             </div>
-            <div className="frame-gallery design-library-grid">
+            <div className="frame-gallery design-library-grid" id="standard-frame-gallery">
               {visibleFrames.map((option) => (
                 <div className="gallery-tile" key={option.value}>
                 <button
@@ -411,10 +413,10 @@ export function GeneratorCustomization({
                 {option.value !== "none" ? <GalleryPreviewButton label={t("Preview {name} frame", { name: t(option.label) })} onClick={() => setStylePreview({ name: option.label, image: getFramePreview(option), free: true })} /> : null}
                 </div>
               ))}
-            </div>
             <button
+              aria-controls="standard-frame-gallery"
               aria-expanded={framesExpanded}
-              className="library-expand-button"
+              className="library-expand-button gallery-more-card"
               onClick={() => setFramesExpanded((current) => !current)}
               type="button"
             >
@@ -422,6 +424,7 @@ export function GeneratorCustomization({
                 ? t("Show fewer frames")
                 : t("View all {count} frames", { count: frameOptions.length })}
             </button>
+            </div>
           </section>
 
           <section className="editor-section frame-background-section">
@@ -819,10 +822,10 @@ function StylePreview({ name, image, onClose }: {
   const ref = useRef<HTMLDialogElement>(null);
   useEffect(() => { ref.current?.showModal(); }, []);
   return <dialog ref={ref} onCancel={onClose} aria-labelledby="style-preview-title"
-    style={{ border: "1px solid var(--line)", borderRadius: 24, padding: 24, color: "var(--ink)", background: "var(--surface)", maxWidth: "calc(100vw - 32px)" }}>
+    className="style-preview-dialog">
     <h2 id="style-preview-title"><T text={name} /> </h2>
     <div role="img" aria-label={t("{name} sample design preview", { name: t(name) })} style={{ width: "min(65vw, 360px)", height: "min(65vw, 360px)", backgroundImage: image, backgroundPosition: "center", backgroundRepeat: "no-repeat", backgroundSize: "contain", margin: "16px auto" }} />
     <p><T text="Sample style preview. Your QR content stays unchanged." /></p>
-    <button className="button button-secondary" type="button" onClick={onClose} style={{ marginTop: 12, marginLeft: 8 }}><T text="Close preview" /></button>
+    <button className="button button-secondary" type="button" onClick={onClose} style={{ marginTop: 12 }}><T text="Close preview" /></button>
   </dialog>;
 }

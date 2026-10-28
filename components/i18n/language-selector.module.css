@@ -9,3 +9,11 @@
 .panel button:hover,.panel button[aria-pressed=true] { background:var(--mint-pale); }
 .panel small { margin-inline-start:auto; color:var(--ink-soft); font-size:.65rem; }
 .error { position:absolute; inset-inline-end:0; top:100%; width:15rem; padding:.5rem; background:#fff; border:1px solid var(--line); border-radius:.5rem; font-size:.7rem; }
+.trigger { background:var(--depth-surface); box-shadow:var(--depth-tile); }
+.panel { background:var(--depth-surface); box-shadow:var(--depth-level-3); }
+.panel button[aria-pressed=true] { background:var(--depth-mint); box-shadow:var(--depth-edge); }
+.trigger:hover,.trigger[aria-expanded=true] { background:var(--depth-mint); box-shadow:var(--depth-level-3); }
+.panel button:hover { background:var(--depth-mint); box-shadow:var(--depth-level-2); }
+.panel button:active,.trigger:active { box-shadow:var(--depth-input); }
+.trigger,.panel button { transition:box-shadow 180ms var(--depth-ease),background-color 180ms ease; }
+@media(prefers-reduced-motion:reduce) { .trigger,.panel button { transition:none; } }

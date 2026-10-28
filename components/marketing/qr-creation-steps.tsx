@@ -1,5 +1,6 @@
 import { T } from "@/components/i18n/language-provider";
 import { Container } from "@/components/ui/container";
+import { IllustrationMaterials, illustrationMaterialStyle } from "@/components/marketing/illustration-materials";
 
 const qrModules = [
   [3, 0], [5, 0], [3, 1], [4, 1], [6, 1], [0, 3], [2, 3], [4, 3], [5, 3],
@@ -60,7 +61,8 @@ function QrGlyph({ scale = 1, x, y }: { scale?: number; x: number; y: number }) 
 
 function ChooseTypeIllustration() {
   return (
-    <svg aria-hidden="true" viewBox="0 0 360 220">
+    <svg aria-hidden="true" style={illustrationMaterialStyle("step-choose")} viewBox="0 0 360 220">
+      <IllustrationMaterials id="step-choose" />
       <rect className="step-svg-panel" height="176" rx="18" width="300" x="30" y="22" />
       <path className="step-svg-line" d="M30 53h300" />
       <circle className="step-svg-mint" cx="48" cy="38" r="4" />
@@ -106,7 +108,8 @@ function ChooseTypeIllustration() {
 
 function AddContentIllustration() {
   return (
-    <svg aria-hidden="true" viewBox="0 0 360 220">
+    <svg aria-hidden="true" style={illustrationMaterialStyle("step-content")} viewBox="0 0 360 220">
+      <IllustrationMaterials id="step-content" />
       <rect className="step-svg-panel" height="176" rx="18" width="300" x="30" y="22" />
       <path className="step-svg-line" d="M30 53h300" />
       <circle className="step-svg-mint" cx="48" cy="38" r="4" />
@@ -130,7 +133,8 @@ function AddContentIllustration() {
 
 function CustomizeIllustration() {
   return (
-    <svg aria-hidden="true" viewBox="0 0 360 220">
+    <svg aria-hidden="true" style={illustrationMaterialStyle("step-customize")} viewBox="0 0 360 220">
+      <IllustrationMaterials id="step-customize" />
       <rect className="step-svg-panel" height="176" rx="18" width="300" x="30" y="22" />
       <path className="step-svg-line" d="M30 53h300" />
       <circle className="step-svg-mint" cx="48" cy="38" r="4" />

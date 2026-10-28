@@ -38,3 +38,21 @@
 .asideFoot { font-size:.7rem; color:var(--ink-soft); border-top:1px solid var(--line); padding-top:1.4rem; }
 .page a:focus-visible,.page button:focus-visible { outline:3px solid var(--mint-strong); outline-offset:3px; }
 @media(max-width:760px) { .page { max-width:34rem; grid-template-columns:1fr; margin:1.25rem auto 2.5rem; border-radius:1.15rem; } .card { padding:1.5rem; } .aside { display:none; } .options { flex-wrap:wrap; } }
+
+/* Shared depth tokens change surfaces only, never the form geometry. */
+.page { background:var(--depth-surface); box-shadow:var(--depth-panel); }
+.card { background:var(--depth-surface); box-shadow:var(--depth-level-0); }
+.aside { background:radial-gradient(ellipse at 16% 0%,#ffffff8c,transparent 65%),var(--depth-mint); box-shadow:var(--depth-edge); }
+.google { background:var(--depth-surface); box-shadow:var(--depth-tile); transition:box-shadow 180ms var(--depth-ease),border-color 180ms ease; }
+.google:hover:not(:disabled) { box-shadow:var(--depth-tile-active); }
+.google:active:not(:disabled) { box-shadow:var(--depth-input); }
+.form input:not([type=checkbox]) { background:linear-gradient(180deg,#ecf2e9,#fbfdf7 60%); border-color:#b8cbb9; box-shadow:var(--depth-input); }
+.benefit { border-color:#609374; background:linear-gradient(100deg,#ffffff47,transparent); box-shadow:inset 0 1px 0 #ffffff33; }
+.status { background:var(--depth-mint); box-shadow:var(--depth-edge); }
+@media(prefers-reduced-motion:reduce) { .google { transition:none; } }
+.password button { background:var(--depth-surface); border-radius:.35rem; box-shadow:var(--depth-edge); }
+.password button:hover { background:var(--depth-mint); box-shadow:var(--depth-level-3); }
+.password button:active { box-shadow:var(--depth-input); }
+.google { transition:transform 180ms var(--depth-ease),box-shadow 180ms var(--depth-ease),border-color 180ms ease; }
+@media(hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference) { .google:hover:not(:disabled) { transform:translateY(-1px); } .google:active:not(:disabled) { transform:none; } }
+@media(prefers-reduced-motion:reduce) { .google { transition:none; } }
