@@ -4,7 +4,6 @@ import { authClient } from "@/lib/supabase/server";
 import { authOrigin } from "@/lib/auth/origin";
 import { validNewPassword } from "@/lib/auth/validation";
 import { cookies, headers } from "next/headers";
-import { checkoutIntentCookie, checkoutPeriod } from "@/lib/pricing/checkout";
 import { authFailureMessage } from "@/lib/auth/errors";
 import { authReturnPath } from "@/lib/auth/continuation";
 import { googleAuthAvailable } from "@/lib/auth/providers";
@@ -22,9 +21,6 @@ export async function signup(form: FormData) {
   const next = await authReturnPath(form.get("next"));
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !validNewPassword(password)) message("/signup", "Use a valid email and a password of at least 12 characters, up to 72 UTF-8 bytes.", next);
   const siteOrigin = await origin();
-  const interval = checkoutPeriod(new URL(next, siteOrigin).searchParams.get("checkout"));
-  // Preserve only an allowlisted billing choice across email confirmation, never entitlement.
-  (await cookies()).set(checkoutIntentCookie, interval ?? "", { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax", path: "/", maxAge: interval ? 86400 : 0 });
   const client = await authClient();
   const { data, error } = await client.auth.signUp({ email, password, options: { emailRedirectTo: `${siteOrigin}/auth/callback?next=/dashboard` } });
   if (error) {
@@ -33,7 +29,7 @@ export async function signup(form: FormData) {
   }
   if (data.user?.identities?.length === 0) message("/login", "This email is already registered. Please log in, or reset your password.", next);
   if (data.session) redirect(next);
-  message("/login", next === "/pricing?paypal=approved" ? "Confirm your email in this browser, then log in to link your approved subscription. Do not start another payment." : interval ? "Check your email to confirm your account in this browser, then continue to checkout." : "Check your email to confirm your account, then log in.", next);
+  message("/login", "Check your email to confirm your account, then log in.", next);
 }
 export async function login(form: FormData) {
   const { email, password } = credentials(form);
@@ -45,7 +41,6 @@ export async function login(form: FormData) {
   const client = await authClient();
   const { error } = await client.auth.signInWithPassword({ email, password });
   if (error) message("/login", authFailureMessage(error), next);
-  (await cookies()).delete(checkoutIntentCookie);
   redirect(next);
 }
 export async function logout() {
@@ -57,7 +52,7 @@ export async function logout() {
 }
 export async function googleLogin(form: FormData) {
   const next = await authReturnPath(form.get("next"));
-  if (!await googleAuthAvailable()) message("/login", "Google sign-in is not available yet. Please use email and password. Your pending checkout is safe.", next);
+  if (!await googleAuthAvailable()) message("/login", "Google sign-in is not available yet. Please use email and password.", next);
   const callback = new URL("/auth/callback", await origin());
   callback.searchParams.set("next", next);
   callback.searchParams.set("provider", "google");
@@ -70,7 +65,7 @@ export async function googleLogin(form: FormData) {
       if (url.origin === new URL(process.env.NEXT_PUBLIC_SUPABASE_URL!).origin && url.pathname === "/auth/v1/authorize") destination = url.href;
     }
   } catch { /* Never expose provider errors or credentials. */ }
-  if (!destination) message("/login", "We couldn’t start Google sign-in. Please try again or use email and password. Your pending checkout is safe.", next);
+  if (!destination) message("/login", "We couldn’t start Google sign-in. Please try again or use email and password.", next);
   redirect(destination);
 }
 export async function forgotPassword(form: FormData) {

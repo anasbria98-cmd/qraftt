@@ -4,10 +4,10 @@ import { readFileSync } from "node:fs";
 import { authFailureMessage } from "../lib/auth/errors.ts";
 import { checkoutAuthReturnPath } from "../lib/auth/redirect.ts";
 const source = (path: string) => readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
-test("pending checkout resumes after auth from any account entry without starting another payment", () => {
+test("legacy checkout state cannot override an intentional safe account destination", () => {
   const pending = { state: "open", claimed_by: null, subscription_id: "I-TEST", expires_at: "2030-01-01T00:00:00Z" };
   for (const next of [undefined, "/dashboard", "/pricing", "/account", "/pricing?checkout=monthly", "/pricing?checkout=yearly"]) {
-    assert.equal(checkoutAuthReturnPath(next, pending, 0), "/pricing?paypal=approved");
+    assert.equal(checkoutAuthReturnPath(next, pending, 0), next === "/pricing" || next === "/account" ? next : "/dashboard");
   }
   assert.equal(checkoutAuthReturnPath("/reset-password", pending, 0), "/reset-password");
   assert.equal(checkoutAuthReturnPath("/dashboard", { ...pending, claimed_by: "another-user" }, 0), "/dashboard");

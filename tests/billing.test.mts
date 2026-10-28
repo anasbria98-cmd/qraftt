@@ -65,11 +65,11 @@ test("webhook retries and older events cannot restore a revoked entitlement", as
   } finally { store.db.close(); }
 });
 
-test("server rejects premium export requests from Free users and unsafe logos", () => {
+test("server allows all exports for everyone while rejecting unsafe logos", () => {
   assert.doesNotThrow(() => validateExportAccess(false, freeDesign, "png", 512));
-  assert.throws(() => validateExportAccess(false, freeDesign, "svg", 512), /Unlock Pro/);
-  assert.throws(() => validateExportAccess(false, freeDesign, "png", 2000), /Unlock Pro/);
-  assert.throws(() => validateExportAccess(false, { ...freeDesign, foreground: "#ff0000" }, "png", 512), /Unlock Pro/);
+  assert.doesNotThrow(() => validateExportAccess(false, freeDesign, "svg", 512));
+  assert.doesNotThrow(() => validateExportAccess(false, freeDesign, "png", 2000));
+  assert.doesNotThrow(() => validateExportAccess(false, { ...freeDesign, foreground: "#ff0000" }, "png", 512));
   assert.doesNotThrow(() => validateExportAccess(true, { ...freeDesign, foreground: "#ff0000" }, "svg", 2000));
   assert.throws(() => validatedDesign({ logoDataUrl: "https://internal.local/secret" }), /Invalid logo/);
   assert.throws(() => validatedDesign({ foreground: '"><script>' }), /Invalid color/);

@@ -29,12 +29,12 @@ async function destination(action: () => Promise<unknown>) {
   try { await action(); assert.fail("Expected redirect"); }
   catch (error) { if (!(error instanceof RedirectSignal)) throw error; return new URL(error.location, "https://www.qraftt.com"); }
 }
-test("successful normal login reaches dashboard; pending checkout resumes linking without another checkout", async () => {
+test("successful normal login reaches dashboard; legacy checkout state cannot divert authentication", async () => {
   for (const pending of [false, true]) {
     const h = harness(pending);
     const target = await destination(() => h.actions.login(h.form));
-    assert.equal(target.pathname, pending ? "/pricing" : "/dashboard");
-    if (pending) assert.equal(target.searchParams.get("paypal"), "approved");
+    assert.equal(target.pathname, "/dashboard");
+    assert.equal(target.searchParams.get("paypal"), null);
     assert.deepEqual(h.calls.map(call => call.name), ["login"]);
   }
 });
@@ -42,8 +42,8 @@ test("signup preserves email confirmation and existing accounts get a clear logi
   const h = harness(true);
   const confirmation = await destination(() => h.actions.signup(h.form));
   assert.equal(confirmation.pathname, "/login");
-  assert.match(confirmation.searchParams.get("message")!, /Confirm your email/);
-  assert.equal(confirmation.searchParams.get("next"), "/pricing?paypal=approved");
+  assert.match(confirmation.searchParams.get("message")!, /confirm your account/);
+  assert.equal(confirmation.searchParams.get("next"), "/dashboard");
   h.auth.signUp = async () => ({ data: { user: { identities: [] }, session: null }, error: null });
   const existing = await destination(() => h.actions.signup(h.form));
   assert.equal(existing.pathname, "/login"); assert.match(existing.searchParams.get("message")!, /already registered/);
@@ -52,8 +52,8 @@ test("forgot/reset preserves pending continuation and requires a fresh login aft
   const h = harness(true);
   const sent = await destination(() => h.actions.forgotPassword(h.form));
   assert.equal(sent.pathname, "/forgot-password"); assert.match(sent.searchParams.get("message")!, /reset email/);
-  assert.equal(h.cookies.get("qraftt_auth_return"), "/pricing?paypal=approved");
+  assert.equal(h.cookies.get("qraftt_auth_return"), "/dashboard");
   const reset = await destination(() => h.actions.resetPassword(h.form));
-  assert.equal(reset.pathname, "/login"); assert.equal(reset.searchParams.get("next"), "/pricing?paypal=approved");
+  assert.equal(reset.pathname, "/login"); assert.equal(reset.searchParams.get("next"), "/dashboard");
   assert.deepEqual(h.calls.map(call => call.name), ["recovery", "reset", "logout"]);
 });

@@ -19,7 +19,7 @@ export function Header() {
             </Link>
           ))}
         </nav>
-        <Link href="/pricing" className="header-pricing-link"><T text="Free & Pro" /></Link>
+        <Link href="/pricing" className="header-pricing-link"><T text="Free features" /></Link>
         <div className="header-cta">
           <LanguageSelector />
           <HeaderAccountLink />

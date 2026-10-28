@@ -66,8 +66,8 @@ test("yearly creation validates USD 19.99/year and rejects monthly metadata with
   }
 });
 
-test("every entitlement, claim, cleanup and dashboard boundary isolates environment-specific plans", () => {
-  for (const path of ["lib/billing/account-store.ts", "lib/paypal/guest-checkout.ts", "lib/paypal/abandoned-checkout.ts", "app/api/paypal/cleanup/route.ts", "app/api/paypal/webhook/route.ts", "lib/account/dashboard.ts"]) {
-    assert.match(readFileSync(new URL(`../${path}`, import.meta.url), "utf8"), /currentPayPalPlanIds\(process.env\)/);
-  }
+test("historical records remain isolated; product access no longer depends on plans", () => {
+  assert.match(readFileSync(new URL("../lib/billing/account-store.ts", import.meta.url), "utf8"), /currentPayPalPlanIds\(process.env\)/);
+  assert.doesNotMatch(readFileSync(new URL("../lib/account/dashboard.ts", import.meta.url), "utf8"), /PayPal|subscriptions|entitlement/);
+  assert.doesNotMatch(readFileSync(new URL("../app/api/qr/render/route.ts", import.meta.url), "utf8"), /getBillingStore|billingCustomer|consumeFreeDownload/);
 });

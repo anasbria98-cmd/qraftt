@@ -1,6 +1,5 @@
 import "server-only";
 import { adminClient, currentUser } from "@/lib/supabase/server";
-import { currentPayPalPlanIds } from "@/lib/paypal/plans";
 import { validatedDesign } from "@/lib/qr/access";
 import { buildQrPayload } from "@/lib/qr/payloads";
 import { qrTypeOptions } from "@/lib/qr/config";
@@ -28,9 +27,9 @@ export function validateSavedDocument(input: unknown): SavedDocument {
 export async function savedQr(action: string, input: { id?: string; title?: string; document?: SavedDocument } = {}) {
   const user=await currentUser(); if(!user)throw new Error("LOGIN_REQUIRED");
   if(action==="save" && input.document?.design.logoDataUrl) input.document.design.logoDataUrl=await normalizeLogoDataUrl(input.document.design.logoDataUrl);
-  const {data,error}=await adminClient().rpc("qraftt_saved_qr",{p_user:user.id,p_plans:currentPayPalPlanIds(process.env),p_action:action,p_id:input.id??null,p_title:input.title??null,p_document:input.document??null});
+  const {data,error}=await adminClient().rpc("qraftt_saved_qr",{p_user:user.id,p_plans:[],p_action:action,p_id:input.id??null,p_title:input.title??null,p_document:input.document??null});
   if(error) {
-    const code=["PRO_REQUIRED","NOT_FOUND","SAVED_QR_LIMIT","STORAGE_LIMIT","DOCUMENT_TOO_LARGE","INVALID_DOCUMENT"].find(c=>error.message.includes(c));
+    const code=["NOT_FOUND","SAVED_QR_LIMIT","STORAGE_LIMIT","DOCUMENT_TOO_LARGE","INVALID_DOCUMENT"].find(c=>error.message.includes(c));
     throw new Error(code??"Saved QR storage is temporarily unavailable. Please try again later.");
   }
   return data;

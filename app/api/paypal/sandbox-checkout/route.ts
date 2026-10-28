@@ -1,16 +1,3 @@
-import { NextResponse } from "next/server";
-
-export const runtime = "nodejs";
-
-export async function POST(request: Request) {
-  if (process.env.NODE_ENV !== "development" || process.env.PAYPAL_ENV !== "sandbox") {
-    return new Response(null, { status: 404 });
-  }
-  const origin = new URL(request.url).origin;
-  if (!new Set(["localhost", "127.0.0.1", "[::1]"]).has(new URL(origin).hostname) ||
-    request.headers.get("origin") !== origin) {
-    return new Response(null, { status: 403 });
-  }
-  // Preserve the legacy local route, but use the account-bound checkout only.
-  return NextResponse.redirect(`${origin}/pricing`, 303);
-}
+/** Retired: never create, claim, change or cancel a PayPal agreement. */
+export function POST() { return Response.json({ error: "Qraftt is free. Subscription checkout is no longer available." }, { status: 410, headers: { "Cache-Control": "no-store" } }); }
+export const GET = POST;

@@ -6,10 +6,9 @@ export const freeDesign: QrDesignOptions = {
   ...defaultDesign, foreground: "#000000", outerEyeColor: "#000000", innerEyeColor: "#000000",
 };
 
-export function validateExportAccess(pro: boolean, design: QrDesignOptions, format: string, size: number) {
-  if (!pro && (!["png", "jpg"].includes(format) || size > 512 || !isFreeDesign(design))) {
-    throw new Error("Unlock Pro for this design or export.");
-  }
+export function validateExportAccess(_historicalPro: boolean, design: QrDesignOptions, format: string, size: number) {
+  validatedDesign(design);
+  if (!["png", "jpg", "svg", "pdf", "eps"].includes(format) || ![512, 1000, 2000].includes(size)) throw new Error("Invalid export request.");
 }
 
 export function freeTemplateForDesign(design: QrDesignOptions) {
@@ -19,9 +18,7 @@ export function freeTemplateForDesign(design: QrDesignOptions) {
 }
 
 export function isFreeDesign(design: QrDesignOptions) {
-  if (design.premiumTemplateId) return false;
-  if (!frameOptions.some(option => option.value === design.frame)) return false;
-  return (!design.uploadedFrameId && Object.keys(freeDesign).every((key) => key === "frame" || design[key as keyof QrDesignOptions] === freeDesign[key as keyof QrDesignOptions])) || Boolean(freeTemplateForDesign(design));
+  try { validatedDesign(design); return true; } catch { return false; }
 }
 
 export function designCorrection(design: QrDesignOptions, requested: "L" | "M" | "Q" | "H") {

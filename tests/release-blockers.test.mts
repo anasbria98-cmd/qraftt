@@ -7,11 +7,11 @@ test("privacy and cookie disclosures match render API, accounts, storage and con
   const privacy = JSON.stringify(legalPages["privacy-policy"]);
   const cookies = JSON.stringify(legalPages["cookie-policy"]);
   for (const value of ["/api/qr/render", "WiFi credentials", "Supabase", "Resend", "PayPal", "cookieless", "Vercel Analytics"]) assert.ok(privacy.includes(value), value);
-  for (const value of ["qraftt_customer", "qraftt_paypal_checkout", "qraftt_checkout_interval", "qraftt_auth_return", "qraftt_language_v1", "qraft_optional_consent_v1", "seven days", "24 hours", "one year"]) assert.ok(cookies.includes(value), value);
+  for (const value of ["qraftt_customer", "qraftt_auth_return", "qraftt_language_v1", "qraft_optional_consent_v1", "unlimited", "Legacy checkout"]) assert.ok(cookies.includes(value), value);
   assert.doesNotMatch(privacy + cookies, /not intentionally sent to a Qraftt application server|no login session|does not include a subscription|scripts load only after|render the downloadable code locally/);
-  assert.equal(legalPages["privacy-policy"].updatedAt, "2026-10-22");
-  assert.equal(legalPages["cookie-policy"].updatedAt, "2026-10-22");
-  assert.equal(legalPages.terms.updatedAt, "2026-08-09", "unrelated Terms are not rewritten");
+  assert.equal(legalPages["privacy-policy"].updatedAt, "2026-10-28");
+  assert.equal(legalPages["cookie-policy"].updatedAt, "2026-10-28");
+  assert.equal(legalPages.terms.updatedAt, "2026-10-28");
 });
 
 // Real route handlers, isolated dependencies: never loads environment credentials,
@@ -56,7 +56,7 @@ function isolatedBilling() {
   const webhook = componentFixture("app/api/paypal/webhook/route.ts", overrides).POST;
   return {
     pending,
-    login: () => { user = {id: "test-user-only", email_confirmed_at: "2026-01-02T00:00:00Z", last_sign_in_at: "2026-01-02T00:00:00Z"}; },
+    login: () => { user = {id: "test-user-only", email_confirmed_at: "2026-01-02T00:00:00Z", last_sign_in_at: "2026-01-02T00:00:00Z"}; stored = { customer_id: user.id, paypal_custom_id: actual.customerId, plan_id: actual.planId, interval: "monthly" }; state = "ACTIVE"; },
     actual: (change: Partial<typeof actual>) => { actual = {...actual, ...change}; },
     signature: (value: boolean) => { validSignature = value; },
     loseProof: () => { proof = false; },
@@ -66,22 +66,15 @@ function isolatedBilling() {
   };
 }
 
-test("approved guest checkout requires authentication and claims once for the correct user", async () => {
-  const h = isolatedBilling();
-  const guest = await h.confirm();
-  assert.equal(guest.status, 401); assert.equal((await guest.json()).approved, true);
-  assert.equal(h.stats().claims, 0);
-  h.login(); const claimed = await h.confirm();
-  assert.equal(claimed.status, 200); assert.equal((await claimed.json()).pro, true);
-  assert.equal(h.stats().claims, 1); assert.equal(h.stats().stored?.customer_id, "test-user-only");
-  assert.equal((await h.confirm()).status, 200); assert.equal(h.stats().claims, 1);
+test("checkout confirmation is retired for guests and authenticated accounts", async () => {
+ const h = isolatedBilling(); assert.equal((await h.confirm()).status, 410); h.login(); assert.equal((await h.confirm()).status, 410); assert.equal(h.stats().claims, 0);
 });
 
 test("pending approval and missing browser proof never grant Pro", async () => {
   const h = isolatedBilling(); h.actual({status: "APPROVAL_PENDING"}); h.login();
-  assert.equal((await h.confirm()).status, 409); assert.equal(h.stats().claims, 0);
+  assert.equal((await h.confirm()).status, 410); assert.equal(h.stats().claims, 0);
   h.actual({status: "ACTIVE"}); h.loseProof();
-  assert.equal((await h.confirm()).status, 404); assert.equal(h.stats().claims, 0);
+  assert.equal((await h.confirm()).status, 410); assert.equal(h.stats().claims, 0);
 });
 
 test("real webhook handler rejects invalid signatures without changing entitlement", async () => {

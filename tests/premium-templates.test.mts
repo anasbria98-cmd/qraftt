@@ -45,9 +45,9 @@ test("all 20 old templates remain byte-identical apart from repaired caption out
     assert.doesNotThrow(() => validateExportAccess(false, design, "png", 512));
     assert.equal(designCorrection(design, "M"), template.errorCorrection);
     assert.equal(freeTemplateForDesign(design)?.id, template.id);
-    assert.throws(() => validateExportAccess(false, { ...design, foreground: "#010101" }, "png", 512), /Unlock Pro/);
-    assert.throws(() => validateExportAccess(false, design, "svg", 512), /Unlock Pro/);
-    assert.throws(() => validateExportAccess(false, design, "png", 2000), /Unlock Pro/);
+    assert.doesNotThrow(() => validateExportAccess(false, { ...design, foreground: "#010101" }, "png", 512));
+    assert.doesNotThrow(() => validateExportAccess(false, design, "svg", 512));
+    assert.doesNotThrow(() => validateExportAccess(false, design, "png", 2000));
   });
 });
 
@@ -57,19 +57,19 @@ test("reference rebuild replaces invented catalog and defers unresolved referenc
   assert.equal(premiumTemplates.filter(t => t.reference.startsWith("5:")).length, 2);
   assert.equal(new Set(premiumTemplates.map(t => t.id)).size, 10);
   assert.ok(premiumTemplates.every(t => !designTemplates.some(old => old.id === t.id)));
-  assert.equal(pricingPlans[0].benefits.templates, "20 original templates");
-  assert.equal(pricingPlans[1].benefits.templates, "20 original + 10 Pro templates");
+  assert.equal(pricingPlans[0].benefits.templates, "All templates");
+  assert.equal(pricingPlans.length, 1);
   assert.throws(() => validatedDesign({ premiumTemplateId: "pro-ink-enamel" }), /Invalid premium/);
   assert.throws(() => validatedDesign({ premiumTemplateId: "pro-ref-11" }), /Invalid premium/);
 });
 
-test("new templates are server-gated and forged IDs cannot grant access", () => {
+test("decorative templates are free; unknown template IDs remain rejected", () => {
   for (const template of premiumTemplates) {
     const design = validatedDesign({ ...defaultDesign, ...template.design });
-    assert.throws(() => validateExportAccess(false, design, "png", 512), /Unlock Pro/);
+    assert.doesNotThrow(() => validateExportAccess(false, design, "png", 512));
     assert.doesNotThrow(() => validateExportAccess(true, design, "svg", 2000));
     assert.equal(designCorrection(design, "L"), "H");
-    assert.throws(() => validateExportAccess(false, { ...freeDesign, premiumTemplateId: template.id }, "png", 512), /Unlock Pro/);
+    assert.doesNotThrow(() => validateExportAccess(false, { ...freeDesign, premiumTemplateId: template.id }, "png", 512));
   }
   assert.throws(() => validatedDesign({ premiumTemplateId: "fake-free" }), /Invalid premium/);
   assert.throws(() => validatedDesign({ logoDataUrl: 'data:image/svg+xml;base64,AAAA' }), /Invalid logo/);
@@ -119,12 +119,12 @@ test("every Pro template exports real SVG and PNG with protected function patter
   }
 });
 
-test("center-logo uploads remain Pro-only and force high correction", async () => {
+test("center-logo uploads are free and force high correction", async () => {
   const logo = await sharp({ create: { width: 32, height: 32, channels: 4, background: "#14532d" } }).png().toBuffer();
   const dataUrl = `data:image/png;base64,${logo.toString("base64")}`;
   for (const base of [freeDesign, ...designTemplates.map(t => t.design), ...premiumTemplates.map(t => t.design)]) {
     const design = validatedDesign({ ...defaultDesign, ...base, logoDataUrl: dataUrl, logoSize: 18 });
-    assert.throws(() => validateExportAccess(false, design, "png", 512), /Unlock Pro/);
+    assert.doesNotThrow(() => validateExportAccess(false, design, "png", 512));
     assert.equal(designCorrection(design, "L"), "H");
     const svg = renderQrSvg("https://example.com/logo", "L", design);
     assert.match(svg, /preserveAspectRatio="xMidYMid meet"/);
@@ -145,7 +145,7 @@ test("logo sanitization rejects disguised SVG and re-encodes bounded real raster
   assert.equal(metadata.height, 256);
 });
 
-test("render endpoint enforces Free/Pro, correction and quotas independently of client claims", async () => {
+test("render endpoint permits all designs without billing but preserves validation and origin protection", async () => {
   let pro = false;
   let downloads = 0;
   const { POST } = componentFixture("app/api/qr/render/route.ts", {
@@ -161,18 +161,18 @@ test("render endpoint enforces Free/Pro, correction and quotas independently of 
   }
   assert.equal(downloads, 0, "previews do not use a download");
   for (const t of premiumTemplates) {
-    assert.equal((await request({ ...defaultDesign, ...t.design }, { pro: true })).status, 403, "client Pro flags must be ignored");
+    assert.equal((await request({ ...defaultDesign, ...t.design }, { pro: true })).status, 200, "templates are free regardless of client flags");
   }
   const original = { ...defaultDesign, ...designTemplates[0].design };
   for (let i = 0; i < 3; i++) assert.equal((await request(original, { preview: false })).status, 200);
-  assert.equal((await request(original, { preview: false })).status, 429);
+  assert.equal((await request(original, { preview: false })).status, 200);
   pro = true;
   for (const t of premiumTemplates) {
     const response = await request({ ...defaultDesign, ...t.design }, { preview: false, format: "svg", size: 2000 });
     assert.equal(response.status, 200);
     assert.match(await response.text(), /width="2000" height="2000"/);
   }
-  assert.equal(downloads, 4, "Pro exports do not consume Free quota");
+  assert.equal(downloads, 0, "all downloads are unlimited without billing calls");
   const crossOrigin = new Request("https://qraftt.test/api/qr/render", { method: "POST", headers: { Origin: "https://other.test" } });
   assert.equal((await POST(crossOrigin)).status, 403);
 });

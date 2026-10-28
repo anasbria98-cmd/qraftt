@@ -47,6 +47,7 @@ test("account navigation exposes creation and marks future features clearly; pro
   assert.match(nav, /\["Create QR Code", "\/qr-code-generator"/);
   assert.match(nav, /comingSoon.has\(href\)/);
   const profile = source("app/(account)/account/page.tsx");
-  assert.match(profile, /await dashboardAccount\(\)/); assert.match(profile, /access.pro \? "Pro active" : "Free plan"/);
+  assert.match(profile, /await dashboardAccount\(\)/); assert.match(profile, /text="Free account"/);
+  assert.doesNotMatch(profile, /access.pro|Upgrade/);
   assert.match(profile, /action=\{logout\}/); assert.doesNotMatch(profile, /name="plan"|\.update\(/);
 });

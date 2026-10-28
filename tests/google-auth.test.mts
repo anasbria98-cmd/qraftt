@@ -14,17 +14,17 @@ test("login and signup render Google before the email form, with clear account n
     const { AuthPage } = componentFixture("components/account/auth-page.tsx", {
       "@/lib/auth/actions": { signup: async () => {}, login: async () => {}, googleLogin: async () => {} },
       "@/lib/auth/providers": { googleAuthAvailable: async () => true },
-      "@/lib/auth/continuation": { authReturnPath: async () => "/pricing?paypal=approved" },
+      "@/lib/auth/continuation": { authReturnPath: async () => "/dashboard" },
     });
     const html = renderToStaticMarkup(await AuthPage({ mode, searchParams: Promise.resolve({}) }));
     assert.ok(html.indexOf(mode === "login" ? "Log In with Google" : "Sign Up with Google") < html.indexOf('name="email"'));
     assert.match(html, /src="\/images\/brand\/google-g.svg"/);
     assert.doesNotMatch(html, />G<|Continue with Google/);
-    assert.match(html, />or</); assert.match(html, /No second checkout is needed/);
-    assert.match(html, /value="\/pricing\?paypal=approved"/);
+    assert.match(html, />or</); assert.match(html, /All templates, logos and export formats are free/);
+    assert.match(html, /value="\/dashboard"/);
     assert.match(html, mode === "login" ? /Welcome back/ : /Create your Qraftt account/);
     assert.match(html, mode === "login" ? /Remember me/ : /Already have an account/);
-    assert.match(html, /next=%2Fpricing%3Fpaypal%3Dapproved/);
+    assert.match(html, /next=%2Fdashboard/);
     assert.doesNotMatch(html, /disabled=""/);
   }
 });
@@ -48,7 +48,7 @@ test("Google OAuth uses the existing Supabase PKCE client and allowlisted pendin
       assert.equal(request!.options.skipBrowserRedirect, true);
       const callback = new URL(request!.options.redirectTo);
       assert.equal(callback.pathname, "/auth/callback");
-      assert.equal(callback.searchParams.get("next"), hasPending ? "/pricing?paypal=approved" : "/dashboard");
+      assert.equal(callback.searchParams.get("next"), hasPending ? "/dashboard" : "/dashboard");
     }
   } finally { if (original === undefined) delete process.env.NEXT_PUBLIC_SUPABASE_URL; else process.env.NEXT_PUBLIC_SUPABASE_URL = original; }
 });
@@ -63,11 +63,11 @@ test("Google cancellation and callback success preserve checkout without grantin
       "@/lib/auth/continuation": { authReturnPath: async (value: unknown) => checkoutAuthReturnPath(value, hasPending ? pending : null) },
     });
     const success = await GET(new Request("https://www.qraftt.com/auth/callback?provider=google&code=fixture&next=/dashboard"));
-    assert.equal(success.headers.get("location"), hasPending ? "https://www.qraftt.com/pricing?paypal=approved" : "https://www.qraftt.com/dashboard");
+    assert.equal(success.headers.get("location"), "https://www.qraftt.com/dashboard");
     const failure = await GET(new Request("https://www.qraftt.com/auth/callback?provider=google&error=access_denied&next=/dashboard"));
     const target = new URL(failure.headers.get("location")!);
     assert.match(target.searchParams.get("message")!, /Google sign-in wasn’t completed/);
-    assert.equal(target.searchParams.get("next"), hasPending ? "/pricing?paypal=approved" : "/dashboard");
+    assert.equal(target.searchParams.get("next"), hasPending ? "/dashboard" : "/dashboard");
     assert.equal(failure.headers.get("cache-control"), "private, no-store");
   }
 });

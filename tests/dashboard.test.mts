@@ -7,33 +7,23 @@ import { componentFixture } from "./helpers/render-component.mjs";
 import { PayPalClient } from "../lib/paypal/client.ts";
 const source = (path: string) => readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
 
-test("Free and Pro subscription cards use real supplied state without unnecessary Pro upgrade prompts", () => {
+test("every account card exposes the complete free toolkit without checkout", () => {
   const { SubscriptionCard } = componentFixture("components/account/subscription-card.tsx");
-  const free = renderToStaticMarkup(createElement(SubscriptionCard, { access: { pro: false, status: "FREE", remaining: 3 }, subscription: null }));
-  assert.match(free, /Free plan/); assert.match(free, /Upgrade to Pro/); assert.match(free, /\/pricing\?checkout=monthly/);
-  assert.doesNotMatch(free, /Subscription ID/);
-  const pro = renderToStaticMarkup(createElement(SubscriptionCard, { access: { pro: true, status: "ACTIVE", remaining: 3 }, subscription: { id: "I-FIXTURE", billing_interval: "monthly", current_period_end: null } }));
-  for (const value of ["Pro", "Active", "monthly", "I-FIXTURE", "Create with Pro"]) assert.ok(pro.includes(value));
-  assert.doesNotMatch(pro, /Upgrade to Pro/);
-  assert.match(pro, /Not supplied/);
+  const html = renderToStaticMarkup(createElement(SubscriptionCard));
+  for (const text of ["Free", "All features included", "100 QR codes", "250 MB", "Create a QR code"]) assert.ok(html.includes(text));
+  assert.doesNotMatch(html, /Upgrade|checkout|Pro active/);
 });
-test("billing plans reuse pricing and checkout and support both billing periods", () => {
-  const { BillingPlans } = componentFixture("components/account/billing-plans.tsx");
-  const free = renderToStaticMarkup(createElement(BillingPlans, { pro: false }));
-  assert.match(free, /\$4.99/); assert.match(free, /Yearly/); assert.match(free, /disabled/);
-  assert.match(free, /\/pricing\?checkout=monthly/); assert.doesNotMatch(free, /checkout=yearly/);
-  assert.match(free, /20 original templates/);
-  assert.match(free, /20 original \+ 10 Pro templates/);
-  assert.match(source("components/account/billing-plans.tsx"), /String\(benefits.templates\)/);
-  const yearly = renderToStaticMarkup(createElement(BillingPlans, { pro: true, interval: "yearly" }));
-  assert.match(yearly, /\$19.99/); assert.match(yearly, /500 QR codes/); assert.match(yearly, /1 GB/);
-  const pro = renderToStaticMarkup(createElement(BillingPlans, { pro: true }));
-  assert.doesNotMatch(pro, /Upgrade to Pro/); assert.match(pro, /Current plan/);
+test("account storage replaces paid plans but preserves historical records read-only", () => {
+  const code = source("app/(account)/dashboard/billing/page.tsx");
+  assert.match(code, /Historical payment records/);
+  assert.match(code, /not automatically cancelled or changed/);
+  assert.match(code, /eq\("user_id", user.id\)/);
+  assert.doesNotMatch(code, /BillingPlans|createSubscription|checkout=|\.insert\(|\.update\(/);
 });
 test("dashboard navigation is complete and storage does not invent usage", async () => {
   const { DashboardShell } = componentFixture("components/account/dashboard-shell.tsx");
   const markup = renderToStaticMarkup(createElement(DashboardShell, { email: "fixture@example.test", pro: false }, "Dashboard fixture"));
-  for (const text of ["Dashboard", "My QR Codes", "Statistics", "Import from CSV", "Archived QR Codes", "Custom Domain", "API Integration", "Profile", "Payment &amp; Subscription", "Support", "FAQ", "Log out"]) assert.ok(markup.includes(text), text);
+  for (const text of ["Dashboard", "My QR Codes", "Statistics", "Import from CSV", "Archived QR Codes", "Custom Domain", "API Integration", "Profile", "Account &amp; storage", "Support", "FAQ", "Log out"]) assert.ok(markup.includes(text), text);
   assert.match(markup, /aria-current="page"/); assert.match(markup, /aria-controls="dashboard-navigation"/);
   const storage = componentFixture("components/account/storage-card.tsx", { "@/lib/account/saved-qr": { savedQr: async () => { throw new Error("offline"); } } }).StorageCard;
   const state = renderToStaticMarkup(await storage());
@@ -42,11 +32,11 @@ test("dashboard navigation is complete and storage does not invent usage", async
 test("dashboard pages enforce auth, RLS ownership and environment-isolated billing without mutations", () => {
   assert.match(source("app/(account)/layout.tsx"), /await requireUser\(\)/);
   const loader = source("lib/account/dashboard.ts");
-  assert.match(loader, /await requireUser\(\)/); assert.match(loader, /\.eq\("user_id", user.id\)/);
-  assert.match(loader, /currentPayPalPlanIds\(process.env\)/); assert.match(loader, /getBillingStore\(\).entitlement\(user.id\)/);
+  assert.match(loader, /await requireUser\(\)/); assert.match(loader, /\.eq\("id", user.id\)/);
+  assert.doesNotMatch(loader, /subscriptions|PayPal|entitlement/);
   assert.doesNotMatch(loader, /\.insert\(|\.update\(|adminClient/);
   const billing = source("app/(account)/dashboard/billing/page.tsx");
-  assert.match(billing, /getRecentTransactions\(account.subscription.id\)/);
+  assert.match(billing, /from\("subscriptions"\).select/);
   assert.doesNotMatch(billing, /searchParams|createSubscription|clientSecret|service.role/i);
   assert.match(source("app/(account)/dashboard/[section]/page.tsx"), /notFound\(\)/);
 });
@@ -76,5 +66,5 @@ test("payment history reports upstream failure instead of inventing an empty pay
       String(input).endsWith("token") ? Response.json({ access_token: "fixture" }) : Response.json({ error: "unavailable" }, { status }) });
     await assert.rejects(client.getRecentTransactions("I-OWNED"));
   }
-  assert.match(source("app/(account)/dashboard/billing/page.tsx"), /historyUnavailable = true/);
+  assert.match(source("app/(account)/dashboard/billing/page.tsx"), /history.error/);
 });

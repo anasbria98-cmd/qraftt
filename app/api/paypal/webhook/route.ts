@@ -1,9 +1,6 @@
 import { NextResponse } from "next/server";
-import { currentPayPalPlanIds } from "@/lib/paypal/plans";
 import { parsePayPalSubscriptionEvent } from "@/lib/paypal/events";
 import { getBillingStore } from "@/lib/billing/server";
-import { adminClient } from "@/lib/supabase/server";
-import { cancelUnclaimedCheckout } from "@/lib/paypal/abandoned-checkout";
 import {
   getPayPalClient,
   getPayPalWebhookId,
@@ -70,14 +67,8 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: "Invalid subscription event." }, { status: 400 });
       }
       const db = getBillingStore();
-      let stored = await db.subscription(subscriptionEvent.subscriptionId);
-      if (!stored) {
-        const { data: pending, error } = await adminClient().from("pending_paypal_checkouts").select("id,state,expires_at,claimed_by").in("provider_plan_id", currentPayPalPlanIds(process.env)).eq("subscription_id", subscriptionEvent.subscriptionId).maybeSingle();
-        if (error) throw new Error("Pending checkout unavailable.");
-        if (pending && !pending.claimed_by && (pending.state !== "open" || Date.parse(pending.expires_at) <= Date.now() || subscriptionEvent.state !== "activated")) await cancelUnclaimedCheckout(pending.id);
-        // A claim may have won the row lock while this webhook was arriving.
-        stored = await db.subscription(subscriptionEvent.subscriptionId);
-      }
+      const stored = await db.subscription(subscriptionEvent.subscriptionId);
+      // Historical status reconciliation only. Never claim or cancel agreements.
       if (stored) {
         const actual = await getPayPalClient().getSubscription(subscriptionEvent.subscriptionId);
         if (actual.planId !== stored.plan_id || actual.customerId !== stored.paypal_custom_id) throw new Error("Subscription mismatch.");

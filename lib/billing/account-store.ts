@@ -7,21 +7,8 @@ export class AccountBillingStore {
   private client() { return adminClient(); }
 
   async entitlement(principal: string) {
-    const db = this.client();
-    const usage = await db.from("download_usage").select("count").eq("principal", principal).eq("day", new Date().toISOString().slice(0, 10)).maybeSingle();
-    if (usage.error) throw new Error("Billing schema is not ready.");
-    if (principal.startsWith("guest:")) return { pro: false, status: "FREE", interval: null, ...limitsFor(false), remaining: Math.max(0, 3 - (usage.data?.count ?? 0)) };
-    const { data, error } = await db.from("subscriptions").select("id,status,billing_interval").in("provider_plan_id", currentPayPalPlanIds(process.env)).eq("user_id", principal).order("updated_at", { ascending: false });
-    if (error) throw new Error("Could not verify subscription.");
-    const subscription = data.find(s => s.status === "active") ?? data[0];
-    const pro = subscription?.status === "active";
-    return { pro, status: subscription?.status.toUpperCase() ?? "FREE", interval: pro ? subscription.billing_interval : null, ...limitsFor(pro, subscription?.billing_interval), remaining: Math.max(0, 3 - (usage.data?.count ?? 0)) };
-  }
-
-  async consumeFreeDownload(principal: string) {
-    const { data, error } = await this.client().rpc("qraftt_consume_download", { p_principal: principal });
-    if (error) throw new Error("Could not check download limit.");
-    return data === true;
+    void principal;
+    return { status: "FREE", ...limitsFor(false), downloads: "unlimited" };
   }
 
   async saveSubscription(id: string, customerId: string, planId: string, interval: string, status: string) {

@@ -21,8 +21,8 @@ test("main QR choices precede unchanged customization tabs and template gallerie
     assert.ok(markup.indexOf("qr-mode-choices") < markup.indexOf('role="tablist"'));
     for (const tab of ["frames", "shapes", "logo", "level"]) assert.ok(markup.includes(`id="customize-tab-${tab}"`));
     assert.match(markup, /Free templates/);
-    assert.match(markup, /New Pro templates/);
+    assert.match(markup, /Decorative templates/);
   }
   const source = readFileSync(new URL("../components/generator/generator-customization.tsx", import.meta.url), "utf8");
-  assert.ok(source.includes('if (!pro) { onRequestPro?.(); return; } setActiveTab("logo")'));
+  assert.doesNotMatch(source, /onRequestPro|ProBadge|if \(!pro\)/);
 });

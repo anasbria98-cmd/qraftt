@@ -21,14 +21,14 @@ test("review access requires explicit development flag and loopback, never produ
   assert.equal(localTemplateReview(undefined, enabled), false);
 });
 
-test("local session reports review capability, not Pro, without accessing accounts", async () => {
+test("session reports universal free access without accessing accounts or billing", async () => {
   const { GET } = componentFixture("app/api/billing/session/route.ts", {
     "@/lib/qr/local-review": { localTemplateReview: (r: Request) => localTemplateReview(r, enabled) },
     "@/lib/billing/server": { billingCustomer: () => { throw new Error("must not access accounts"); } },
   });
   const response = await GET(new Request("http://127.0.0.1:3017/api/billing/session"));
   assert.equal(response.status, 200);
-  assert.deepEqual(await response.json(), { pro: false, remaining: 3, status: "LOCAL_REVIEW", templateReview: true });
+  assert.deepEqual(await response.json(), { status: "FREE", downloads: "unlimited", savedCodes: 100, storageBytes: 250_000_000 });
   assert.equal(response.headers.get("set-cookie"), null);
 });
 

@@ -15,14 +15,14 @@ test("new passwords respect Supabase length and UTF-8 byte limits", () => {
 });
 
 test("auth callbacks accept only intentional local destinations", () => {
-  for (const path of ["/dashboard", "/account", "/pricing", "/reset-password", "/pricing?checkout=monthly", "/pricing?checkout=yearly"]) assert.equal(safeReturnPath(path), path);
+  for (const path of ["/dashboard", "/account", "/pricing", "/reset-password"]) assert.equal(safeReturnPath(path), path);
   for (const path of ["//evil.test", "https://evil.test", "/%2fevil.test", "\\evil.test", undefined, "/dashboard?next=https://evil.test"]) assert.equal(safeReturnPath(path), "/dashboard");
 });
 test("checkout continuation rejects arbitrary queries and keeps signup/login intent", () => {
   for (const path of ["/pricing?checkout=invalid", "/pricing?checkout=monthly&next=https://evil.test", "/pricing?checkout=monthly#bad"]) assert.equal(safeReturnPath(path), "/dashboard");
   assert.match(source("lib/auth/actions.ts"), /if \(data.session\) redirect\(next\)/);
   assert.match(source("lib/auth/actions.ts"), /httpOnly: true/);
-  assert.match(source("app/auth/callback/route.ts"), /next === "\/dashboard" && interval/);
+  assert.match(source("app/auth/callback/route.ts"), /new URL\(next, url.origin\)/);
   assert.match(source("components/account/auth-page.tsx"), /encodeURIComponent\(next\)/);
 });
 test("Supabase migration protects billing writes and scopes account reads", () => {
@@ -40,11 +40,11 @@ test("Supabase migration protects billing writes and scopes account reads", () =
 });
 test("checkout starts before auth while entitlement requires verified ownership", () => {
   const checkout = source("app/api/paypal/subscriptions/route.ts");
-  assert.match(checkout, /prepareGuestCheckout\(planId, interval\)/);
+  assert.match(checkout, /status: 410/);
   assert.doesNotMatch(checkout, /status: 401/);
   assert.match(source("lib/billing/server.ts"), /if \(user\) return user\.id/);
   assert.doesNotMatch(source("lib/billing/server.ts"), /new BillingStore/);
-  assert.match(source("app/api/paypal/confirm/route.ts"), /stored\.customer_id !== customer/);
+  assert.match(source("app/api/paypal/confirm/route.ts"), /status: 410/);
   assert.match(source("app/api/paypal/webhook/route.ts"), /actual\.customerId !== stored\.paypal_custom_id/);
   assert.ok(source("lib/supabase/server.ts").startsWith('import "server-only"'));
   assert.doesNotMatch(source("app/api/paypal/sandbox-checkout/route.ts"), /createSubscription/);

@@ -1,7 +1,8 @@
 import { Buffer } from "node:buffer";
 import { createHash } from "node:crypto";
 import { payPalApiOrigin, payPalEnvironment, type PayPalEnvironment } from "./environment.ts";
-import { pricingPlans } from "../pricing/plans.ts";
+// Historical plan verification only; product checkout is retired.
+const historicalPrices = { monthly: 4.99, yearly: 19.99 };
 
 export const PAYPAL_SANDBOX_API_ORIGIN = "https://api-m.sandbox.paypal.com";
 
@@ -187,7 +188,7 @@ export class PayPalClient {
   }
 
   async verifyLivePlan(planId: string, interval: "monthly" | "yearly" = "monthly") {
-    const expectedPrice = pricingPlans.find(plan => plan.id === "pro")!.prices[interval];
+    const expectedPrice = historicalPrices[interval];
     if (!/^P-[A-Z0-9]+$/.test(planId)) throw new Error("Invalid PayPal plan.");
     const { accessToken } = await this.getAccessToken();
     const response = await this.fetch(`${this.apiOrigin}/v1/billing/plans/${planId}`, {

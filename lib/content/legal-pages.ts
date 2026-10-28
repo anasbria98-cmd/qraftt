@@ -23,14 +23,14 @@ export const legalPages: Record<LegalPageSlug, LegalPageContent> = {
       "Learn how Qraftt handles QR generator inputs, files, technical request data, third-party destinations, and future policy changes.",
     eyebrow: "Privacy",
     introduction:
-      "Qraftt creates static QR codes through a browser interface and a server-side render API. Basic creation is available without an account. Optional accounts and paid subscriptions use authentication and billing records. This policy describes the data used by these current features.",
+      "Qraftt creates static QR codes through a browser interface and a server-side render API. All QR tools and exports are free without an account. Optional accounts provide saved-design storage. This policy describes the data used by these current features.",
     sections: [
       {
         heading: "QR generator content",
         paragraphs: [
-          "Your browser prepares a QR payload from the fields you enter. For live previews and PNG or SVG exports, it sends that payload, design settings and any selected center-logo image to Qraftt’s /api/qr/render endpoint. This includes entered text, destination URLs, WiFi credentials, contact details or event information. Production requests use HTTPS. Do not enter information you are not authorized to process or share.",
-          "The render endpoint processes this content to produce the requested image. Preview and export do not save your payload or image to a library. If you explicitly choose Save to dashboard as a Pro user, Qraftt persists your QR content, design settings and embedded logo in your account until you delete that saved design or your account. Do not save sensitive content unless you intend to store it. This is not a promise that hosting infrastructure has no technical logs or transient processing. Download counters are stored separately and do not include the QR payload.",
-          "Downloaded PNG and SVG files are created for you to save on your device. Qraftt does not maintain an account library or hosted copy of those generated files.",
+          "Your browser prepares a QR payload from the fields you enter. For live previews and PNG, JPG, SVG, PDF or EPS exports, it sends that payload, design settings and any selected center-logo image to Qraftt’s /api/qr/render endpoint. This includes entered text, destination URLs, WiFi credentials, contact details or event information. Production requests use HTTPS. Do not enter information you are not authorized to process or share.",
+          "The render endpoint processes this content to produce the requested image. Preview and export do not save your payload or image to a library. If you explicitly choose Save to dashboard, Qraftt persists your QR content, design settings and embedded logo in your account until you delete that saved design or your account. Do not save sensitive content unless you intend to store it. This is not a promise that hosting infrastructure has no technical logs or transient processing. Downloads are unlimited and no download counters are required for access.",
+          "Downloaded files are saved on your device. Only designs explicitly saved to your dashboard are stored in your account.",
         ],
       },
       {
@@ -43,9 +43,9 @@ export const legalPages: Record<LegalPageSlug, LegalPageContent> = {
       {
         heading: "Accounts, analytics, and advertising",
         paragraphs: [
-          "Supabase provides account authentication and database storage. Account records include an identifier, email, optional display name and timestamps. Subscription records include the account link, PayPal subscription and plan identifiers, billing interval, verified status and available billing-period dates. Download-limit records contain an account identifier or a hashed guest identifier, day and count. Pro users can explicitly save QR documents in their account. Usage is measured from persisted document bytes, including embedded logos. Monthly limits are 100 documents and 250 MB; yearly limits are 500 documents and 1 GB. Downloads do not consume dashboard storage. Saved documents are retained after cancellation, but adding or editing requires active Pro. Owners can delete retained documents. Scan analytics are not implemented.",
+          "Supabase provides account authentication and database storage. Account records include an identifier, email, optional display name and timestamps. Historical subscription records, including PayPal identifiers and status, are retained but never determine feature access. Every account may save 100 QR codes using 250 MB. Usage measures persisted document and title bytes, including embedded logo data. Deletes release that usage. Existing over-limit data is retained; new saves or storage growth are blocked until space is freed. Downloads do not use dashboard storage. Scan analytics are not implemented.",
           "Authentication may use email and password or Google sign-in. Confirmation and password-recovery emails are sent through Supabase Auth using Qraftt’s configured Resend SMTP service. These providers process the information needed for authentication and email delivery. Contact support@qraftt.com for questions about account data or requests concerning its retention; this page does not promise immediate deletion of billing or security records.",
-          "PayPal handles subscription approval and payment-method information. Qraftt retains identifiers and status needed to verify access, not full card details. For checkout before login, an expiring pending record and a browser-proof cookie connect the approved subscription to the account after authentication. Pending records and webhook identifiers may be retained for reconciliation and duplicate-event protection; expiration of a checkout does not itself mean every record is deleted.",
+          "Qraftt no longer offers PayPal checkout or paid subscriptions. Historical billing, checkout and webhook records may be retained for reconciliation and legal obligations. Historical PayPal agreements are not automatically cancelled or modified; previous subscribers should manage renewals directly in PayPal. Qraftt does not store full payment-card details.",
           "Google Analytics and AdSense integrations are present. Google and its partners may process information for analytics, advertising, security and fraud prevention according to the configuration and consent signals they receive. Available advertising behavior can vary by visitor choice, location and provider settings.",
           "Advertising data may be processed for purposes such as delivering ads, measuring their performance, limiting how often an ad appears, and detecting or preventing fraud and abuse. Non-personalized ads are not selected using a personalized advertising profile, but Google may still process limited contextual, device, measurement, security, or fraud-prevention information as permitted by the visitor’s choices and applicable law.",
           "When GA4 is configured, its tag initializes with analytics_storage, ad_storage, ad_user_data and ad_personalization set to denied. The consent interface updates those signals after your choice. Google’s advanced consent behavior may still send cookieless measurement or consent requests while consent is denied. Qraftt’s AdSense verification script also loads independently of the consent-controlled advertising loader, so rejecting optional services does not mean that no request is made to Google. Core QR generation remains available after rejection.",
@@ -78,14 +78,14 @@ export const legalPages: Record<LegalPageSlug, LegalPageContent> = {
     ],
     slug: "privacy-policy",
     title: "Privacy Policy",
-    updatedAt: "2026-10-22",
+    updatedAt: "2026-10-28",
   },
   terms: {
     description:
-      "Read the terms for using Qraftt’s free, client-side static QR code generator and informational website.",
+      "Read the terms for using Qraftt’s free static QR code generator and informational website.",
     eyebrow: "Terms",
     introduction:
-      "These terms describe the current free Qraftt website and its client-side static QR tools. They do not create a subscription, payment plan, or mandatory account relationship.",
+      "These terms describe the current free Qraftt website and its static QR tools, server-side rendering and optional saved-design accounts. They do not create a subscription, payment plan, or mandatory account relationship.",
     sections: [
       {
         heading: "Using the service",
@@ -124,21 +124,21 @@ export const legalPages: Record<LegalPageSlug, LegalPageContent> = {
     ],
     slug: "terms",
     title: "Terms of Use",
-    updatedAt: "2026-08-09",
+    updatedAt: "2026-10-28",
   },
   "cookie-policy": {
     description:
-      "Understand Qraftt’s authentication, checkout, download-limit and preference storage, server-side QR rendering, and Google consent signals.",
+      "Understand Qraftt’s authentication, session and preference storage, server-side QR rendering, and Google consent signals.",
     eyebrow: "Cookies",
     introduction:
-      "Qraftt uses cookies for authentication, secure checkout continuation and guest download limits, plus local browser storage for language and optional-service preferences. QR preview and export content is sent separately to a server-side render endpoint; it is not stored as a QR history in these cookies.",
+      "Qraftt uses cookies for optional account authentication, plus local browser storage for language and optional-service preferences. QR preview and export content is sent separately to a server-side render endpoint; it is not stored as a QR history in these cookies.",
     sections: [
       {
         heading: "Current cookie use",
         paragraphs: [
           "Supabase authentication uses sb-… cookies for session and sign-in verification data. Their lifetime follows the authentication configuration. The qraftt_session_only preference requests session cookies when Remember me is not selected; browser session-restoration settings can affect how long a session remains available. Logout attempts to end the current browser session.",
-          "The qraftt_customer HTTP-only cookie identifies a signed-out browser for download-limit enforcement and is set for up to one year. The server uses a hash of that identifier with a date and count, not the QR payload. Clearing this cookie can reset the browser identity; it does not delete an existing account or subscription.",
-          "The HTTP-only qraftt_paypal_checkout cookie holds browser proof for a pending checkout and is set for up to seven days. Pending records have a separate expiry, currently 24 hours when created. The cookie is not itself proof of payment or Pro entitlement. qraftt_checkout_interval and qraftt_auth_return preserve a billing choice or authentication return path for up to one day. Claimed or expired records may remain for reconciliation. Production checkout and guest cookies use Secure and SameSite=Lax attributes.",
+          "The former qraftt_customer cookie is no longer used to enforce download limits. Downloads are unlimited. Old cookies may remain until expiry or removal by your browser; clearing them does not delete account data.",
+          "Legacy checkout cookies are no longer used for purchases or feature access. The qraftt_auth_return HTTP-only cookie can preserve a password-recovery return path for up to one day. Authentication cookies use secure production attributes.",
         ],
       },
       {
@@ -153,7 +153,7 @@ export const legalPages: Record<LegalPageSlug, LegalPageContent> = {
         heading: "Hosting and essential technology",
         paragraphs: [
           "The hosting, security, or network services that deliver the website may use technical mechanisms needed to route traffic, prevent abuse, balance requests, or maintain service integrity. Their operation can vary by provider and browser.",
-          "The application’s session, checkout and guest-limit cookies are separate from optional advertising preferences. Blocking essential cookies can prevent login, checkout recovery or official downloads from working. Basic creation does not require a paid account, but official downloads still enforce server-side access and usage checks.",
+          "Session cookies are separate from optional advertising preferences. Blocking essential cookies can prevent account login and saved-design access. Creating and exporting QR codes does not require an account, payment or a download-limit cookie.",
         ],
       },
       {
@@ -166,7 +166,7 @@ export const legalPages: Record<LegalPageSlug, LegalPageContent> = {
       {
         heading: "Browser controls",
         paragraphs: [
-          "Most browsers let you inspect, block or delete cookies and local storage. Blocking essential storage can prevent account sessions, pending-checkout linking or download-limit checks from working. Clearing local state does not cancel a PayPal subscription. Manage an existing subscription through its billing controls, not by deleting browser data.",
+          "Most browsers let you inspect, block or delete cookies and local storage. Blocking essential storage can prevent account sessions from working. Clearing local state does not cancel a PayPal subscription. Manage a historical agreement directly in PayPal, not by deleting browser data.",
           "Browser settings do not control information sent when you choose to open an external destination from a QR code. The destination site applies its own cookie and privacy practices.",
         ],
       },
@@ -179,6 +179,6 @@ export const legalPages: Record<LegalPageSlug, LegalPageContent> = {
     ],
     slug: "cookie-policy",
     title: "Cookie Policy",
-    updatedAt: "2026-10-22",
+    updatedAt: "2026-10-28",
   },
 };

@@ -1,54 +1,26 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { readFileSync } from "node:fs";
-import { siteConfig } from "../lib/site.ts";
-import { checkoutReturnPath } from "../lib/pricing/checkout.ts";
-import { safeReturnPath } from "../lib/auth/redirect.ts";
-import { pricingPlans } from "../lib/pricing/plans.ts";
+import { readFileSync, existsSync } from "node:fs";
+import { componentFixture } from "./helpers/render-component.mjs";
 const source = (path: string) => readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
-
-test("homepage reuses full pricing with section semantics and leaves return handling on pricing", () => {
-  const home = source("app/page.tsx");
-  const pricing = source("components/pricing/pricing-comparison.tsx");
-  assert.match(home, /<PricingComparison embedded \/>/);
-  assert.ok(home.indexOf("<PricingComparison embedded") < home.indexOf('className="closing-section"'));
-  assert.match(pricing, /const Root = embedded \? "section" : "main"/);
-  assert.match(pricing, /const Heading = embedded \? "h2" : "h1"/);
-  assert.match(pricing, /embedded \|\| params.get\("paypal"\)/);
-  assert.match(pricing, /embedded \|\| !interval/);
-  assert.match(source("app/pricing/page.tsx"), /<PricingComparison \/>/);
+test("homepage and pricing retain URLs and semantics without purchase handlers", () => {
+  assert.match(source("app/page.tsx"), /<PricingComparison embedded \/>/);
+  assert.match(source("components/pricing/pricing-comparison.tsx"), /const Root = embedded \? "section" : "main"/);
+  assert.match(source("components/layout/header.tsx"), /Free features/);
 });
-
-test("public navigation exposes pricing on desktop and mobile", () => {
-  assert.ok(siteConfig.navigation.some(([label, href]) => label === "Pricing" && href === "/pricing"));
-  const header = source("components/layout/header.tsx");
-  assert.match(header, /href="\/pricing" className="header-pricing-link"/);
-  assert.match(header, /aria-label="Mobile navigation"/);
-  assert.equal(header.match(/siteConfig.navigation.map/g)?.length, 2);
-});
-
-test("all reusable generator workspaces expose Free and Pro without hiding premium controls", () => {
-  const generator = source("components/generator/qr-generator.tsx");
-  assert.match(generator, /aria-label=\{t\("Free and Pro plans"\)\}/);
-  assert.match(generator, /Upgrade to Pro/);
-  assert.match(generator, /href="\/pricing"><T text="Compare plans"/);
-  assert.match(generator, /sandboxMonthlyTest=\{Boolean\(access\?\.sandboxMonthlyTest\)\}/);
-  assert.match(generator, /onRequestPro=\{\(\) => setPaywall/);
-  assert.match(generator, /validateExportAccess/);
-});
-
-test("premium prompts reuse the PayPal-first flow and retain accurate final pricing", () => {
-  const prompt = source("components/billing/upgrade-prompt.tsx");
-  for (const period of ["monthly", "yearly"] as const) {
-    assert.equal(safeReturnPath(checkoutReturnPath(period)), `/pricing?checkout=${period}`);
-    assert.ok(prompt.includes(`checkoutReturnPath("${period}")`));
+test("no public generator or customization component contains a paywall", () => {
+  for (const path of ["components/generator/qr-generator.tsx", "components/generator/generator-customization.tsx", "components/account/dashboard-shell.tsx", "components/account/saved-qr-library.tsx", "components/account/auth-page.tsx"]) {
+    assert.doesNotMatch(source(path), /ProBadge|setPaywall|UpgradePrompt|onRequestPro|Unlock Pro| · PRO|upgrade flow|Explore Pro/);
   }
-  assert.match(prompt, /prefetch=\{false\}/);
-  assert.match(prompt, /USD 1.00\/month/);
-  assert.match(prompt, /PayPal opens first/);
-  assert.match(prompt, /Keep using Free/);
-  assert.doesNotMatch(prompt, /href="\/login|href="\/signup|api\/paypal/);
-  assert.deepEqual(pricingPlans.map(plan => plan.id), ["free", "pro"]);
-  assert.deepEqual(pricingPlans[1].prices, { monthly: 4.99, yearly: 19.99 });
-  assert.match(prompt, /checkoutReturnPath\("yearly"\)/);
+  assert.equal(existsSync(new URL("../components/billing/upgrade-prompt.tsx", import.meta.url)), false);
+});
+test("all former purchase, claim and cancellation endpoints are inert", async () => {
+  for (const name of ["subscriptions", "confirm", "sandbox-checkout", "abandon", "cleanup"]) {
+    const path = `app/api/paypal/${name}/route.ts`;
+    assert.doesNotMatch(source(path), /getPayPalClient|adminClient|createSubscription|cancelUnclaimedCheckout/);
+    const handler = componentFixture(path);
+    for (const method of ["GET", "POST"]) assert.equal((await handler[method](new Request(`https://qraftt.test/api/paypal/${name}`))).status, 410);
+  }
+  assert.doesNotMatch(source("vercel.json"), /paypal/);
+  assert.doesNotMatch(source("app/api/paypal/webhook/route.ts"), /cancelUnclaimedCheckout|pending_paypal_checkouts/);
 });

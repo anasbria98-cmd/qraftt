@@ -12,12 +12,12 @@ const navigation = [
   ["Statistics", "/dashboard/statistics", "statistics"], ["Import from CSV", "/dashboard/import", "import"],
   ["Archived QR Codes", "/dashboard/archive", "archive"], ["Custom Domain", "/dashboard/domains", "domain"],
   ["API Integration", "/dashboard/api", "api"], ["Profile", "/account", "profile"],
-  ["Payment & Subscription", "/dashboard/billing", "billing"], ["Support", "/dashboard/support", "support"],
+  ["Account & storage", "/dashboard/billing", "billing"], ["Support", "/dashboard/support", "support"],
   ["FAQ", "/dashboard/faq", "faq"],
 ] as const;
 const comingSoon = new Set(["/dashboard/statistics", "/dashboard/import", "/dashboard/archive", "/dashboard/domains", "/dashboard/api"]);
 
-export function DashboardShell({ email, pro, children }: { email: string; pro: boolean; children: React.ReactNode }) {
+export function DashboardShell({ email, children }: { email: string; children: React.ReactNode }) {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const current = navigation.find(item => item[1] === pathname)?.[0] ?? "Your workspace";
@@ -29,10 +29,10 @@ export function DashboardShell({ email, pro, children }: { email: string; pro: b
         {navigation.map(([label, href, icon]) => <Link key={href} href={href} className={href === "/qr-code-generator" ? styles.createLink : undefined} aria-current={pathname === href ? "page" : undefined} onClick={() => setMenuOpen(false)}><DashboardIcon name={icon} /><span><T text={label} /></span>{comingSoon.has(href) ? <small className={styles.soon}><T text="Coming soon" /></small> : null}</Link>)}
         <form action={logout}><button type="submit"><DashboardIcon name="logout" /><T text="Log out" /></button></form>
       </nav>
-      <div className={styles.sidebarPlan}><span className={styles.pill}><T text={pro ? "Pro active" : "Free plan"} /></span><p><T text={pro ? "Your full design toolkit is unlocked." : "A simple start. Room for your best ideas."} /></p><Link href={pro ? "/qr-code-generator" : "/dashboard/billing"}><T text={pro ? "Create a QR code →" : "Explore Pro →"} /></Link></div>
+      <div className={styles.sidebarPlan}><span className={styles.pill}><T text="Free account" /></span><p><T text="Every QR tool is free. Save up to 100 QR codes / 250 MB." /></p><Link href="/qr-code-generator"><T text="Create a QR code →" /></Link></div>
     </aside>
     <div className={styles.workspaceBody}>
-      <header className={styles.topbar}><p><T text="Your workspace" /> <span aria-hidden="true">/</span> <strong><T text={current} /></strong></p><div className={styles.identity}><span className={styles.avatar} aria-hidden="true">{email.charAt(0).toUpperCase()}</span><span className={styles.email} dir="ltr" translate="no">{email}</span><span className={styles.pill}><T text={pro ? "Pro" : "Free"} /></span></div></header>
+      <header className={styles.topbar}><p><T text="Your workspace" /> <span aria-hidden="true">/</span> <strong><T text={current} /></strong></p><div className={styles.identity}><span className={styles.avatar} aria-hidden="true">{email.charAt(0).toUpperCase()}</span><span className={styles.email} dir="ltr" translate="no">{email}</span><span className={styles.pill}><T text="Free" /></span></div></header>
       <div className={styles.content}>{children}</div>
     </div>
   </main>;

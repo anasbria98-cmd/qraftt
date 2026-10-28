@@ -18,8 +18,6 @@ export async function AuthPage({ mode, searchParams }: { mode: keyof typeof form
   const params = await searchParams;
   const config = forms[mode];
   const next = await authReturnPath(params.next);
-  const checkout = next.startsWith("/pricing?checkout=");
-  const approved = next === "/pricing?paypal=approved";
   const suffix = `?next=${encodeURIComponent(next)}`;
   const accountEntry = mode === "login" || mode === "signup";
   const googleReady = accountEntry && await googleAuthAvailable();
@@ -28,8 +26,6 @@ export async function AuthPage({ mode, searchParams }: { mode: keyof typeof form
     <p className={styles.eyebrow}><T text="Your Qraftt account" /></p>
     <h1><T text={config.title} /></h1>
     <p className={styles.intro}><T text={mode === "login" ? "Log in to your Qraftt account" : mode === "signup" ? "One account for your plan and premium toolkit. Basic QR creation stays free without signing up." : mode === "forgot" ? "Enter your email and we’ll send a secure password reset link. Check your inbox and spam folder." : "Choose a new password. After saving it, log in normally to return to your account."} /></p>
-    {approved ? <p className={styles.status}><T text="Your PayPal approval is waiting." />{" "}<T text={mode === "signup" ? "Create your account and confirm your email in this browser" : "Log in to your chosen account"} />{" "}<T text="to link Pro securely. No second checkout is needed." /></p> : null}
-    {checkout ? <p className={styles.status}><T text="Your Pro" />{" "}<T text={next.endsWith("yearly") ? "yearly" : "monthly"} />{" "}<T text="plan is selected." />{" "}<T text={mode === "signup" ? "Create an account" : "Log in"} />{" "}<T text="to continue automatically to PayPal. No payment is taken here." /></p> : null}
     {params.message ? <p role="status" className={styles.status}><T text={params.message.slice(0, 300)} /></p> : null}
     {accountEntry ? <>
       <form action={googleLogin} className={styles.googleForm}>
@@ -49,6 +45,6 @@ export async function AuthPage({ mode, searchParams }: { mode: keyof typeof form
     <p className={styles.switch}>{mode === "login" ? <><T text="Don’t have an account?" /> <Link href={`/signup${suffix}`}><T text="Create account" /></Link></> : mode === "signup" ? <><T text="Already have an account?" /> <Link href={`/login${suffix}`}><T text="Log in" /></Link></> : <Link href={`/login${suffix}`}><T text="Back to Log in" /></Link>}</p>
     <p className={styles.legal}><T text="Read our" />{" "}<Link href="/privacy-policy"><T text="Privacy Policy" /></Link>{" "}<T text="and" />{" "}<Link href="/terms"><T text="Terms" /></Link>. <Link href="/contact"><T text="Need help?" /></Link></p>
   </section>
-  <aside className={styles.aside}><div><p className={styles.eyebrow}><T text="Made for useful connections" /></p><h2><T text="Your ideas, ready to share." /></h2><div className={styles.benefit}><h3><T text="Create without friction" /></h3><p><T text="Choose from all 30 content types. Basic generation stays free, with no account required." /></p></div><div className={styles.benefit}><h3><T text="Keep your plan together" /></h3><p><T text="Your account connects your subscription and premium design tools in one place." /></p></div><div className={styles.benefit}><h3><T text="Pick up where you left off" /></h3><p><T text="Already approved a payment? Finish signing in here to securely link it. No second checkout needed." /></p></div></div><div className={styles.asideFoot}><T text="Qraftt · Simple tools. Direct connections." /></div></aside>
+  <aside className={styles.aside}><div><p className={styles.eyebrow}><T text="Made for useful connections" /></p><h2><T text="Your ideas, ready to share." /></h2><div className={styles.benefit}><h3><T text="Create without friction" /></h3><p><T text="Choose from all 30 content types. Every feature is free, with no account required." /></p></div><div className={styles.benefit}><h3><T text="Keep your designs together" /></h3><p><T text="Save up to 100 QR codes using 250 MB of storage. All templates, logos and export formats are free." /></p></div><div className={styles.benefit}><h3><T text="Pick up where you left off" /></h3><p><T text="Save a design, return to edit it, and download it again whenever you need." /></p></div></div><div className={styles.asideFoot}><T text="Qraftt · Simple tools. Direct connections." /></div></aside>
   </main>;
 }

@@ -13,11 +13,8 @@ test("only subscription lookup 404 is a stale checkout, never OAuth, credentials
   const client = new PayPalSandboxClient({ clientId: "test", clientSecret: "secret", fetch: async () => ++calls === 1 ? Response.json({access_token: "test"}) : Response.json({name: "RESOURCE_NOT_FOUND"}, {status:404}) });
   await assert.rejects(client.getSubscription("I-STALE"), error => isMissingPayPalSubscription(error));
   const route = source("app/api/paypal/subscriptions/route.ts");
-  assert.match(route, /if \(!isMissingPayPalSubscription\(error\)\) throw error/);
-  assert.match(route, /no new subscription was created by this request/);
-  assert.match(route, /status: 409/);
-  assert.match(route, /paypalHttpStatus: error instanceof PayPalApiError/);
-  assert.match(source("lib/paypal/abandoned-checkout.ts"), /if \(!isMissingPayPalSubscription\(error\)\) throw error/);
+  assert.match(route, /status: 410/);
+  assert.doesNotMatch(route, /getPayPalClient|createSubscription/);
 });
 
 test("guest checkout storage is private, expiring, single-claim and transactionally grants entitlement", () => {
@@ -30,28 +27,18 @@ test("guest checkout storage is private, expiring, single-claim and transactiona
   assert.match(sql, /revoke all on function public.qraftt_claim_paypal_checkout[\s\S]*from public,anon,authenticated/);
 });
 
-test("confirmation requires browser proof, fresh auth and independent PayPal verification", () => {
-  const code = source("app/api/paypal/confirm/route.ts");
-  assert.match(code, /body.id \?\? pending\?\.subscription_id/);
-  assert.match(code, /actual.customerId !== `checkout:\$\{pending.id\}`/);
-  assert.match(code, /actual.planId !== pending.provider_plan_id/);
-  assert.match(code, /actual.status !== "ACTIVE"/);
-  assert.match(code, /user.last_sign_in_at/);
-  assert.match(code, /qraftt_claim_paypal_checkout/);
-  const guest = source("lib/paypal/guest-checkout.ts");
-  assert.match(guest, /randomBytes\(32\)/);
-  assert.match(guest, /secret_hash: checkoutSecretHash\(secret\)/);
-  assert.match(guest, /httpOnly: true/);
-  assert.equal(safeReturnPath("/pricing?paypal=approved"), "/pricing?paypal=approved");
-  assert.equal(safeReturnPath("/pricing?paypal=approved&user=another"), "/dashboard");
+test("retired confirmation cannot claim a subscription or grant paid access", () => {
+ const code = source("app/api/paypal/confirm/route.ts");
+ assert.match(code, /status: 410/); assert.doesNotMatch(code, /getPayPalClient|qraftt_claim/);
+ assert.equal(safeReturnPath("/pricing?paypal=approved"), "/dashboard");
 });
 
 test("abandonment cannot cancel claimed subscriptions and cleanup fails closed without its secret", () => {
   const code = source("lib/paypal/abandoned-checkout.ts");
   assert.match(code, /\.is\("claimed_by", null\)\.select\(\)\.maybeSingle\(\)/);
   assert.match(code, /if \(!data\) return/);
-  assert.match(source("app/api/paypal/cleanup/route.ts"), /!expected/);
-  assert.match(source("app/api/paypal/abandon/route.ts"), /!sameOrigin\(request\)/);
+  assert.match(source("app/api/paypal/cleanup/route.ts"), /status: 410/);
+  assert.match(source("app/api/paypal/abandon/route.ts"), /status: 410/);
 });
 
 test("Sandbox cancellation uses the server API and never a live origin", async () => {

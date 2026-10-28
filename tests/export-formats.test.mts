@@ -22,15 +22,15 @@ const decode = async (bytes: Buffer, label: string) => {
   assert.ok(decoded === payload || await secondaryDecode?.(bytes), label);
 };
 
-test("Free allows PNG/JPG only at basic resolution and server-side rejects paid designs", () => {
+test("Every format, resolution and valid design is free; malformed designs remain rejected", () => {
   for (const format of ["png", "jpg"]) assert.doesNotThrow(() => validateExportAccess(false, freeDesign, format, 512));
-  for (const format of ["svg", "pdf", "eps"]) assert.throws(() => validateExportAccess(false, freeDesign, format, 512));
-  assert.throws(() => validateExportAccess(false, freeDesign, "png", 1000));
-  assert.throws(() => validateExportAccess(false, { ...freeDesign, logoDataUrl: "data:image/png;base64,AA==" }, "png", 512));
-  for (const template of premiumTemplates) assert.throws(() => validateExportAccess(false, { ...defaultDesign, ...template.design }, "jpg", 512));
+  for (const format of ["svg", "pdf", "eps"]) assert.doesNotThrow(() => validateExportAccess(false, freeDesign, format, 512));
+  assert.doesNotThrow(() => validateExportAccess(false, freeDesign, "png", 1000));
+  assert.doesNotThrow(() => validateExportAccess(false, { ...freeDesign, logoDataUrl: "data:image/png;base64,AA==" }, "png", 512));
+  for (const template of premiumTemplates) assert.doesNotThrow(() => validateExportAccess(false, { ...defaultDesign, ...template.design }, "jpg", 512));
 });
 
-test("official render route shares the daily PNG/JPG quota and ignores forged Pro flags", async () => {
+test("official render route exports every format without authentication, subscription reads or daily counters", async () => {
   let pro = false, downloads = 0;
   const { POST } = componentFixture("app/api/qr/render/route.ts", {
     "@/lib/qr/local-review": { localTemplateReview: () => false },
@@ -40,14 +40,14 @@ test("official render route shares the daily PNG/JPG quota and ignores forged Pr
     },
   });
   const request = (format: string, extra = {}) => POST(new Request("https://qraftt.test/api/qr/render", { method: "POST", body: JSON.stringify({ payload, design: freeDesign, size: 512, format, ...extra }) }));
-  for (const format of ["svg", "pdf", "eps"]) assert.equal((await request(format, { pro: true, plan: "pro" })).status, 403);
-  assert.equal((await request("png", { size: 2000, pro: true })).status, 403);
+  for (const format of ["svg", "pdf", "eps"]) assert.equal((await request(format, { pro: true, plan: "pro" })).status, 200);
+  assert.equal((await request("png", { size: 2000, pro: true })).status, 200);
   for (const format of ["png", "jpg", "png"]) assert.equal((await request(format)).status, 200);
-  assert.equal((await request("jpg")).status, 429);
+  assert.equal((await request("jpg")).status, 200);
   const count = downloads;
   pro = true;
   for (const format of ["png", "jpg", "svg", "pdf", "eps"]) assert.equal((await request(format, { size: 2000 })).status, 200);
-  assert.equal(downloads, count, "Pro does not consume daily Free allowance");
+  assert.equal(downloads, count, "exports never consume a daily allowance");
 });
 
 test("PNG/JPG preserve selected raster resolution; SVG/PDF/EPS have real file structures", async () => {

@@ -1,5 +1,5 @@
 export type BillingPeriod = "monthly" | "yearly";
-export type PlanId = "free" | "pro";
+export type PlanId = "free";
 export type BenefitValue = string | boolean;
 
 export const pricingBenefits = [
@@ -32,39 +32,13 @@ interface PricingPlan {
   recommended: boolean;
   prices: Record<BillingPeriod, number>;
   benefits: Record<BenefitId, BenefitValue>;
-  // Future server checkout should map these keys to allowlisted PayPal plan IDs.
-  checkout: { provider: "paypal"; enabled: boolean; planKey: "pro" } | null;
+  checkout: null;
 }
 
-export const pricingPlans: PricingPlan[] = [
-  {
-    id: "free", name: "Free", description: "For everyday sharing.", recommended: false,
-    prices: { monthly: 0, yearly: 0 }, checkout: null,
-    benefits: {
-      types: true, preview: true, basic: true, png: true, jpg: true, downloads: "3 downloads / day",
-      logo: false, colors: false, styling: false, frames: false, patterns: false,
-      templates: "20 original templates", svg: false, pdf: false, eps: false, resolution: "512 × 512", saved: "Not included", storage: "Not included",
-    },
-  },
-  {
-    id: "pro", name: "Pro", description: "For growing projects.", recommended: true,
-    prices: { monthly: 4.99, yearly: 19.99 },
-    checkout: { provider: "paypal", enabled: true, planKey: "pro" },
-    benefits: {
-      types: true, preview: true, basic: true, png: true, jpg: true, downloads: "Unlimited",
-      logo: true, colors: true, styling: true, frames: "30 frames", patterns: true,
-      templates: "20 original + 10 Pro templates", svg: true, pdf: true, eps: true, resolution: "Up to 2000 × 2000", saved: "100 QR codes", storage: "250 MB",
-    },
-  },
-];
-
-export function planBenefits(plan: PricingPlan, period: BillingPeriod) {
-  return plan.id === "pro" && period === "yearly"
-    ? { ...plan.benefits, saved: "500 QR codes", storage: "1 GB" }
-    : plan.benefits;
-}
-
-// Display-only override; the saved production prices above never change.
-export function pricingDisplayAmount(plan: PricingPlan, period: BillingPeriod, localSandboxTest: boolean) {
-  return localSandboxTest && plan.id === "pro" && period === "monthly" ? 1 : plan.prices[period];
-}
+export const pricingPlans: PricingPlan[] = [{
+  id: "free", name: "Free", description: "Every QR tool, free for everyone.", recommended: false,
+  prices: { monthly: 0, yearly: 0 }, checkout: null,
+  benefits: { types: true, preview: true, basic: true, png: true, jpg: true, downloads: "Unlimited", logo: true, colors: true, styling: true, frames: "All frames", patterns: true, templates: "All templates", svg: true, pdf: true, eps: true, resolution: "Up to 2000 × 2000", saved: "100 QR codes", storage: "250 MB" },
+}];
+export function planBenefits(plan: PricingPlan, period: BillingPeriod) { void period; return plan.benefits; }
+export function pricingDisplayAmount(plan: PricingPlan, period: BillingPeriod, historicalTest: boolean) { void historicalTest; return plan.prices[period]; }

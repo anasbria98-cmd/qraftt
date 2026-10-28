@@ -3,7 +3,6 @@
 import { T, useLanguage } from "@/components/i18n/language-provider";
 import NextImage from "next/image";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
-import { ProBadge } from "@/components/generator/pro-badge";
 import {
   bodyStyleOptions,
   defaultDesign,
@@ -159,8 +158,6 @@ function ColorControl({
 }
 
 interface GeneratorCustomizationProps {
-  pro?: boolean;
-  onRequestPro?: () => void;
   design: QrDesignOptions;
   errorCorrection: ErrorCorrectionLevel;
   onDesignChange: (updates: Partial<QrDesignOptions>) => void;
@@ -170,8 +167,6 @@ interface GeneratorCustomizationProps {
 }
 
 export function GeneratorCustomization({
-  pro = true,
-  onRequestPro,
   design,
   errorCorrection,
   onDesignChange,
@@ -197,7 +192,6 @@ export function GeneratorCustomization({
 
   async function handleLogo(file: File | undefined) {
     if (!file) return;
-    if (!pro) { onRequestPro?.(); return; }
     try {
       const dataUrl = await processLogo(file);
       setLogoName(file.name);
@@ -258,9 +252,8 @@ export function GeneratorCustomization({
 
   function applyTemplate(template: QrDesignTemplate) {
     if (template.id === noTemplate.id) { onReset(); return; }
-    if (template.design.premiumTemplateId && !pro) { onRequestPro?.(); return; }
-    onDesignChange({ ...template.design, uploadedFrameId: template.design.uploadedFrameId ?? null, premiumTemplateId: template.design.premiumTemplateId ?? null, logoDataUrl: pro ? design.logoDataUrl : null, logoSize: pro ? design.logoSize : 16 });
-    if (pro) onErrorCorrectionChange(template.errorCorrection);
+    onDesignChange({ ...template.design, uploadedFrameId: template.design.uploadedFrameId ?? null, premiumTemplateId: template.design.premiumTemplateId ?? null, logoDataUrl: design.logoDataUrl, logoSize: design.logoSize });
+    onErrorCorrectionChange(template.errorCorrection);
   }
 
   return (
@@ -275,9 +268,9 @@ export function GeneratorCustomization({
           </span>
         </button>
         <button type="button" className="qr-mode-choice qr-mode-logo" aria-pressed={activeTab === "logo" || Boolean(design.logoDataUrl)}
-          onClick={() => { if (!pro) { onRequestPro?.(); return; } setActiveTab("logo"); }}>
+          onClick={() => { setActiveTab("logo"); }}>
           <span className="qr-mode-indicator" aria-hidden="true" />
-          <strong><T text="Logo QR" /></strong><span className="qr-mode-badge"><ProBadge /></span>
+          <strong><T text="Logo QR" /></strong>
           <span className="qr-mode-thumbnails" aria-hidden="true">
             <span className="qr-mode-thumbnail qr-mode-brand"><NextImage src="/images/brand/nike.svg" width={24} height={24} alt="" /></span>
             <span className="qr-mode-thumbnail qr-mode-brand"><NextImage src="/images/brand/mcdonalds.svg" width={24} height={24} alt="" /></span>
@@ -306,7 +299,7 @@ export function GeneratorCustomization({
               type="button"
             >
               <T text={tab.label} />
-              {tab.value !== "frames" ? <ProBadge /> : null}
+
             </button>
           ))}
         </div>
@@ -324,7 +317,7 @@ export function GeneratorCustomization({
             <div className="editor-section-heading">
               <div>
                 <h3><T text="Free templates" /></h3>
-                <p><T text="All 20 original designs stay free. Choose a design and download a basic PNG or JPG." /></p>
+                <p><T text="Choose any design and download it in PNG, JPG, SVG, PDF or EPS for free." /></p>
               </div>
               <span>{designTemplates.length}{" "}<T text="designs" /></span>
             </div>
@@ -372,9 +365,9 @@ export function GeneratorCustomization({
             </button>
           </section>
 
-          <section className="editor-section premium-template-section" aria-label="New Pro templates">
+          <section className="editor-section premium-template-section" aria-label="Decorative templates">
             <div className="editor-section-heading">
-              <div><h3><T text="New Pro templates" /> <ProBadge /></h3><p>Reference-based artwork. Preview each design; Pro unlocks applying and exporting.</p></div>
+              <div><h3><T text="Decorative templates" /> </h3><p>Reference-based artwork. Every design is free to apply and export.</p></div>
               <span>{premiumTemplates.length} <T text="designs" /></span>
             </div>
             <div className="design-template-gallery design-library-grid">
@@ -382,14 +375,14 @@ export function GeneratorCustomization({
                 <div key={template.id}>
                   <button type="button" style={{ width: "100%" }} className={isTemplateActive(design, template) ? "design-gallery-card active" : "design-gallery-card"} aria-pressed={isTemplateActive(design, template)} onClick={() => applyTemplate(template)}>
                     <span aria-hidden="true" className="design-gallery-preview" style={previewsReady ? { backgroundImage: getTemplatePreview(template) } : undefined} />
-                    <span className="premium-template-badge"><ProBadge /></span>
+
                     <span className="design-gallery-copy"><strong><T text={template.name} /></strong><small><T text={template.description} /></small></span>
                   </button>
                   <button type="button" className="text-button" aria-label={t("Preview {name}", { name: template.name })} onClick={() => setStylePreview({ name: template.name, image: getTemplatePreview(template) })}><T text="Preview" /></button>
                 </div>
               ))}
             </div>
-            <button type="button" className="library-expand-button" aria-expanded={premiumExpanded} onClick={() => setPremiumExpanded((value) => !value)}>{premiumExpanded ? <T text="Show fewer Pro templates" /> : <T text="View all {count} Pro templates" values={{ count: premiumTemplates.length }} />}</button>
+            <button type="button" className="library-expand-button" aria-expanded={premiumExpanded} onClick={() => setPremiumExpanded((value) => !value)}>{premiumExpanded ? <T text="Show fewer decorative templates" /> : <T text="View all {count} decorative templates" values={{ count: premiumTemplates.length }} />}</button>
           </section>
 
           <section className="editor-section">
@@ -441,28 +434,28 @@ export function GeneratorCustomization({
           <section className="editor-section frame-background-section">
             <div className="editor-section-heading">
               <div>
-                <h3><T text="Frame background" />{" "}<ProBadge /></h3>
+                <h3><T text="Frame background" />{" "}</h3>
                 <p><T text="The QR quiet zone remains solid for reliable scanning." /></p>
               </div>
             </div>
             <div className="color-controls frame-color-controls">
               <ColorControl
                 ariaLabel="Frame background color"
-                disabled={pro && (design.frame === "none" || design.frameTransparent)}
+                disabled={(design.frame === "none" || design.frameTransparent)}
                 label="Background"
                 onChange={(value) => onDesignChange({ frameBackground: value })}
                 value={design.frameBackground}
               />
               <ColorControl
                 ariaLabel="Frame accent color"
-                disabled={pro && design.frame === "none"}
+                disabled={design.frame === "none"}
                 label="Frame"
                 onChange={(value) => onDesignChange({ frameColor: value })}
                 value={design.frameColor}
               />
               <ColorControl
                 ariaLabel="Frame text color"
-                disabled={pro && design.frame === "none"}
+                disabled={design.frame === "none"}
                 label="Frame text"
                 onChange={(value) => onDesignChange({ frameTextColor: value })}
                 value={design.frameTextColor}
@@ -471,7 +464,7 @@ export function GeneratorCustomization({
             <label className="generator-field frame-label-field">
               <span className="generator-label"><T text="Call-to-action text" /></span>
               <input
-                disabled={pro && design.frame === "none"}
+                disabled={design.frame === "none"}
                 maxLength={32}
                 onChange={(event) =>
                   onDesignChange({ frameLabel: event.target.value || null })
@@ -485,7 +478,7 @@ export function GeneratorCustomization({
             <label className="generator-checkbox frame-transparency-toggle">
               <input
                 checked={design.frameTransparent}
-                disabled={pro && design.frame === "none"}
+                disabled={design.frame === "none"}
                 onChange={(event) =>
                   onDesignChange({ frameTransparent: event.target.checked })
                 }
@@ -508,7 +501,7 @@ export function GeneratorCustomization({
           <section className="editor-section">
             <div className="editor-section-heading">
               <div>
-                <h3><T text="QR patterns" />{" "}<ProBadge /></h3>
+                <h3><T text="QR patterns" />{" "}</h3>
                 <p><T text="Style the modules and corners without changing the encoded content." /></p>
               </div>
             </div>
@@ -530,7 +523,7 @@ export function GeneratorCustomization({
                         data-body-style={option.value}
                       />
                       <T text={option.label} />
-                      {option.value !== "square" ? <ProBadge /> : null}
+
                     </button>
                   ))}
                 </div>
@@ -552,7 +545,7 @@ export function GeneratorCustomization({
                         data-eye-style={option.value}
                       />
                       <T text={option.label} />
-                      {option.value !== "square" ? <ProBadge /> : null}
+
                     </button>
                   ))}
                 </div>
@@ -574,7 +567,7 @@ export function GeneratorCustomization({
                         data-eye-style={option.value}
                       />
                       <T text={option.label} />
-                      {option.value !== "square" ? <ProBadge /> : null}
+
                     </button>
                   ))}
                 </div>
@@ -585,7 +578,7 @@ export function GeneratorCustomization({
           <section className="editor-section color-fieldset">
             <div className="editor-section-heading">
               <div>
-                <h3><T text="QR colors" />{" "}<ProBadge /></h3>
+                <h3><T text="QR colors" />{" "}</h3>
                 <p><T text="Use a dark foreground and a light background for dependable scanning." /></p>
               </div>
               <button
@@ -651,7 +644,7 @@ export function GeneratorCustomization({
                   }
                   type="checkbox"
                 /><T text="Foreground gradient" /></label>
-              {design.gradientColor || !pro ? (
+              {design.gradientColor ? (
                 <div className="gradient-color-field">
                   <ColorControl
                     ariaLabel="QR gradient end color"
@@ -687,10 +680,10 @@ export function GeneratorCustomization({
           <section className="editor-section logo-controls">
             <div className="editor-section-heading">
               <div>
-                <h3><T text="Logo in center" />{" "}<ProBadge /></h3>
-                <p><T text="Converted in your browser, securely rendered in a protected center cutout, and not stored." /></p>
+                <h3><T text="Logo in center" />{" "}</h3>
+                <p><T text="Converted in your browser and securely rendered in a protected center cutout. Stored only when you save your QR design." /></p>
               </div>
-              <span><T text="Local only" /></span>
+              <span><T text="Your logo, your design" /></span>
             </div>
             <input
               accept="image/*"
@@ -719,11 +712,11 @@ export function GeneratorCustomization({
                 <div className="logo-actions">
                   <button
                     className="button button-secondary"
-                    onClick={() => { if (!pro) { onRequestPro?.(); return; } inputRef.current?.click(); }}
+                    onClick={() => { inputRef.current?.click(); }}
                     type="button"
                   >
                     <T text={design.logoDataUrl ? "Replace logo" : "Upload logo"} />
-                    <ProBadge />
+
                   </button>
                   {design.logoDataUrl ? (
                     <button className="text-button" onClick={removeLogo} type="button"><T text="Remove logo" /></button>
@@ -733,11 +726,11 @@ export function GeneratorCustomization({
               </div>
             </div>
             {uploadError ? <p className="customize-error"><T text={uploadError} /></p> : null}
-            {design.logoDataUrl || !pro ? (
+            {design.logoDataUrl ? (
               <label className="logo-size-field editor-setting-card">
                 <span>
                   <span className="generator-label"><T text="Logo size" /></span>
-                  <ProBadge />
+
                   <output>{design.logoSize}%</output>
                 </span>
                 <input
@@ -766,7 +759,7 @@ export function GeneratorCustomization({
           <section className="editor-section">
             <div className="editor-section-heading">
               <div>
-                <h3><T text="Error correction level" />{" "}<ProBadge /></h3>
+                <h3><T text="Error correction level" />{" "}</h3>
                 <p><T text="Higher levels recover from more damage but create a denser code." /></p>
               </div>
             </div>
@@ -781,7 +774,7 @@ export function GeneratorCustomization({
               >
                 {correctionLevels.map((level) => (
                   <option key={level.value} value={level.value}>
-                    <T text={level.label} /><T text={level.value !== "M" ? " · PRO" : ""} />
+                    <T text={level.label} />
                   </option>
                 ))}
               </select>
@@ -814,24 +807,23 @@ export function GeneratorCustomization({
           ))}
         </ul>
       ) : null}
-      {stylePreview ? <StylePreview name={stylePreview.name} image={stylePreview.image} pro={pro || Boolean(stylePreview.free)} free={Boolean(stylePreview.free)}
-        onClose={() => setStylePreview(null)} onUpgrade={() => { setStylePreview(null); onRequestPro?.(); }} /> : null}
+      {stylePreview ? <StylePreview name={stylePreview.name} image={stylePreview.image}
+        onClose={() => setStylePreview(null)} /> : null}
     </div>
   );
 }
 
-function StylePreview({ name, image, pro, free, onClose, onUpgrade }: {
-  name: string; image: string; pro: boolean; free: boolean; onClose: () => void; onUpgrade: () => void;
+function StylePreview({ name, image, onClose }: {
+  name: string; image: string; onClose: () => void;
 }) {
   const { t } = useLanguage();
   const ref = useRef<HTMLDialogElement>(null);
   useEffect(() => { ref.current?.showModal(); }, []);
   return <dialog ref={ref} onCancel={onClose} aria-labelledby="style-preview-title"
     style={{ border: "1px solid var(--line)", borderRadius: 24, padding: 24, color: "var(--ink)", background: "var(--surface)", maxWidth: "calc(100vw - 32px)" }}>
-    <h2 id="style-preview-title"><T text={name} /> {!free ? <ProBadge /> : null}</h2>
+    <h2 id="style-preview-title"><T text={name} /> </h2>
     <div role="img" aria-label={t("{name} sample design preview", { name: t(name) })} style={{ width: "min(65vw, 360px)", height: "min(65vw, 360px)", backgroundImage: image, backgroundPosition: "center", backgroundRepeat: "no-repeat", backgroundSize: "contain", margin: "16px auto" }} />
     <p><T text="Sample style preview. Your QR content stays unchanged." /></p>
-    {!pro ? <button className="button button-primary" type="button" onClick={onUpgrade} style={{ marginTop: 16 }}><T text="Unlock Pro to apply" /></button> : null}
     <button className="button button-secondary" type="button" onClick={onClose} style={{ marginTop: 12, marginLeft: 8 }}><T text="Close preview" /></button>
   </dialog>;
 }
