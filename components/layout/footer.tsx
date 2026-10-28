@@ -34,7 +34,7 @@ export function Footer() {
               <a href="https://www.youtube.com/@qraftt.generator" target="_blank" rel="noopener noreferrer" aria-label="Qraftt on YouTube (opens in a new tab)">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8ZM9.6 15.6V8.4l6.3 3.6-6.3 3.6Z" /></svg>
               </a>
-              <a href="https://www.facebook.com/profile.php?id=61595929613573" target="_blank" rel="noopener noreferrer" aria-label="Qraftt on Facebook (opens in a new tab)">
+              <a href="https://www.facebook.com/profile.php?id=61586264129845" target="_blank" rel="noopener noreferrer" aria-label="Qraftt on Facebook (opens in a new tab)">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M24 12a12 12 0 1 0-13.875 11.855V15.47H7.078V12h3.047V9.356c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953h-1.513c-1.49 0-1.956.925-1.956 1.875V12h3.328l-.532 3.469h-2.796v8.386A12.003 12.003 0 0 0 24 12Z" /></svg>
               </a>
               <a href="https://www.instagram.com/qraftt.generator/" target="_blank" rel="noopener noreferrer" aria-label="Qraftt on Instagram (opens in a new tab)">
