@@ -13,7 +13,7 @@ test("gallery cards contain only artwork while retaining names for assistive tec
     onDesignChange() {}, onErrorCorrectionChange() {}, onReset() {},
   }));
   const cards = [...html.matchAll(/<button\b[^>]*class="(?:design|frame)-gallery-card[^>]*>[\s\S]*?<\/button>/g)].map(match => match[0]);
-  assert.equal(cards.length, 30); // 12 original/uploaded slots, 8 art slots and 10 Standard Frame slots.
+  assert.equal(cards.length, 32); // 12 original/uploaded slots, all 10 art slots and 10 Standard Frame slots.
   for (const card of cards) {
     assert.match(card, /aria-label="[^"]+"/);
     assert.match(card, /aria-pressed="(?:true|false)"/);
@@ -27,4 +27,10 @@ test("gallery cards contain only artwork while retaining names for assistive tec
   assert.equal(names[12].replaceAll("&amp;", "&"), premiumTemplates[0].name);
   assert.match(html, /aria-label="Preview Shopping cart"/);
   assert.match(html, /class="gallery-preview-button"/);
+  const decorative = html.split('aria-label="Decorative templates"')[1].split('</section>')[0];
+  const decorativeNames = [...decorative.matchAll(/<button\b[^>]*aria-label="([^"]+)"[^>]*class="design-gallery-card/g)].map(match => match[1].replaceAll("&amp;", "&"));
+  assert.deepEqual(decorativeNames, premiumTemplates.map(template => template.name));
+  assert.doesNotMatch(decorative, /library-expand-button|View all|Show fewer/);
+  assert.match(html, /View all 30 templates/);
+  assert.match(html, /View all 30 frames/);
 });

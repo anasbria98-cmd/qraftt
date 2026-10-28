@@ -181,7 +181,6 @@ export function GeneratorCustomization({
   const [framesExpanded, setFramesExpanded] = useState(false);
   const [logoName, setLogoName] = useState("");
   const [templatesExpanded, setTemplatesExpanded] = useState(false);
-  const [premiumExpanded, setPremiumExpanded] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [stylePreview, setStylePreview] = useState<{ name: string; image: string; free?: boolean } | null>(null);
   const previewsReady = useSyncExternalStore(
@@ -368,7 +367,7 @@ export function GeneratorCustomization({
               <span>{premiumTemplates.length} <T text="designs" /></span>
             </div>
             <div className="design-template-gallery design-library-grid">
-              {(premiumExpanded ? premiumTemplates : premiumTemplates.slice(0, 8)).map((template) => (
+              {premiumTemplates.map((template) => (
                 <div className="gallery-tile" key={template.id}>
                   <button type="button" aria-label={t(template.name)} style={{ width: "100%" }} className={isTemplateActive(design, template) ? "design-gallery-card active" : "design-gallery-card"} aria-pressed={isTemplateActive(design, template)} onClick={() => applyTemplate(template)}>
                     <span aria-hidden="true" className="design-gallery-preview" style={previewsReady ? { backgroundImage: getTemplatePreview(template) } : undefined} />
@@ -377,7 +376,6 @@ export function GeneratorCustomization({
                 </div>
               ))}
             </div>
-            <button type="button" className="library-expand-button" aria-expanded={premiumExpanded} onClick={() => setPremiumExpanded((value) => !value)}>{premiumExpanded ? <T text="Show fewer decorative templates" /> : <T text="View all {count} decorative templates" values={{ count: premiumTemplates.length }} />}</button>
           </section>
 
           <section className="editor-section">
