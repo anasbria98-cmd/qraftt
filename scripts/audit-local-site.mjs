@@ -1,5 +1,5 @@
 import { mkdir, writeFile } from 'node:fs/promises';
-const origin = 'http://localhost:3017';
+const origin = process.env.QRAFTT_AUDIT_ORIGIN ?? 'http://localhost:3017';
 const report = { started: new Date().toISOString(), pages: [], protected: [], assets: [], errors: [] };
 const xml = await (await fetch(origin + '/sitemap.xml')).text();
 const paths = [...new Set([...xml.matchAll(/<loc>(.*?)<\/loc>/g)].map(m => new URL(m[1]).pathname).concat(['/pricing','/login','/signup','/forgot-password','/reset-password','/robots.txt','/ads.txt','/llms.txt']))];

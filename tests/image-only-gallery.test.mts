@@ -5,6 +5,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { componentFixture } from "./helpers/render-component.mjs";
 import { defaultDesign, designTemplates } from "../lib/qr/design.ts";
 import { premiumTemplates } from "../lib/qr/premium-templates.ts";
+import { freeDesign } from "../lib/qr/access.ts";
 
 test("gallery cards contain only artwork while retaining names for assistive technology", () => {
   const { GeneratorCustomization } = componentFixture("components/generator/generator-customization.tsx");
@@ -38,4 +39,12 @@ test("gallery cards contain only artwork while retaining names for assistive tec
     assert.match(sectionEnd, /class="library-expand-button gallery-more-card"[\s\S]*<\/button><\/div>$/);
     assert.match(sectionEnd, new RegExp(`aria-controls="${id}"`));
   }
+});
+
+test("No template reflects the actual unchanged reset design", () => {
+  const { GeneratorCustomization } = componentFixture("components/generator/generator-customization.tsx");
+  const html = renderToStaticMarkup(createElement(GeneratorCustomization, {
+    design: freeDesign, errorCorrection: "M", warnings: [], onDesignChange() {}, onErrorCorrectionChange() {}, onReset() {},
+  }));
+  assert.match(html, /aria-label="No template" aria-pressed="true" class="design-gallery-card active"/);
 });

@@ -46,7 +46,7 @@
 .google { background:var(--depth-surface); box-shadow:var(--depth-tile); transition:box-shadow 180ms var(--depth-ease),border-color 180ms ease; }
 .google:hover:not(:disabled) { box-shadow:var(--depth-tile-active); }
 .google:active:not(:disabled) { box-shadow:var(--depth-input); }
-.form input:not([type=checkbox]) { background:linear-gradient(180deg,#ecf2e9,#fbfdf7 60%); border-color:#b8cbb9; box-shadow:var(--depth-input); }
+.form input:not([type=checkbox]) { background:var(--depth-field); border-color:#b8cbb9; box-shadow:var(--depth-input); }
 .benefit { border-color:#609374; background:linear-gradient(100deg,#ffffff47,transparent); box-shadow:inset 0 1px 0 #ffffff33; }
 .status { background:var(--depth-mint); box-shadow:var(--depth-edge); }
 @media(prefers-reduced-motion:reduce) { .google { transition:none; } }

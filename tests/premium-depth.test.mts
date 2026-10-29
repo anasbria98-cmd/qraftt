@@ -71,3 +71,16 @@ test("secondary surfaces complete the existing depth system without new effects 
   assert.match(source("components/pricing/pricing.module.css"), /\.freeCard \.rows li\s*\{[^}]*background:/);
   assert.match(source("components/account/dashboard.module.css"), /\.table td a,\.table td button\s*\{[^}]*var\(--depth-surface\)/);
 });
+
+test("final polish shares field lighting and touch pressed surfaces without offset layers", () => {
+  const css = source("app/premium-depth.css");
+  const polish = css.split("/* Final polish:")[1].split("@media (hover:")[0];
+  assert.match(polish, /\.use-case-card:hover, \.qr-step-card:hover\s*\{[^}]*var\(--depth-level-2\)/);
+  assert.match(polish, /\.button:not\(:disabled\):active[\s\S]*var\(--depth-pressed\)/);
+  assert.doesNotMatch(polish, /(?:content|position|width|height|padding|margin|gap)\s*:/);
+  for (const path of ["components/account/auth.module.css", "components/account/account.module.css"]) {
+    assert.ok(source(path).includes("background:var(--depth-field)"));
+  }
+  assert.match(source("components/pricing/pricing.module.css"), /\.freeCard \.cardHead\s*\{[^}]*background:var\(--depth-mint\)/);
+  assert.match(source("app/globals.css"), /\.footer-socials\s*\{[^}]*margin-inline-start:\s*0;/);
+});

@@ -3497,7 +3497,7 @@ html[dir=rtl] input[type=email],html[dir=rtl] input[type=url],html[dir=rtl] inpu
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
-  margin-inline-start: -0.75rem;
+  margin-inline-start: 0;
 }
 
 .footer-socials a {

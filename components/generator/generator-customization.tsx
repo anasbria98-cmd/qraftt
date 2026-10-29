@@ -18,6 +18,7 @@ import { renderFramePreviewSvg, renderQrSvg } from "@/lib/qr/render";
 import type { ErrorCorrectionLevel } from "@/lib/qr/types";
 import { premiumTemplates } from "@/lib/qr/premium-templates";
 import { uploadedFramePath } from "@/lib/qr/uploaded-frames";
+import { freeDesign } from "@/lib/qr/access";
 
 const correctionLevels: Array<{
   description: string;
@@ -87,7 +88,8 @@ function isTemplateActive(
 ) {
   if ((design.premiumTemplateId ?? null) !== (template.design.premiumTemplateId ?? null)) return false;
   if ((design.uploadedFrameId ?? null) !== (template.design.uploadedFrameId ?? null)) return false;
-  return Object.entries(template.design).every(
+  const expected = template.id === noTemplate.id ? freeDesign : template.design;
+  return Object.entries(expected).every(
     ([key, value]) =>
       design[key as keyof QrDesignOptions] === value,
   );

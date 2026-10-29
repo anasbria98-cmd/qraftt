@@ -25,9 +25,67 @@ test("dashboard navigation is complete and storage does not invent usage", async
   const markup = renderToStaticMarkup(createElement(DashboardShell, { email: "fixture@example.test", pro: false }, "Dashboard fixture"));
   for (const text of ["Dashboard", "My QR Codes", "Statistics", "Import from CSV", "Archived QR Codes", "Custom Domain", "API Integration", "Profile", "Account &amp; storage", "Support", "FAQ", "Log out"]) assert.ok(markup.includes(text), text);
   assert.match(markup, /aria-current="page"/); assert.match(markup, /aria-controls="dashboard-navigation"/);
+  assert.match(markup, /class="brand"/);
+  assert.doesNotMatch(markup, /workspaceMark|>Free<|Free account/);
+  for (const path of ["statistics", "import", "archive", "domains", "api"]) assert.doesNotMatch(markup, new RegExp(`href="/dashboard/${path}"`));
+  assert.equal((markup.match(/aria-disabled="true"/g) ?? []).length, 5);
   const storage = componentFixture("components/account/storage-card.tsx", { "@/lib/account/saved-qr": { savedQr: async () => { throw new Error("offline"); } } }).StorageCard;
   const state = renderToStaticMarkup(await storage());
   assert.match(state, /Storage usage is temporarily unavailable/); assert.doesNotMatch(state, /0 GB|100 MB/);
+});
+
+test("usage overview shows measured count, decimal MB and remaining capacity", async () => {
+  const { StorageCard } = componentFixture("components/account/storage-card.tsx", { "@/lib/account/saved-qr": { savedQr: async (action: string) => {
+    assert.equal(action, "usage"); return { count: 37, bytes: 125_500_000, savedLimit: 100, storageLimit: 250_000_000 };
+  } } });
+  const html = renderToStaticMarkup(await StorageCard({ title: "Usage overview" }));
+  for (const text of ["Usage overview", "37 / 100", "125.5 MB / 250 MB", "63", "124.5 MB", "QR codes remaining"]) assert.ok(html.includes(text), text);
+  assert.match(html, /aria-label="Saved QR codes used" value="37" max="100"/);
+  assert.match(html, /aria-label="Saved QR storage used" value="125500000" max="250000000"/);
+});
+
+test("over-quota accounts retain honest usage and zero remaining capacity", async () => {
+  const { StorageCard } = componentFixture("components/account/storage-card.tsx", { "@/lib/account/saved-qr": { savedQr: async () => ({ count: 110, bytes: 260_000_000, savedLimit: 100, storageLimit: 250_000_000 }) } });
+  const html = renderToStaticMarkup(await StorageCard());
+  assert.ok(html.includes("110 / 100")); assert.ok(html.includes("260 MB / 250 MB"));
+  assert.doesNotMatch(html, /-10|-10 MB/);
+});
+
+test("recent designs are newest first, bounded, read-only and preserve edit/download links", async () => {
+  const calls: string[] = [];
+  const records = [1, 3, 2, 4].map(n => ({ id: `owned-${n}`, title: `Saved <QR> ${n}`, updated_at: `2026-10-${20 + n}T00:00:00Z`, storage_bytes: 100 }));
+  const { RecentQrCodes } = componentFixture("components/account/recent-qr-codes.tsx", {
+    "next/image": { __esModule: true, default: ({ src, alt, width, height }: { src: string; alt: string; width: number; height: number }) => createElement("img", { src, alt, width, height }) },
+    "@/lib/account/saved-qr": { savedQr: async (action: string, input?: { id: string }) => {
+      calls.push(`${action}:${input?.id ?? ""}`);
+      if (action === "list") return records;
+      assert.equal(action, "get");
+      return { document: { type: "url", values: { url: "https://example.com" }, design: {}, correction: "M" } };
+    } },
+    "@/lib/qr/render": { renderQrSvg: () => "<svg/>" },
+    "@/lib/qr/exports": { exportQr: async () => Buffer.from("fixture-png") },
+  });
+  const html = renderToStaticMarkup(await RecentQrCodes());
+  assert.deepEqual(calls, ["list:", "get:owned-4", "get:owned-3", "get:owned-2"]);
+  assert.ok(html.indexOf("Saved &lt;QR&gt; 4") < html.indexOf("Saved &lt;QR&gt; 3"));
+  assert.match(html, /saved=owned-4/); assert.match(html, /Edit \/ download/); assert.match(html, /data:image\/png;base64/);
+  assert.doesNotMatch(html, /saved=owned-1/);
+});
+
+test("recent designs distinguish empty libraries, failed loads and unavailable previews", async () => {
+  for (const fail of [false, true]) {
+    const { RecentQrCodes } = componentFixture("components/account/recent-qr-codes.tsx", { "@/lib/account/saved-qr": { savedQr: async () => { if (fail) throw new Error("offline"); return []; } } });
+    const html = renderToStaticMarkup(await RecentQrCodes());
+    assert.ok(html.includes(fail ? "temporarily unavailable" : "No saved QR codes yet"));
+    if (fail) assert.doesNotMatch(html, /No saved QR codes yet/);
+    else assert.match(html, /Create QR Code/);
+  }
+  const { RecentQrCodes } = componentFixture("components/account/recent-qr-codes.tsx", { "@/lib/account/saved-qr": { savedQr: async (action: string) => {
+    if (action === "get") throw new Error("preview unavailable");
+    return [{ id: "owned", title: "Preserved", updated_at: "2026-10-28T00:00:00Z" }];
+  } } });
+  const html = renderToStaticMarkup(await RecentQrCodes());
+  assert.match(html, /Preview unavailable/); assert.match(html, /saved=owned/); assert.match(html, /Preserved/);
 });
 test("dashboard pages enforce auth, RLS ownership and environment-isolated billing without mutations", () => {
   assert.match(source("app/(account)/layout.tsx"), /await requireUser\(\)/);

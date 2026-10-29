@@ -10,8 +10,9 @@ const {premiumTemplates}=componentFixture('lib/qr/premium-templates.ts');
 const source=await readFile('tests/qr-payloads.test.mts','utf8');
 const values=vm.runInNewContext('('+source.match(/const values: QrFormValues = ([\s\S]*?\n});/)[1]+')');
 const report={types:[],designs:[],errors:[]};
+const origin=process.env.QRAFTT_AUDIT_ORIGIN??'http://localhost:3017';
 async function render(payload,design,correction='M',format='png'){
- const r=await fetch('http://localhost:3017/api/qr/render',{method:'POST',headers:{origin:'http://localhost:3017','content-type':'application/json'},body:JSON.stringify({payload,design,correction,format,size:512})});
+ const r=await fetch(origin+'/api/qr/render',{method:'POST',headers:{origin,'content-type':'application/json'},body:JSON.stringify({payload,design,correction,format,size:512})});
  const bytes=Buffer.from(await r.arrayBuffer());
  if(!r.ok)return{status:r.status,decoded:false};
  const {data,info}=await sharp(bytes).ensureAlpha().raw().toBuffer({resolveWithObject:true});
